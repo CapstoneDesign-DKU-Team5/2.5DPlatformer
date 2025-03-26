@@ -116,14 +116,14 @@ public class Player : MonoBehaviour
         float offset = 0.5f;
         Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (cameraRaySize / 2);
 
-        //콜라이더 y 값 하드 코딩 0.5f + 0.1f
-        Vector3 rayTopOffset = Vector3.up * 0.6f;
+        //콜라이더 y 값 하드 코딩 0.5f + 0.15f
+        Vector3 rayTopOffset = Vector3.up * 0.65f;
 
         Vector3 boxSize = playerCollider.bounds.extents;
         //콜라이더 y 값 하드 코딩 0.5f
         boxSize.y = rayTopOffset.y - 0.5f;
 
-        //Debug.DrawRay(rayStartDefault + rayTopOffset, Camera.main.transform.forward * cameraRaySize, new Color(0, 1, 0));
+        Debug.DrawRay(rayStartDefault + rayTopOffset, Camera.main.transform.forward * cameraRaySize, new Color(0, 1, 0));
 
         if (rigidBody.linearVelocity.y > 0f)
         {
@@ -153,14 +153,14 @@ public class Player : MonoBehaviour
         float offset = 0.5f;
         Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (cameraRaySize / 2);
 
-        //콜라이더 y 값 하드 코딩 0.5f + 0.1f
-        Vector3 rayDownOffset = Vector3.up * 0.6f;
+        //콜라이더 y 값 하드 코딩 0.5f + 0.15f
+        Vector3 rayDownOffset = Vector3.up * 0.65f;
 
         Vector3 boxSize = playerCollider.bounds.extents;
         //콜라이더 y 값 하드 코딩 0.5f
         boxSize.y = rayDownOffset.y - 0.5f;
 
-        //Debug.DrawRay(rayStartDefault - rayDownOffset, Camera.main.transform.forward * cameraRaySize, new Color(0, 1, 0));
+        Debug.DrawRay(rayStartDefault - rayDownOffset, Camera.main.transform.forward * cameraRaySize, new Color(0, 1, 0));
 
         //rigidbody Collision Detection 설정 필요 continuous
         //하강 속도 제한도 필요할 듯
@@ -208,19 +208,25 @@ public class Player : MonoBehaviour
         if (h != dir)
             return;
 
+        Vector3 boxSize = playerCollider.bounds.extents;
+        //하드 코딩
+        boxSize.x = 0.15f;
+        boxSize.y *= 0.98f;
+
         //콜라이더 하드코딩1
-        Vector3 sideOffset = Camera.main.transform.right * dir * 0.41f;
+        Vector3 sideOffset = Camera.main.transform.right * dir * 0.415f;
         Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (raySize / 2);
 
         Debug.DrawRay(rayStartDefault + sideOffset, Camera.main.transform.forward * raySize, new Color(1, 0, 0));
-        RaycastHit rayHitSidePlatform;
-        Physics.Raycast(rayStartDefault + sideOffset, Camera.main.transform.forward, out rayHitSidePlatform, raySize, LayerMask.GetMask("Platform"));
 
+        RaycastHit rayHitSidePlatform;
+        Physics.BoxCast(rayStartDefault + sideOffset, boxSize, Camera.main.transform.forward, out rayHitSidePlatform, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
 
         //콜라이더 하드코딩2
         Vector3 downSideOffset = Camera.main.transform.right * dir * 0.4f - Camera.main.transform.up * 0.51f;
 
         Debug.DrawRay(rayStartDefault + downSideOffset, Camera.main.transform.forward * raySize, new Color(1, 0, 0));
+
         RaycastHit rayHitDownSidePlatform;
         Physics.Raycast(rayStartDefault + downSideOffset, Camera.main.transform.forward, out rayHitDownSidePlatform, raySize, LayerMask.GetMask("Platform"));
 
@@ -232,7 +238,7 @@ public class Player : MonoBehaviour
 
         if (rayHitSidePlatform.collider != null)
         {
-            Vector3 targetPosition1 = rayHitSidePlatform.point + rayHitSidePlatform.normal * offset - sideOffset;
+            Vector3 targetPosition1 = rayStartDefault + Camera.main.transform.forward.normalized * rayHitSidePlatform.distance + rayHitSidePlatform.normal * offset;
 
             if (!Physics.CheckBox(targetPosition1, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
             {
@@ -243,8 +249,6 @@ public class Player : MonoBehaviour
                 }
             }
         }
-
-
 
         //2 발판이 있어야 이동되는...
         if (rayHitDownSidePlatform.collider == null)
@@ -267,6 +271,7 @@ public class Player : MonoBehaviour
 
         Vector3 boxSize = playerCollider.bounds.extents;
         boxSize.y = 0.1f;
+
         Vector3 direction = Vector3.down;
         float raySize = 0.51f;
 
