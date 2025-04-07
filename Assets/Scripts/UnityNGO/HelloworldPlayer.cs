@@ -20,7 +20,6 @@ namespace HelloWorld
 
         private bool climbState = false;
 
-        // flipX 상태를 네트워크로 동기화하기 위한 네트워크 변수.
         private NetworkVariable<bool> flipState = new NetworkVariable<bool>(
             default,
             NetworkVariableReadPermission.Everyone,
@@ -99,8 +98,6 @@ namespace HelloWorld
             transform.rotation = Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0);
         }
 
-<<<<<<< Updated upstream
-=======
         private bool IsVisible()
         {
             RaycastHit rayHitPlayer;
@@ -130,16 +127,11 @@ namespace HelloWorld
 
             return Physics.BoxCast(position, boxSize, direction, out hit, Quaternion.identity, raySize, LayerMask.GetMask("Platform"));
         }
->>>>>>> Stashed changes
 
         private void Move()
         {
             float h = Input.GetAxisRaw("Horizontal");
 
-<<<<<<< Updated upstream
-            Vector3 moveVec = new Vector3(0, rigidBody.linearVelocity.y, 0);
-            moveVec += h * speed * Camera.main.transform.right;
-=======
             Vector3 moveVec;
 
             if (climbState)
@@ -159,11 +151,9 @@ namespace HelloWorld
                 moveVec = new Vector3(0, rigidBody.linearVelocity.y, 0);
                 moveVec += h * speed * Camera.main.transform.right;
             }
->>>>>>> Stashed changes
 
             rigidBody.linearVelocity = moveVec;
         }
-
 
         private void Jump()
         {
@@ -173,30 +163,6 @@ namespace HelloWorld
             }
         }
 
-<<<<<<< Updated upstream
-
-        private void PlayerAnimation()
-        {
-            float h = Input.GetAxisRaw("Horizontal");         
-
-            // flip 상태를 네트워크 변수로 동기화
-            if (IsOwner)
-            {
-                if (h > 0)
-                {
-                    spriteRenderer.flipX = false;
-                    animator.SetBool("isWalking", true);
-                }
-                else if (h < 0)
-                {
-                    spriteRenderer.flipX = true;
-                    animator.SetBool("isWalking", true);
-                }
-                else
-                {
-                    animator.SetBool("isWalking", false);
-                }
-=======
         //위치를 옮겨야...// 나중에
         private void PlayerAnimation()
         {
@@ -206,7 +172,6 @@ namespace HelloWorld
             {
                 spriteRenderer.flipX = false;
                 animator.SetBool("isWalking", true);
->>>>>>> Stashed changes
             }
             else if (h < 0)
             {
@@ -224,27 +189,7 @@ namespace HelloWorld
             //}
         }
 
-<<<<<<< Updated upstream
-        private bool IsVisible()
-        {
-            RaycastHit rayHitPlayer;
-
-            Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (cameraRaySize / 2);
-
-            Physics.Raycast(rayStartDefault, Camera.main.transform.forward, out rayHitPlayer, cameraRaySize);
-            if (rayHitPlayer.collider == null)
-                return false;
-
-            int playerLayer = LayerMask.NameToLayer("Player");
-            if (rayHitPlayer.collider.gameObject.layer != playerLayer)
-                return false;
-
-            return true;
-        }
-=======
         //카메라 회전 중 게임 멈춰야
->>>>>>> Stashed changes
-
 
         private void RayTop()
         {
@@ -280,9 +225,8 @@ namespace HelloWorld
                         transform.position = targetPosition;
                     }
                 }
-            }
+            }     
         }
-
 
         private void RayDown()
         {
@@ -324,16 +268,11 @@ namespace HelloWorld
             }
         }
 
-
         private void RaySide(string leftRight)
         {
             if (!IsVisible())
                 return;
 
-<<<<<<< Updated upstream
-            float raySize = 30f;
-=======
->>>>>>> Stashed changes
             int dir = 0;
             float offset = 0.5f;
 
@@ -360,11 +299,7 @@ namespace HelloWorld
             Vector3 sideOffset = Camera.main.transform.right * dir * 0.415f;
             Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (cameraRaySize / 2);
 
-<<<<<<< Updated upstream
-            Debug.DrawRay(rayStartDefault + sideOffset, Camera.main.transform.forward * raySize, new Color(1, 0, 0));
-=======
             Debug.DrawRay(rayStartDefault + sideOffset, Camera.main.transform.forward * cameraRaySize, new Color(1, 0, 0));
->>>>>>> Stashed changes
 
             RaycastHit rayHitSidePlatform;
             Physics.BoxCast(rayStartDefault + sideOffset, boxSize, Camera.main.transform.forward, out rayHitSidePlatform, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
@@ -372,17 +307,10 @@ namespace HelloWorld
             //콜라이더 하드코딩2
             Vector3 downSideOffset = Camera.main.transform.right * dir * 0.4f - Camera.main.transform.up * 0.51f;
 
-<<<<<<< Updated upstream
-            Debug.DrawRay(rayStartDefault + downSideOffset, Camera.main.transform.forward * raySize, new Color(1, 0, 0));
-
-            RaycastHit rayHitDownSidePlatform;
-            Physics.Raycast(rayStartDefault + downSideOffset, Camera.main.transform.forward, out rayHitDownSidePlatform, raySize, LayerMask.GetMask("Platform"));
-=======
             Debug.DrawRay(rayStartDefault + downSideOffset, Camera.main.transform.forward * cameraRaySize, new Color(1, 0, 0));
 
             RaycastHit rayHitDownSidePlatform;
             Physics.Raycast(rayStartDefault + downSideOffset, Camera.main.transform.forward, out rayHitDownSidePlatform, cameraRaySize, LayerMask.GetMask("Platform"));
->>>>>>> Stashed changes
 
 
 
@@ -414,11 +342,6 @@ namespace HelloWorld
                 if (IsGrounded(targetPosition2))
                 {
                     transform.position = targetPosition2;
-<<<<<<< Updated upstream
-                }
-            }
-
-=======
                 }
             }
 
@@ -439,14 +362,14 @@ namespace HelloWorld
             //player 꼭짓점에 ray
             Vector3[] offsets = new Vector3[]
             {
-        //topRight
-        topOffset + rightOffset,
-        //topLeft
-        topOffset - rightOffset,
-        //downRight
-        -topOffset + rightOffset,
-        //downLeft
-        -topOffset - rightOffset
+            //topRight
+            topOffset + rightOffset,
+            //topLeft
+            topOffset - rightOffset,
+            //downRight
+            -topOffset + rightOffset,
+            //downLeft
+            -topOffset - rightOffset
             };
 
             RaycastHit ivyHit;
@@ -458,29 +381,16 @@ namespace HelloWorld
                 //null이 아니고
                 if (Physics.Raycast(rayStartDefault + offset, Camera.main.transform.forward, out ivyHit, cameraRaySize, mask))
                 {
-                    if (ivyHit.collider.gameObject.layer == ivy)
-                    {
+                    if (ivyHit.collider.gameObject.layer == ivy) {
                         return true;
                     }
                 }
             }
             return false;
->>>>>>> Stashed changes
         }
 
         private void UpdateClimbState()
         {
-<<<<<<< Updated upstream
-            RaycastHit hit;
-
-            Vector3 boxSize = playerCollider.bounds.extents;
-            boxSize.y = 0.1f;
-
-            Vector3 direction = Vector3.down;
-            float raySize = 0.51f;
-
-            return Physics.BoxCast(position, boxSize, direction, out hit, Quaternion.identity, raySize, LayerMask.GetMask("Platform"));
-=======
             bool canClimb = CanClimb();
 
             if (climbState && Input.GetButtonDown("Jump"))
@@ -489,7 +399,7 @@ namespace HelloWorld
                 return;
             }
 
-            if (Input.GetButtonDown("Jump") && canClimb)
+            if (Input.GetButtonDown("Jump") && canClimb) 
             {
                 climbState = true;
             }
@@ -498,7 +408,5 @@ namespace HelloWorld
             {
                 climbState = false;
             }
->>>>>>> Stashed changes
         }
-    }
 }
