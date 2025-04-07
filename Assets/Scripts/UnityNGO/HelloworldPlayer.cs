@@ -225,7 +225,7 @@ namespace HelloWorld
                         transform.position = targetPosition;
                     }
                 }
-            }     
+            }
         }
 
         private void RayDown()
@@ -381,7 +381,8 @@ namespace HelloWorld
                 //null이 아니고
                 if (Physics.Raycast(rayStartDefault + offset, Camera.main.transform.forward, out ivyHit, cameraRaySize, mask))
                 {
-                    if (ivyHit.collider.gameObject.layer == ivy) {
+                    if (ivyHit.collider.gameObject.layer == ivy)
+                    {
                         return true;
                     }
                 }
@@ -399,7 +400,7 @@ namespace HelloWorld
                 return;
             }
 
-            if (Input.GetButtonDown("Jump") && canClimb) 
+            if (Input.GetButtonDown("Jump") && canClimb)
             {
                 climbState = true;
             }
@@ -409,4 +410,5 @@ namespace HelloWorld
                 climbState = false;
             }
         }
+    }
 }
