@@ -47,7 +47,7 @@ namespace HelloWorld
             flipState.OnValueChanged += OnFlipStateChanged;
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
             flipState.OnValueChanged -= OnFlipStateChanged;
         }
@@ -56,6 +56,7 @@ namespace HelloWorld
         {
             // flip 상태를 반영합니다.
             spriteRenderer.flipX = newValue;
+            
         }
 
         private void Awake()
@@ -168,15 +169,19 @@ namespace HelloWorld
         {
             //좌우이동 애니메이션
             float h = Input.GetAxisRaw("Horizontal");
+
             if (h > 0)
             {
                 spriteRenderer.flipX = false;
                 animator.SetBool("isWalking", true);
+
+                if (flipState.Value != false) { flipState.Value = false; }
             }
             else if (h < 0)
             {
                 spriteRenderer.flipX = true;
                 animator.SetBool("isWalking", true);
+                if (flipState.Value != true) { flipState.Value = true; }
             }
             else
             {
