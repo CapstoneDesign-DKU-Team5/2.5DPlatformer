@@ -128,7 +128,25 @@ namespace HelloWorld
             return Physics.BoxCast(position, boxSize, direction, out hit, Quaternion.identity, raySize, LayerMask.GetMask("Platform"));
         }
 
+<<<<<<< Updated upstream
         private void Move()
+=======
+        private void InputMove()
+        {
+            h = Input.GetAxisRaw("Horizontal");
+            v = Input.GetAxisRaw("Vertical");
+        }
+
+        private void InputJump()
+        {
+            if (Input.GetButtonDown("Jump"))
+            {
+                jump = true;
+            }
+        }
+
+     private void Move()
+>>>>>>> Stashed changes
         {
             float h = Input.GetAxisRaw("Horizontal");
 

@@ -39,7 +39,12 @@ public class RotateCamera : MonoBehaviour
         Vector3 movedPos = rotationY * start;
 
         //플레이어 위치로 위치 재설정
-        Vector3 finalPos = movedPos + playerTransform.position;
+        Vector3 finalPos = Vector3.zero;
+        if (playerTransform != null)
+        {
+            finalPos = movedPos + playerTransform.position;
+        }
+
 
         //카메라 각도 회전
         if (Quaternion.Angle(transform.rotation, rotationY) < 0.2f)
