@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: bd90c934f28a03b478153a89c3e8eee6
+guid: c392d3457adb58346a2c1484c66b2640
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -69,8 +69,8 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 4096
-    resizeAlgorithm: 1
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
     compressionQuality: 50
@@ -93,56 +93,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: iOS
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Player_0
+      name: M3_Walk0
       rect:
         serializedVersion: 2
-        x: 1
-        y: 34
-        width: 13
-        height: 16
+        x: 2
+        y: 64
+        width: 29
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -151,20 +112,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5cdce5a8c2680e64eb1d5e10891b3f98
-      internalID: -968055405
+      spriteID: 1abbf020da5e49f41962d184b93b7a08
+      internalID: 1226375238
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_1
+      name: M3_Walk1 3
       rect:
         serializedVersion: 2
-        x: 18
-        y: 34
-        width: 13
-        height: 15
+        x: 34
+        y: 64
+        width: 29
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -173,20 +134,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0bf3e80c5d461a348940dba3cb618b4c
-      internalID: -1406868327
+      spriteID: 72b285b861bf0924595ea23f0057becb
+      internalID: -1264277268
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_2
+      name: M3_Walk2
       rect:
         serializedVersion: 2
-        x: 35
-        y: 34
-        width: 13
-        height: 15
+        x: 66
+        y: 64
+        width: 29
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -195,20 +156,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 829ef372d9b342745aa328b74f0b0607
-      internalID: -1095280432
+      spriteID: a9a94761ca54ee946bf8f0afcaa37f0f
+      internalID: -463148228
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_3
+      name: M3_Attack1
       rect:
         serializedVersion: 2
-        x: 1
-        y: 17
-        width: 13
-        height: 16
+        x: 2
+        y: 32
+        width: 29
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -217,20 +178,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 94520ddbb8be4f148a07ad1841800e9b
-      internalID: -2056430430
+      spriteID: 3d360cd9c1a001340a39e595ef23e01d
+      internalID: -592065859
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_4
+      name: M3_Attack2
       rect:
         serializedVersion: 2
-        x: 18
-        y: 17
-        width: 13
-        height: 15
+        x: 34
+        y: 32
+        width: 29
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -239,42 +200,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: deea8bb747ea8c14086116540052e10c
-      internalID: 952440965
+      spriteID: b9ae2556d0b290f44992c60b7c862d58
+      internalID: -316168351
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_5
+      name: M3_Dead1
       rect:
         serializedVersion: 2
-        x: 35
-        y: 17
-        width: 13
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8ee89800e9604e84695fa22eb98ecc48
-      internalID: -2138866765
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player_6
-      rect:
-        serializedVersion: 2
-        x: 1
+        x: 2
         y: 0
-        width: 13
-        height: 16
+        width: 29
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -283,20 +222,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 193232a58545acf44b04fae5593fad7f
-      internalID: 23916388
+      spriteID: d97e21428ee95964fb28686cf0baddb2
+      internalID: -1770296587
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_7
+      name: M3_Dead2
       rect:
         serializedVersion: 2
-        x: 18
+        x: 34
         y: 0
-        width: 13
-        height: 16
+        width: 29
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -305,20 +244,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4548fb274310b2d4795f0a89b4e710f6
-      internalID: 1416174384
+      spriteID: f24e161dc97363a47ac7b56e95f92958
+      internalID: 1305713181
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player_8
+      name: M3_Dead3
       rect:
         serializedVersion: 2
-        x: 35
+        x: 66
         y: 0
-        width: 13
-        height: 16
+        width: 29
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -327,8 +266,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9ca22d1865e1ff74c9256afa22c3eb32
-      internalID: -750864003
+      spriteID: 0aa082a997af38945a04731cee2acdb7
+      internalID: 504109262
       vertices: []
       indices: 
       edges: []
@@ -337,7 +276,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 457a8f5edb1447f488e29e213aa0e259
+    spriteID: c935622f6cedda0408e34b893e97e311
     internalID: 0
     vertices: []
     indices: 
@@ -347,15 +286,14 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Player_0: -968055405
-      Player_1: -1406868327
-      Player_2: -1095280432
-      Player_3: -2056430430
-      Player_4: 952440965
-      Player_5: -2138866765
-      Player_6: 23916388
-      Player_7: 1416174384
-      Player_8: -750864003
+      M3_Attack1: -592065859
+      M3_Attack2: -316168351
+      M3_Dead1: -1770296587
+      M3_Dead2: 1305713181
+      M3_Dead3: 504109262
+      M3_Walk0: 1226375238
+      M3_Walk1 3: -1264277268
+      M3_Walk2: -463148228
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
