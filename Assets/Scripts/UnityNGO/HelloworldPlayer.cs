@@ -45,7 +45,7 @@ namespace HelloWorld
             flipState.OnValueChanged += OnFlipStateChanged;
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
             flipState.OnValueChanged -= OnFlipStateChanged;
         }
@@ -54,6 +54,7 @@ namespace HelloWorld
         {
             // flip 상태를 반영합니다.
             spriteRenderer.flipX = newValue;
+            
         }
 
         private void Awake()
@@ -112,8 +113,28 @@ namespace HelloWorld
         private void PlayerAnimation()
         {
             float h = Input.GetAxisRaw("Horizontal");
+<<<<<<< Updated upstream
             bool isWalking = Mathf.Abs(h) > 0.01f;
             animator.SetBool("isWalking", isWalking);
+=======
+            if (h > 0)
+            {
+                spriteRenderer.flipX = false;
+                animator.SetBool("isWalking", true);
+
+                if (flipState.Value != false) { flipState.Value = false; }
+            }
+            else if (h < 0)
+            {
+                spriteRenderer.flipX = true;
+                animator.SetBool("isWalking", true);
+                if (flipState.Value != true) { flipState.Value = true; }
+            }
+            else
+            {
+                animator.SetBool("isWalking", false);
+            }
+>>>>>>> Stashed changes
 
             // flip 상태를 네트워크 변수로 동기화
             if (IsOwner)
