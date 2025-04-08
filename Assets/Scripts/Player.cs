@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class Player : MonoBehaviour
 
     public float speed;
     public float jumpHeight;
+
+    private float cameraRaySize = 30f;  //카메라에서 쏘는 ray 길이
 
     private void Awake()
     {
@@ -33,7 +36,8 @@ public class Player : MonoBehaviour
         Move();
         RaySide("Right");
         RaySide("Left");
-        RayTopDown();
+        RayTop();
+        RayDown();
     }
 
     private void PlayerLookCamera()
@@ -41,12 +45,13 @@ public class Player : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0);
     }
 
-    private bool isPlayerVisible()
+    private bool IsVisible()
     {
         RaycastHit rayHitPlayer;
-        float raySize = 20f;
 
-        Physics.Raycast(transform.position - Camera.main.transform.forward * (raySize / 2), Camera.main.transform.forward, out rayHitPlayer, raySize);
+        Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (cameraRaySize / 2);
+
+        Physics.Raycast(rayStartDefault, Camera.main.transform.forward, out rayHitPlayer, cameraRaySize);
         if (rayHitPlayer.collider == null)
             return false;
 
@@ -75,7 +80,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    //위치를 옮겨야...
+    //위치를 옮겨야...// 나중에
     private void PlayerAnimation()
     {
         //좌우이동 애니메이션
@@ -101,30 +106,35 @@ public class Player : MonoBehaviour
         //}
     }
 
-    private void RayTopDown()
+    //카메라 회전 중 게임 멈춰야
+
+    private void RayTop()
     {
-        if (!isPlayerVisible())
+        if (!IsVisible())
             return;
 
         float offset = 0.5f;
-        float raySize = 30f;
-        Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (raySize / 2);
-        //콜라이더 y 값 하드 코딩 0.65f
-        Vector3 rayTopDownOffset = Vector3.up * 0.65f;
+        Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (cameraRaySize / 2);
 
-        Debug.DrawRay(rayStartDefault + rayTopDownOffset, Camera.main.transform.forward * raySize, new Color(0, 1, 0));
-        Debug.DrawRay(rayStartDefault - rayTopDownOffset, Camera.main.transform.forward * raySize, new Color(0, 1, 0));       
+        //콜라이더 y 값 하드 코딩 0.5f + 0.15f
+        Vector3 rayTopOffset = Vector3.up * 0.65f;
+
+        Vector3 boxSize = playerCollider.bounds.extents;
+        //콜라이더 y 값 하드 코딩 0.5f
+        boxSize.y = rayTopOffset.y - 0.5f;
+
+        Debug.DrawRay(rayStartDefault + rayTopOffset, Camera.main.transform.forward * cameraRaySize, new Color(0, 1, 0));
 
         if (rigidBody.linearVelocity.y > 0f)
         {
             RaycastHit rayHitUp;
-            Physics.Raycast(rayStartDefault + rayTopDownOffset, Camera.main.transform.forward, out rayHitUp, raySize, LayerMask.GetMask("Platform"));
+            //카메라에서 플레이어 살짝 위쪽으로 Box Ray를 쏨
+            Physics.BoxCast(rayStartDefault + rayTopOffset, boxSize, Camera.main.transform.forward, out rayHitUp, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
+
             if (rayHitUp.collider != null)
             {
-                //Debug.Log(rayHitUp.collider.gameObject.name);
-                
-                Vector3 targetPosition = rayHitUp.point + rayHitUp.normal * offset - rayTopDownOffset;
-                //targetPosition.y = transform.position.y;
+                //충돌한 벽 앞쪽으로 좌표 설정
+                Vector3 targetPosition = rayStartDefault + Camera.main.transform.forward.normalized * rayHitUp.distance + rayHitUp.normal * offset;
 
                 //지정한 위치에 충돌체가 하나라도 존재하면 Physics.CheckBox는 true를 반환
                 if (!Physics.CheckBox(targetPosition, playerCollider.bounds.extents, Quaternion.identity, LayerMask.GetMask("Platform")))
@@ -133,8 +143,24 @@ public class Player : MonoBehaviour
                 }
             }
         }
+    }
 
-        Debug.Log("///////////////////////////////////");
+    private void RayDown()
+    {
+        if (!IsVisible())
+            return;
+
+        float offset = 0.5f;
+        Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (cameraRaySize / 2);
+
+        //콜라이더 y 값 하드 코딩 0.5f + 0.15f
+        Vector3 rayDownOffset = Vector3.up * 0.65f;
+
+        Vector3 boxSize = playerCollider.bounds.extents;
+        //콜라이더 y 값 하드 코딩 0.5f
+        boxSize.y = rayDownOffset.y - 0.5f;
+
+        Debug.DrawRay(rayStartDefault - rayDownOffset, Camera.main.transform.forward * cameraRaySize, new Color(0, 1, 0));
 
         //rigidbody Collision Detection 설정 필요 continuous
         //하강 속도 제한도 필요할 듯
@@ -142,30 +168,28 @@ public class Player : MonoBehaviour
         if (rigidBody.linearVelocity.y < -0.01f)
         {
             RaycastHit rayHitDown;
-            Physics.Raycast(rayStartDefault - rayTopDownOffset, Camera.main.transform.forward, out rayHitDown, raySize, LayerMask.GetMask("Platform"));
+            //카메라에서 플레이어 살짝 아래쪽으로 Box Ray를 쏨
+            Physics.BoxCast(rayStartDefault - rayDownOffset, boxSize, Camera.main.transform.forward, out rayHitDown, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
+
             if (rayHitDown.collider != null)
             {
-                Debug.Log(rayHitDown.collider.gameObject.name);
-                Debug.Log(rigidBody.linearVelocity.y);
-
-                Vector3 targetPosition = rayHitDown.point - rayHitDown.normal * offset + rayTopDownOffset;
-                //targetPosition.y = transform.position.y;
-
-                Debug.Log(targetPosition);
+                //플랫폼 위쪽으로 좌표 조정
+                Vector3 targetPosition = rayStartDefault + Camera.main.transform.forward.normalized * rayHitDown.distance - rayHitDown.normal * offset;
 
                 //지정한 위치에 충돌체가 하나라도 존재하면 Physics.CheckBox는 true를 반환
                 if (!Physics.CheckBox(targetPosition, playerCollider.bounds.extents, Quaternion.identity, LayerMask.GetMask("Platform")))
                 {
-                    Debug.Log("Success");
                     transform.position = targetPosition;
                 }
             }
         }
     }
 
-    //카메라 회전 중에 움직이면 제대로 작동 x
     private void RaySide(string leftRight)
     {
+        if (!IsVisible())
+            return;
+
         float raySize = 30f;
         int dir = 0;
         float offset = 0.5f;
@@ -183,38 +207,42 @@ public class Player : MonoBehaviour
         float h = Input.GetAxisRaw("Horizontal");
         if (h != dir)
             return;
-        if (!isPlayerVisible())
-            return;
+
+        Vector3 boxSize = playerCollider.bounds.extents;
+        //하드 코딩
+        boxSize.x = 0.15f;
+        boxSize.y *= 0.98f;
 
         //콜라이더 하드코딩1
-        Vector3 sideOffset = Camera.main.transform.right * dir * 0.41f;
+        Vector3 sideOffset = Camera.main.transform.right * dir * 0.415f;
         Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (raySize / 2);
 
         Debug.DrawRay(rayStartDefault + sideOffset, Camera.main.transform.forward * raySize, new Color(1, 0, 0));
-        RaycastHit rayHitSidePlatform;
-        Physics.Raycast(rayStartDefault + sideOffset, Camera.main.transform.forward, out rayHitSidePlatform, raySize, LayerMask.GetMask("Platform"));
 
+        RaycastHit rayHitSidePlatform;
+        Physics.BoxCast(rayStartDefault + sideOffset, boxSize, Camera.main.transform.forward, out rayHitSidePlatform, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
 
         //콜라이더 하드코딩2
         Vector3 downSideOffset = Camera.main.transform.right * dir * 0.4f - Camera.main.transform.up * 0.51f;
 
         Debug.DrawRay(rayStartDefault + downSideOffset, Camera.main.transform.forward * raySize, new Color(1, 0, 0));
+
         RaycastHit rayHitDownSidePlatform;
         Physics.Raycast(rayStartDefault + downSideOffset, Camera.main.transform.forward, out rayHitDownSidePlatform, raySize, LayerMask.GetMask("Platform"));
 
 
 
-        //1
+        //1 좌우 좌표
         Vector3 playerBox = playerCollider.bounds.extents;
         playerBox.y *= 0.98f;
 
         if (rayHitSidePlatform.collider != null)
         {
-            Vector3 targetPosition1 = rayHitSidePlatform.point + rayHitSidePlatform.normal * offset - sideOffset;
+            Vector3 targetPosition1 = rayStartDefault + Camera.main.transform.forward.normalized * rayHitSidePlatform.distance + rayHitSidePlatform.normal * offset;
 
             if (!Physics.CheckBox(targetPosition1, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
             {
-                if (isGrounded(transform.position) && isGrounded(targetPosition1) || !isGrounded(transform.position))
+                if (IsGrounded(transform.position) && IsGrounded(targetPosition1) || !IsGrounded(transform.position))
                 {
                     transform.position = targetPosition1;
                     return;
@@ -222,16 +250,14 @@ public class Player : MonoBehaviour
             }
         }
 
-
-
-        //2
+        //2 발판이 있어야 이동되는...
         if (rayHitDownSidePlatform.collider == null)
             return;
         Vector3 targetPosition2 = rayHitDownSidePlatform.point - rayHitDownSidePlatform.normal * offset - downSideOffset;
 
         if (!Physics.CheckBox(targetPosition2, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
         {
-            if (isGrounded(targetPosition2))
+            if (IsGrounded(targetPosition2))
             {
                 transform.position = targetPosition2;
             }
@@ -239,12 +265,13 @@ public class Player : MonoBehaviour
 
     }
 
-    private bool isGrounded(Vector3 position)
+    private bool IsGrounded(Vector3 position)
     {
         RaycastHit hit;
 
         Vector3 boxSize = playerCollider.bounds.extents;
         boxSize.y = 0.1f;
+
         Vector3 direction = Vector3.down;
         float raySize = 0.51f;
 
