@@ -1,6 +1,12 @@
 fileFormatVersion: 2
+<<<<<<<< Updated upstream:Assets/Animation/Player_Jump.anim.meta
 guid: 1a29f2b99e71a1142a4766d3dad0e5d5
 NativeFormatImporter:
+========
+guid: ffc6724d736824b4cba73c71cfcea195
+folderAsset: yes
+DefaultImporter:
+>>>>>>>> Stashed changes:Assets/Resources.meta
   externalObjects: {}
   mainObjectFileID: 7400000
   userData: 

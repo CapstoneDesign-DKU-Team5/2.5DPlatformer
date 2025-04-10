@@ -1459,6 +1459,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2085466961}
+<<<<<<< Updated upstream:Assets/Scenes/SampleScene.unity
+>>>>>>> Stashed changes:Assets/Scenes/GameScene.unity
+=======
 >>>>>>> Stashed changes:Assets/Scenes/GameScene.unity
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &615417288
@@ -2429,4 +2432,7 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 2132429745}
   - {fileID: 124595397}
+<<<<<<< Updated upstream:Assets/Scenes/SampleScene.unity
+>>>>>>> Stashed changes:Assets/Scenes/GameScene.unity
+=======
 >>>>>>> Stashed changes:Assets/Scenes/GameScene.unity
