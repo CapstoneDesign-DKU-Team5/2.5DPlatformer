@@ -1,6 +1,12 @@
 fileFormatVersion: 2
+<<<<<<<< Updated upstream:Assets/Animation/Player_Walk.anim.meta
 guid: 84976b95bcaa62a4aaed1677742e29d8
 NativeFormatImporter:
+========
+guid: ffc6724d736824b4cba73c71cfcea195
+folderAsset: yes
+DefaultImporter:
+>>>>>>>> Stashed changes:Assets/Resources.meta
   externalObjects: {}
   mainObjectFileID: 7400000
   userData: 

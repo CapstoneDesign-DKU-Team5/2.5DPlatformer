@@ -1460,6 +1460,9 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2085466961}
 <<<<<<< Updated upstream:Assets/Scenes/SampleScene.unity
+<<<<<<< Updated upstream:Assets/Scenes/SampleScene.unity
+>>>>>>> Stashed changes:Assets/Scenes/GameScene.unity
+=======
 >>>>>>> Stashed changes:Assets/Scenes/GameScene.unity
 =======
 >>>>>>> Stashed changes:Assets/Scenes/GameScene.unity
@@ -2433,6 +2436,9 @@ SceneRoots:
   - {fileID: 2132429745}
   - {fileID: 124595397}
 <<<<<<< Updated upstream:Assets/Scenes/SampleScene.unity
+<<<<<<< Updated upstream:Assets/Scenes/SampleScene.unity
+>>>>>>> Stashed changes:Assets/Scenes/GameScene.unity
+=======
 >>>>>>> Stashed changes:Assets/Scenes/GameScene.unity
 =======
 >>>>>>> Stashed changes:Assets/Scenes/GameScene.unity

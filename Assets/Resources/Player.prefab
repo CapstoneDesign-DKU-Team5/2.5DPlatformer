@@ -264,13 +264,17 @@ MonoBehaviour:
 Animator:
   serializedVersion: 7
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes:Assets/Resources/Player.prefab
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream:Assets/Prefabs/Player.prefab
   m_GameObject: {fileID: 3559087723837410049}
@@ -282,6 +286,8 @@ Animator:
   ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &-6822115189992886736
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   m_GameObject: {fileID: 5279396508862020313}
@@ -301,7 +307,10 @@ Animator:
   m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &2185707102362390671
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes:Assets/Resources/Player.prefab
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 MonoBehaviour:
@@ -313,6 +322,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3559087723837410049}
   m_Enabled: 1
   m_EditorHideFlags: 0
+<<<<<<< Updated upstream
   m_Script: {fileID: 11500000, guid: 91870dadf244be24b964cd1adca98695, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -364,6 +374,11 @@ MonoBehaviour:
 =======
 =======
 >>>>>>> Stashed changes
+=======
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+>>>>>>> Stashed changes
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
@@ -377,6 +392,7 @@ MonoBehaviour:
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &-7189169598777126721
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 >>>>>>> Stashed changes:Assets/Resources/Player.prefab
 =======
@@ -409,6 +425,8 @@ MonoBehaviour:
   m_SynchronizeScale: 0
   m_UseLocal: 1
 --- !u!114 &382193546035089239
+=======
+>>>>>>> Stashed changes
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -417,6 +435,52 @@ MonoBehaviour:
   m_GameObject: {fileID: 5279396508862020313}
   m_Enabled: 1
   m_EditorHideFlags: 0
+<<<<<<< Updated upstream
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 4
+    SynchronizeType: 2
+    Name: isWalking
+  - Type: 4
+    SynchronizeType: 2
+    Name: isJumping
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
+--- !u!114 &2613694912819447933
+=======
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
+--- !u!114 &382193546035089239
+>>>>>>> Stashed changes
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5279396508862020313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+<<<<<<< Updated upstream
+  m_Script: {fileID: 11500000, guid: 8bf7e07091e8335489da582c9ed16a6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 2
+  jumpHeight: 5
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes:Assets/Resources/Player.prefab
+=======
+>>>>>>> Stashed changes
+=======
   m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -446,7 +510,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 2
   jumpHeight: 5
-<<<<<<< Updated upstream
->>>>>>> Stashed changes:Assets/Resources/Player.prefab
-=======
 >>>>>>> Stashed changes
