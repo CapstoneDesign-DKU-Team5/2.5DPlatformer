@@ -10,27 +10,14 @@ public class RotateCamera : MonoBehaviour
     private float rotationSpeed = 5f;
     private float moveSpeed = 8f;
 
-<<<<<<< Updated upstream
-=======
     private bool cameraRotating = false;
 
->>>>>>> Stashed changes
     private void Update()
     {
         if (playerTransform == null) return;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-<<<<<<< Updated upstream
-            rotationAng += 90f;
-            if(rotationAng > 270f)
-            {
-                rotationAng = 0f;
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-=======
             cameraRotating = true;
             rotationAng += 90f;
             if (rotationAng > 270f) rotationAng = 0f;
@@ -38,7 +25,6 @@ public class RotateCamera : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
         {
             cameraRotating = true;
->>>>>>> Stashed changes
             rotationAng -= 90f;
             if (rotationAng < 0) rotationAng = 270f;
         }
@@ -49,12 +35,8 @@ public class RotateCamera : MonoBehaviour
 
         if (Quaternion.Angle(transform.rotation, targetRot) < 0.2f)
         {
-<<<<<<< Updated upstream
-            transform.rotation = rotationY;
-=======
             transform.rotation = targetRot;
             cameraRotating = false;
->>>>>>> Stashed changes
         }
         else
         {
@@ -70,13 +52,9 @@ public class RotateCamera : MonoBehaviour
             transform.position = Vector3.Lerp(transform.position, finalPos, Time.deltaTime * moveSpeed);
         }
     }
-<<<<<<< Updated upstream
-}
-=======
 
     public bool GetCameraRotating()
     {
         return cameraRotating;
     }
 }
->>>>>>> Stashed changes
