@@ -404,15 +404,15 @@ namespace HelloWorld
                             return;
                         }
 
-                        float isCorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
-                        if (isCorrectDir % 180f == 0 ? true : false)
+                        float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
+                        if (CorrectDir % 180f == 0 ? true : false)
                         {
                             spriteRenderer.color = new Color(1, 1, 1, 0.4f);
 
-                            bool isX = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
+                            bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
 
                             int dir;
-                            if (isX)
+                            if (isXOrZ)
                             {
                                 rigidBody.linearVelocity = Vector3.zero;
                                 dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;                                
