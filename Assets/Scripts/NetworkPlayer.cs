@@ -404,25 +404,34 @@ namespace HelloWorld
                             return;
                         }
 
-                        Debug.Log(transform.position.x);
-                        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
-                        bool isX = Mathf.Abs(transform.rotation.y) == 90 ? false : true;
-                        int dirc;
-                        if (isX)
+                        float isCorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
+                        Debug.Log(isCorrectDir);
+                        if (isCorrectDir % 180f == 0 ? true : false)
                         {
-                            rigidBody.linearVelocity = Vector3.zero;
-                            dirc = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;
-                            rigidBody.AddForce(new Vector3(dirc, 4f, 0), ForceMode.Impulse);
-                        }
-                        else
-                        {
-                            rigidBody.linearVelocity = Vector3.zero;
-                            dirc = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
-                            rigidBody.AddForce(new Vector3(0, 4f, dirc), ForceMode.Impulse);
-                        }
-                        damged = true;
-                        Invoke("OffDamaged", 0.9f);
+                            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+                            bool isX = Mathf.Abs(transform.eulerAngles.y) - 90f >= 1f ? false : true;
+                            int dir;
+                            if (isX)
+                            {
+                                Debug.Log("x");
+                                rigidBody.linearVelocity = Vector3.zero;
+                                dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;
+                                Debug.Log(mainCamera.transform.right);
+                                Vector3 dirVec = mainCamera.transform.right * dir + new Vector3(0, 4f, 0);
+                                rigidBody.AddForce(dirVec, ForceMode.Impulse);
 
+                            }
+                            else
+                            {
+                                Debug.Log("z");
+                                rigidBody.linearVelocity = Vector3.zero;
+                                dir = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
+                                Vector3 dirVec = mainCamera.transform.right * dir + new Vector3(0, 4f, 0);
+                                rigidBody.AddForce(dirVec, ForceMode.Impulse);
+                            }
+                            damged = true;
+                            Invoke("OffDamaged", 0.9f);
+                        }
                     }
                 }
             }
