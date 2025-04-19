@@ -25,8 +25,11 @@ namespace HelloWorld
 
         private float h = 0;
         private float v = 0;
+
         private bool jump = false;
+        private bool attack = false;
         private bool climbJump = false;
+
         private Vector3 savedVelocity;
         private bool needRestoreVelocity = false;
 
@@ -91,8 +94,7 @@ namespace HelloWorld
             if (!IsOwner)
                 return;
 
-            InputMove();
-            InputJump();
+            InputKey();
             UpdateClimbState();
             PlayerAnimation();
             PlayerLookCamera();
@@ -110,6 +112,8 @@ namespace HelloWorld
             RaySide("Left");
             RayTop();
             RayDown();
+            Attack();
+            OnDamaged();
         }
 
         private void PlayerLookCamera()
@@ -147,17 +151,17 @@ namespace HelloWorld
             return Physics.BoxCast(position, boxSize, direction, out hit, Quaternion.identity, raySize, LayerMask.GetMask("Platform"));
         }
 
-        private void InputMove()
+        private void InputKey()
         {
             h = Input.GetAxisRaw("Horizontal");
             v = Input.GetAxisRaw("Vertical");
-        }
-
-        private void InputJump()
-        {
             if (Input.GetButtonDown("Jump"))
             {
                 jump = true;
+            }
+            if (Input.GetButtonDown("Fire1"))
+            {
+                attack = true;
             }
         }
 
@@ -470,6 +474,64 @@ namespace HelloWorld
             if (climbState && !canClimb)
             {
                 climbState = false;
+            }
+        }
+
+        private void Attack()
+        {
+            if (!attack)
+                return;
+        }
+
+        public void OnDamaged()
+        {
+            //콜라이더 하드코딩 0.4 0.5
+            Vector3 rightOffset = mainCamera.transform.right * 0.4f;
+            Vector3 topOffset = Vector3.up * 0.5f;
+            Vector3 rayStartDefault = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
+
+            //player 꼭짓점에 ray
+            Vector3[] offsets = new Vector3[]
+            {
+                //topRight
+                topOffset + rightOffset,
+                //topLeft
+                topOffset - rightOffset,
+                //downRight
+                -topOffset + rightOffset,
+                //downLeft
+                -topOffset - rightOffset
+            };
+
+            Debug.Log("Func true");
+
+            RaycastHit enemyHit;
+            int enemy = LayerMask.NameToLayer("Enemy");
+            int mask = ~(1 << LayerMask.NameToLayer("Player"));
+
+            foreach (var offset in offsets)
+            {
+                //null이 아니고
+                if (Physics.Raycast(rayStartDefault + offset, mainCamera.transform.forward, out enemyHit, cameraRaySize, mask))
+                {
+                    if (enemyHit.collider.gameObject.layer == enemy)
+                    {
+                        Debug.Log("Damaged");
+                        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+                        bool isX = Mathf.Abs(transform.rotation.y) == 90 ? false : true;
+                        int dirc;
+                        if (isX)
+                        {
+                            dirc = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;
+                            rigidBody.AddForce(new Vector3(dirc, 1, 0) * 7, ForceMode.Impulse);
+                        }
+                        else
+                        {
+                            dirc = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
+                            rigidBody.AddForce(new Vector3(0, 1, dirc) * 7, ForceMode.Impulse);
+                        }
+                    }
+                }
             }
         }
     }

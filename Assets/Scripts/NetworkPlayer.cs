@@ -22,8 +22,12 @@ namespace HelloWorld
 
         private float h = 0;
         private float v = 0;
+
         private bool jump = false;
+        private bool attack = false;
         private bool climbJump = false;
+        private bool damged = false;
+
         private Vector3 savedVelocity;
         private bool needRestoreVelocity = false;
 
@@ -54,8 +58,7 @@ namespace HelloWorld
             if (!photonView.IsMine || mainCamera == null || cameraScript == null)
                 return;
 
-            InputMove();
-            InputJump();
+            InputKey();
             UpdateClimbState();
             PlayerAnimation();
             PlayerLookCamera();
@@ -73,6 +76,8 @@ namespace HelloWorld
             RaySide("Left");
             RayTop();
             RayDown();
+            Attack();
+            OnDamaged();
         }
 
         private void PlayerLookCamera()
@@ -102,21 +107,23 @@ namespace HelloWorld
             return Physics.BoxCast(position, boxSize, Vector3.down, out hit, Quaternion.identity, 0.51f, LayerMask.GetMask("Platform"));
         }
 
-        private void InputMove()
+        private void InputKey()
         {
             h = Input.GetAxisRaw("Horizontal");
             v = Input.GetAxisRaw("Vertical");
-        }
-
-        private void InputJump()
-        {
             if (Input.GetButtonDown("Jump"))
+            {
                 jump = true;
+            }
+            if (Input.GetButtonDown("Fire1"))
+            {
+                attack = true;
+            }
         }
 
         private void Move()
         {
-            if (cameraScript.GetCameraRotating())
+            if (cameraScript.GetCameraRotating() || damged)
                 return;
 
             Vector3 moveVec;
@@ -354,6 +361,84 @@ namespace HelloWorld
             {
                 climbState = false;
             }
+        }
+        private void Attack()
+        {
+            if (!attack)
+                return;
+        }
+
+        public void OnDamaged()
+        {
+            //콜라이더 하드코딩 0.25 0.45
+            Vector3 rightOffset = mainCamera.transform.right * 0.25f;
+            Vector3 topOffset = Vector3.up * 0.45f;
+            Vector3 rayStartDefault = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
+
+            //player 꼭짓점에 ray
+            Vector3[] offsets = new Vector3[]
+            {
+                //topRight
+                topOffset + rightOffset,
+                //topLeft
+                topOffset - rightOffset,
+                //downRight
+                -topOffset + rightOffset,
+                //downLeft
+                -topOffset - rightOffset
+            };
+
+            RaycastHit enemyHit;
+            int enemy = LayerMask.NameToLayer("Enemy");
+            int mask = ~(1 << LayerMask.NameToLayer("Player"));
+
+            foreach (var offset in offsets)
+            {
+                //null이 아니고
+                if (Physics.Raycast(rayStartDefault + offset, mainCamera.transform.forward, out enemyHit, cameraRaySize, mask))
+                {
+                    if (enemyHit.collider.gameObject.layer == enemy)
+                    {
+                        if (damged)
+                        {
+                            return;
+                        }
+
+                        float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
+                        if (CorrectDir % 180f == 0 ? true : false)
+                        {
+                            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+
+                            bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
+
+                            int dir;
+                            if (isXOrZ)
+                            {
+                                rigidBody.linearVelocity = Vector3.zero;
+                                dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;                                
+                                Vector3 dirVec = new Vector3(dir, 4f, 0);
+                                rigidBody.AddForce(dirVec, ForceMode.Impulse);
+
+                            }
+                            else
+                            {
+                                rigidBody.linearVelocity = Vector3.zero;
+                                dir = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
+                                Vector3 dirVec =  new Vector3(0, 4f, dir);
+                                rigidBody.AddForce(dirVec, ForceMode.Impulse);
+                            }
+                            damged = true;
+                            Invoke("OffDamaged", 0.9f);
+                        }
+                    }
+                }
+            }
+        }
+
+        void OffDamaged()
+        {
+            spriteRenderer.color = new Color(1, 1, 1, 1);
+            damged = false;
         }
     }
 }
