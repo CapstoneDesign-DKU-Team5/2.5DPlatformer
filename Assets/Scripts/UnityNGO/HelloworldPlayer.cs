@@ -113,6 +113,7 @@ namespace HelloWorld
             RayTop();
             RayDown();
             Attack();
+            OnDamaged();
         }
 
         private void PlayerLookCamera()
@@ -503,7 +504,7 @@ namespace HelloWorld
             };
 
             RaycastHit enemyHit;
-            int enemy = LayerMask.NameToLayer("enemy");
+            int enemy = LayerMask.NameToLayer("Enemy");
             int mask = ~(1 << LayerMask.NameToLayer("Player"));
 
             foreach (var offset in offsets)
@@ -513,6 +514,7 @@ namespace HelloWorld
                 {
                     if (enemyHit.collider.gameObject.layer == enemy)
                     {
+                        Debug.Log("Damaged");
                         spriteRenderer.color = new Color(1, 1, 1, 0.4f);
                         bool isX = Mathf.Abs(transform.rotation.y) == 90 ? false : true;
                         int dirc;
