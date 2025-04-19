@@ -405,28 +405,26 @@ namespace HelloWorld
                         }
 
                         float isCorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
-                        Debug.Log(isCorrectDir);
                         if (isCorrectDir % 180f == 0 ? true : false)
                         {
                             spriteRenderer.color = new Color(1, 1, 1, 0.4f);
-                            bool isX = Mathf.Abs(transform.eulerAngles.y) - 90f >= 1f ? false : true;
+
+                            bool isX = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
+
                             int dir;
                             if (isX)
                             {
-                                Debug.Log("x");
                                 rigidBody.linearVelocity = Vector3.zero;
-                                dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;
-                                Debug.Log(mainCamera.transform.right);
-                                Vector3 dirVec = mainCamera.transform.right * dir + new Vector3(0, 4f, 0);
+                                dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;                                
+                                Vector3 dirVec = new Vector3(dir, 4f, 0);
                                 rigidBody.AddForce(dirVec, ForceMode.Impulse);
 
                             }
                             else
                             {
-                                Debug.Log("z");
                                 rigidBody.linearVelocity = Vector3.zero;
                                 dir = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
-                                Vector3 dirVec = mainCamera.transform.right * dir + new Vector3(0, 4f, 0);
+                                Vector3 dirVec =  new Vector3(0, 4f, dir);
                                 rigidBody.AddForce(dirVec, ForceMode.Impulse);
                             }
                             damged = true;
