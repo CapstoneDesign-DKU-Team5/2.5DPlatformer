@@ -97,13 +97,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: M1_Idle0
+      name: monster1-Sheet_0
       rect:
         serializedVersion: 2
-        x: 2
+        x: 8
         y: 64
-        width: 22
-        height: 30
+        width: 16
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -112,20 +112,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: dd6b59ed534bd304795e64de11de034d
-      internalID: -1516818786
+      spriteID: 1c7e2ea3646e17841a09aad465ef6ff7
+      internalID: -1804049280
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: M1_Idle1
+      name: monster1-Sheet_1
       rect:
         serializedVersion: 2
-        x: 34
+        x: 37
         y: 64
-        width: 22
-        height: 30
+        width: 19
+        height: 28
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,20 +134,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ae1e799a2a4ac3840baffbb25d3325e4
-      internalID: 1936590821
+      spriteID: 0534a7642d2fd8c42985e0af5385352d
+      internalID: 1593201821
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: M1_Attack1
+      name: monster1-Sheet_2
       rect:
         serializedVersion: 2
-        x: 2
+        x: 4
         y: 32
-        width: 22
-        height: 30
+        width: 20
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -156,19 +156,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d78e057f152de34448c6dc0043031e7f
-      internalID: -164425656
+      spriteID: bf771d2cddf31cb46a1144d5b2a92a6d
+      internalID: -870580473
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: M1_Attack2
+      name: monster1-Sheet_3
       rect:
         serializedVersion: 2
-        x: 34
+        x: 40
         y: 32
-        width: 22
+        width: 16
         height: 30
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -178,20 +178,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 04de6d86f21154d43a2703dcebdd6dd8
-      internalID: -640644034
+      spriteID: d04ba3ba80a67924ebec0def2299a816
+      internalID: -364952619
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: M1_Attack3
+      name: monster1-Sheet_4
       rect:
         serializedVersion: 2
         x: 66
         y: 32
         width: 22
-        height: 30
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -200,20 +200,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d53f326c049bd9e4ba3e920971bd0193
-      internalID: -1437772639
+      spriteID: 94c1b93b1e1b5874e881153a35725ef6
+      internalID: 1780660625
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: M1_Dead1
+      name: monster1-Sheet_5
       rect:
         serializedVersion: 2
-        x: 2
+        x: 8
         y: 0
-        width: 22
-        height: 30
+        width: 16
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -222,20 +222,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cf41973d1c245624386c7dcdc4c09e4e
-      internalID: 511227374
+      spriteID: 307bb313a75698f4b83e4d4c107789cb
+      internalID: 499211147
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: M1_Dead2
+      name: monster1-Sheet_6
       rect:
         serializedVersion: 2
-        x: 34
+        x: 40
         y: 0
-        width: 22
-        height: 30
+        width: 16
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -244,20 +244,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4149faaa194c85e44ac3cad4ca63122e
-      internalID: 1006839837
+      spriteID: 162ab31e1e2c22b48ac7064f151ac9f3
+      internalID: -435033227
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: M1_Dead3
+      name: monster1-Sheet_7
       rect:
         serializedVersion: 2
-        x: 66
+        x: 72
         y: 0
-        width: 22
-        height: 30
+        width: 16
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -266,8 +266,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 406df42e4e0219b42989661cb33ff6e9
-      internalID: 15215137
+      spriteID: 66d1fd1d80f31494f9d4e5ee8564e19d
+      internalID: -1497418651
       vertices: []
       indices: 
       edges: []
@@ -286,14 +286,14 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      M1_Attack1: -164425656
-      M1_Attack2: -640644034
-      M1_Attack3: -1437772639
-      M1_Dead1: 511227374
-      M1_Dead2: 1006839837
-      M1_Dead3: 15215137
-      M1_Idle0: -1516818786
-      M1_Idle1: 1936590821
+      monster1-Sheet_0: -1804049280
+      monster1-Sheet_1: 1593201821
+      monster1-Sheet_2: -870580473
+      monster1-Sheet_3: -364952619
+      monster1-Sheet_4: 1780660625
+      monster1-Sheet_5: 499211147
+      monster1-Sheet_6: -435033227
+      monster1-Sheet_7: -1497418651
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

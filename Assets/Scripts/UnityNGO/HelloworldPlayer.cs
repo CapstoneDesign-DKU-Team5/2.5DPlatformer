@@ -493,15 +493,17 @@ namespace HelloWorld
             //player 꼭짓점에 ray
             Vector3[] offsets = new Vector3[]
             {
-        //topRight
-        topOffset + rightOffset,
-        //topLeft
-        topOffset - rightOffset,
-        //downRight
-        -topOffset + rightOffset,
-        //downLeft
-        -topOffset - rightOffset
+                //topRight
+                topOffset + rightOffset,
+                //topLeft
+                topOffset - rightOffset,
+                //downRight
+                -topOffset + rightOffset,
+                //downLeft
+                -topOffset - rightOffset
             };
+
+            Debug.Log("Func true");
 
             RaycastHit enemyHit;
             int enemy = LayerMask.NameToLayer("Enemy");
