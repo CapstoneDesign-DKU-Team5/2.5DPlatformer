@@ -388,8 +388,6 @@ namespace HelloWorld
                 -topOffset - rightOffset
             };
 
-            Debug.Log("Func true");
-
             RaycastHit enemyHit;
             int enemy = LayerMask.NameToLayer("Enemy");
             int mask = ~(1 << LayerMask.NameToLayer("Player"));
@@ -406,17 +404,19 @@ namespace HelloWorld
                             return;
                         }
 
-                        Debug.Log("Damaged");
+                        Debug.Log(transform.position.x);
                         spriteRenderer.color = new Color(1, 1, 1, 0.4f);
                         bool isX = Mathf.Abs(transform.rotation.y) == 90 ? false : true;
                         int dirc;
                         if (isX)
                         {
+                            rigidBody.linearVelocity = Vector3.zero;
                             dirc = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;
                             rigidBody.AddForce(new Vector3(dirc, 4f, 0), ForceMode.Impulse);
                         }
                         else
                         {
+                            rigidBody.linearVelocity = Vector3.zero;
                             dirc = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
                             rigidBody.AddForce(new Vector3(0, 4f, dirc), ForceMode.Impulse);
                         }
