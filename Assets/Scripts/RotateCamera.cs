@@ -33,6 +33,7 @@ public class RotateCamera : MonoBehaviour
         Quaternion targetRot = Quaternion.Euler(0, rotationAng, 0);
         Vector3 finalPos = targetRot * offset + playerTransform.position;
 
+
         if (Quaternion.Angle(transform.rotation, targetRot) < 0.2f)
         {
             transform.rotation = targetRot;
