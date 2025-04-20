@@ -1,4 +1,5 @@
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 
 namespace HelloWorld
@@ -115,7 +116,8 @@ namespace HelloWorld
             {
                 jump = true;
             }
-            if (Input.GetButtonDown("Fire1"))
+            //Input.GetButtonDown("Fire1")으로 변경 test중
+            if (Input.GetButton("Fire1"))
             {
                 attack = true;
             }
@@ -273,11 +275,11 @@ namespace HelloWorld
             Vector3 sideOffset = mainCamera.transform.right * dir * 0.415f;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
-            Debug.DrawRay(rayStart + sideOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
+            //Debug.DrawRay(rayStart + sideOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
             Physics.BoxCast(rayStart + sideOffset, boxSize, mainCamera.transform.forward, out RaycastHit sideHit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
 
             Vector3 downOffset = mainCamera.transform.right * dir * 0.4f - mainCamera.transform.up * 0.51f;
-            Debug.DrawRay(rayStart + downOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
+            //Debug.DrawRay(rayStart + downOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
             Physics.Raycast(rayStart + downOffset, mainCamera.transform.forward, out RaycastHit downHit, cameraRaySize, LayerMask.GetMask("Platform"));
 
             Vector3 playerBox = playerCollider.bounds.extents;
@@ -367,6 +369,40 @@ namespace HelloWorld
         {
             if (!attack)
                 return;
+            
+            float attackDir = spriteRenderer.flipX ? -1f : 1f;
+
+            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
+
+            Debug.Log(attackDir);
+
+            //player 중심으로부터 범위
+            Vector3 attackRange = mainCamera.transform.right * 0.4f;
+            //player 공격 상 하 범위
+            Vector3 attackHalfHeight = Vector3.up * 0.1f;
+            //스프라이트 적용 후 조절
+            //공격 중심 시작 높이
+            Vector3 attackHeight = Vector3.zero;
+
+            RaycastHit[] enemyHits = new RaycastHit[2];
+            int enemy = LayerMask.NameToLayer("Enemy");
+            int mask = ~(1 << LayerMask.NameToLayer("Player"));
+
+            if (attackDir == 1) {
+                Debug.DrawRay(rayStart + attackHeight + attackRange + attackHalfHeight, mainCamera.transform.forward * cameraRaySize, Color.blue);
+                Debug.DrawRay(rayStart + attackHeight + attackRange - attackHalfHeight, mainCamera.transform.forward * cameraRaySize, Color.blue);
+                Physics.Raycast(rayStart + attackHeight + attackRange + attackHalfHeight, mainCamera.transform.forward, out enemyHits[0], cameraRaySize, mask);
+                Physics.Raycast(rayStart + attackHeight + attackRange - attackHalfHeight, mainCamera.transform.forward, out enemyHits[1], cameraRaySize, mask);
+            }
+            else if (attackDir == -1)
+            {
+                Debug.DrawRay(rayStart + attackHeight - attackRange + attackHalfHeight, mainCamera.transform.forward * cameraRaySize, Color.blue);
+                Debug.DrawRay(rayStart + attackHeight - attackRange - attackHalfHeight, mainCamera.transform.forward * cameraRaySize, Color.blue);
+                Physics.Raycast(rayStart + attackHeight - attackRange + attackHalfHeight, mainCamera.transform.forward, out enemyHits[0], cameraRaySize, mask);
+                Physics.Raycast(rayStart + attackHeight - attackRange - attackHalfHeight, mainCamera.transform.forward, out enemyHits[1], cameraRaySize, mask);
+            }
+            
+                attack = false;
         }
 
         public void OnDamaged()
