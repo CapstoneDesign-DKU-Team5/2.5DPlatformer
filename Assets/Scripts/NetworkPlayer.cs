@@ -262,9 +262,9 @@ namespace HelloWorld
 
             int dir = (leftRight == "Right") ? 1 : -1;
 
-            float inputH = Input.GetAxisRaw("Horizontal");
-            if (inputH != dir)
-                return;
+            //없어도 될듯. test
+            //if (h != dir)
+            //    return;
 
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.x = 0.15f;
@@ -362,6 +362,7 @@ namespace HelloWorld
                 climbState = false;
             }
         }
+
         private void Attack()
         {
             if (!attack)
@@ -407,6 +408,10 @@ namespace HelloWorld
                         float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
                         if (CorrectDir % 180f == 0 ? true : false)
                         {
+                            //매달리기 상태 문제 해결
+                            climbState = false;
+                            rigidBody.useGravity = true;
+
                             spriteRenderer.color = new Color(1, 1, 1, 0.4f);
 
                             bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
