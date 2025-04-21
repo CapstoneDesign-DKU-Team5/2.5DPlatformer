@@ -367,14 +367,14 @@ namespace HelloWorld
 
         private void Attack()
         {
-            if (!attack)
+            if (!attack || damged || climbState)
                 return;
             
             float attackDir = spriteRenderer.flipX ? -1f : 1f;
 
-            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
-
             Debug.Log(attackDir);
+
+            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
             //player 중심으로부터 범위
             Vector3 attackRange = attackDir == 1 ? mainCamera.transform.right * 0.4f : -mainCamera.transform.right * 0.4f;
