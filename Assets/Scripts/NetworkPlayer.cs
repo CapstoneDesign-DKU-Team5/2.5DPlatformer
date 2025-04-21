@@ -27,10 +27,12 @@ namespace HelloWorld
         private bool jump = false;
         private bool attack = false;
         private bool climbJump = false;
-        private bool damged = false;
+        private bool damaged = false;
 
         private Vector3 savedVelocity;
         private bool needRestoreVelocity = false;
+
+        bool isAttacking = false;
 
         private bool flipState = false;
 
@@ -77,7 +79,7 @@ namespace HelloWorld
             RaySide("Left");
             RayTop();
             RayDown();
-            Attack();
+            StartAttack();
             OnDamaged();
         }
 
@@ -125,7 +127,7 @@ namespace HelloWorld
 
         private void Move()
         {
-            if (cameraScript.GetCameraRotating() || damged)
+            if (cameraScript.GetCameraRotating() || damaged)
                 return;
 
             Vector3 moveVec;
@@ -374,15 +376,18 @@ namespace HelloWorld
             }
         }
 
-        private void Attack()
+        private void StartAttack()
         {
-            if (!attack || damged || climbState)
+            if (!attack || damaged || climbState || isAttacking)
                 return;
             animator.SetTrigger("doAttack");
+            isAttacking = true;
+        }
 
+        //Animation Event Attack 0:03에서 호출
+        private void Hit()
+        {
             float attackDir = spriteRenderer.flipX ? -1f : 1f;
-
-            Debug.Log(attackDir);
 
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
@@ -417,8 +422,13 @@ namespace HelloWorld
                     }
                 }
             }
+        }
 
+        //Animation Event Attack 0:06에서 호출
+        private void EndAttack()
+        {
             attack = false;
+            isAttacking = false;
         }
 
         public void OnDamaged()
@@ -452,7 +462,7 @@ namespace HelloWorld
                 {
                     if (enemyHit.collider.gameObject.layer == enemy)
                     {
-                        if (damged)
+                        if (damaged)
                         {
                             return;
                         }
@@ -490,7 +500,7 @@ namespace HelloWorld
                                 Vector3 dirVec =  new Vector3(0, 4f, dir);
                                 rigidBody.AddForce(dirVec, ForceMode.Impulse);
                             }
-                            damged = true;
+                            damaged = true;
                             Invoke("OffDamaged", 0.9f);
                         }
                     }
@@ -501,7 +511,7 @@ namespace HelloWorld
         void OffDamaged()
         {
             spriteRenderer.color = new Color(1, 1, 1, 1);
-            damged = false;
+            damaged = false;
         }
     }
 }
