@@ -116,8 +116,8 @@ namespace HelloWorld
             {
                 jump = true;
             }
-            //Input.GetButtonDown("Fire1")으로 변경 test중
-            if (Input.GetButton("Fire1"))
+
+            if (Input.GetButtonDown("Fire1"))
             {
                 attack = true;
             }
@@ -377,7 +377,7 @@ namespace HelloWorld
             Debug.Log(attackDir);
 
             //player 중심으로부터 범위
-            Vector3 attackRange = mainCamera.transform.right * 0.4f;
+            Vector3 attackRange = attackDir == 1 ? mainCamera.transform.right * 0.4f : -mainCamera.transform.right * 0.4f;
             //player 공격 상 하 범위
             Vector3 attackHalfHeight = Vector3.up * 0.1f;
             //스프라이트 적용 후 조절
@@ -388,27 +388,33 @@ namespace HelloWorld
             int enemy = LayerMask.NameToLayer("Enemy");
             int mask = ~(1 << LayerMask.NameToLayer("Player"));
 
-            if (attackDir == 1) {
-                Debug.DrawRay(rayStart + attackHeight + attackRange + attackHalfHeight, mainCamera.transform.forward * cameraRaySize, Color.blue);
-                Debug.DrawRay(rayStart + attackHeight + attackRange - attackHalfHeight, mainCamera.transform.forward * cameraRaySize, Color.blue);
-                Physics.Raycast(rayStart + attackHeight + attackRange + attackHalfHeight, mainCamera.transform.forward, out enemyHits[0], cameraRaySize, mask);
-                Physics.Raycast(rayStart + attackHeight + attackRange - attackHalfHeight, mainCamera.transform.forward, out enemyHits[1], cameraRaySize, mask);
-            }
-            else if (attackDir == -1)
+            Vector3[] offsets = new Vector3[]
+{
+                attackHeight + attackRange + attackHalfHeight,
+                attackHeight + attackRange - attackHalfHeight
+            };
+
+            for (int i = 0; i < offsets.Length; i++)
             {
-                Debug.DrawRay(rayStart + attackHeight - attackRange + attackHalfHeight, mainCamera.transform.forward * cameraRaySize, Color.blue);
-                Debug.DrawRay(rayStart + attackHeight - attackRange - attackHalfHeight, mainCamera.transform.forward * cameraRaySize, Color.blue);
-                Physics.Raycast(rayStart + attackHeight - attackRange + attackHalfHeight, mainCamera.transform.forward, out enemyHits[0], cameraRaySize, mask);
-                Physics.Raycast(rayStart + attackHeight - attackRange - attackHalfHeight, mainCamera.transform.forward, out enemyHits[1], cameraRaySize, mask);
+                Debug.DrawRay(rayStart + offsets[i], mainCamera.transform.forward * cameraRaySize, Color.blue);
+
+                if (Physics.Raycast(rayStart + offsets[i], mainCamera.transform.forward, out enemyHits[i], cameraRaySize, mask))
+                {
+                    if (enemyHits[i].collider.gameObject.layer == enemy)
+                    {
+                        Debug.Log("Enemy Hit");
+                        break;
+                    }
+                }
             }
-            
-                attack = false;
+
+            attack = false;
         }
 
         public void OnDamaged()
         {
-            //콜라이더 하드코딩 0.25 0.45
-            Vector3 rightOffset = mainCamera.transform.right * 0.25f;
+            //콜라이더 하드코딩 0.2 0.45  새로운 sprite 기준
+            Vector3 rightOffset = mainCamera.transform.right * 0.2f;
             Vector3 topOffset = Vector3.up * 0.45f;
             Vector3 rayStartDefault = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
