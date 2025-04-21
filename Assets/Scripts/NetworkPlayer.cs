@@ -378,7 +378,8 @@ namespace HelloWorld
         {
             if (!attack || damged || climbState)
                 return;
-            
+            animator.SetTrigger("doAttack");
+
             float attackDir = spriteRenderer.flipX ? -1f : 1f;
 
             Debug.Log(attackDir);
@@ -391,7 +392,7 @@ namespace HelloWorld
             Vector3 attackHalfHeight = Vector3.up * 0.1f;
             //스프라이트 적용 후 조절
             //공격 중심 시작 높이
-            Vector3 attackHeight = Vector3.zero;
+            Vector3 attackHeight = Vector3.up * 0.1f;
 
             RaycastHit[] enemyHits = new RaycastHit[2];
             int enemy = LayerMask.NameToLayer("Enemy");
@@ -456,15 +457,21 @@ namespace HelloWorld
                             return;
                         }
 
+                        //카메라에서 보여야만 -> 180도 차이나야
                         float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
                         if (CorrectDir % 180f == 0 ? true : false)
                         {
                             //매달리기 상태 문제 해결
-                            climbState = false;
-                            rigidBody.useGravity = true;
-
+                            if (climbState)
+                            {
+                                climbState = false;
+                                rigidBody.useGravity = true;
+                            }
+                            
                             spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+                            animator.SetTrigger("isDamaged");
 
+                            //플레이어 x로 튕겨야 할지 z로 튕겨야 할지 결정
                             bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
 
                             int dir;
