@@ -167,9 +167,18 @@ namespace HelloWorld
                 rigidBody.useGravity = true;
             }
 
+            bool noSameFrame = false;
             if ((IsGrounded(transform.position) || climbJump) && jump)
             {
                 rigidBody.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
+                animator.SetBool("isJumping", true);
+                noSameFrame = true;
+                Debug.Log("SetBool ½ÇÇàµÊ: " + animator.GetBool("isJumping"));
+            }
+
+            if (IsGrounded(transform.position) && rigidBody.linearVelocity.y < 0 && !noSameFrame) 
+            {
+                animator.SetBool("isJumping", false);
             }
 
             jump = false;
