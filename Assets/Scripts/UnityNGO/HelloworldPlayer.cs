@@ -13,12 +13,25 @@ namespace HelloWorld
         private Rigidbody rigidBody;
         private Collider playerCollider;
 
+        private Camera mainCamera;
+        private RotateCamera cameraScript;
+
         public float speed = 2f;
         public float jumpHeight = 5f;
 
         private float cameraRaySize = 30f;
 
         private bool climbState = false;
+
+        private float h = 0;
+        private float v = 0;
+
+        private bool jump = false;
+        private bool attack = false;
+        private bool climbJump = false;
+
+        private Vector3 savedVelocity;
+        private bool needRestoreVelocity = false;
 
         private NetworkVariable<bool> flipState = new NetworkVariable<bool>(
             default,
@@ -69,14 +82,20 @@ namespace HelloWorld
             playerCollider = GetComponent<Collider>();
         }
 
+        private void Start()
+        {
+            mainCamera = Camera.main;
+            cameraScript = mainCamera.GetComponent<RotateCamera>();
+        }
+
         private void Update()
         {
             // 오직 소유자에서만 입력과 애니메이션 처리
             if (!IsOwner)
                 return;
 
+            InputKey();
             UpdateClimbState();
-            Jump();
             PlayerAnimation();
             PlayerLookCamera();
         }
@@ -88,10 +107,13 @@ namespace HelloWorld
 
             CanClimb();
             Move();
+            Jump();
             RaySide("Right");
             RaySide("Left");
             RayTop();
             RayDown();
+            Attack();
+            OnDamaged();
         }
 
         private void PlayerLookCamera()
@@ -129,9 +151,24 @@ namespace HelloWorld
             return Physics.BoxCast(position, boxSize, direction, out hit, Quaternion.identity, raySize, LayerMask.GetMask("Platform"));
         }
 
+        private void InputKey()
+        {
+            h = Input.GetAxisRaw("Horizontal");
+            v = Input.GetAxisRaw("Vertical");
+            if (Input.GetButtonDown("Jump"))
+            {
+                jump = true;
+            }
+            if (Input.GetButtonDown("Fire1"))
+            {
+                attack = true;
+            }
+        }
+
         private void Move()
         {
-            float h = Input.GetAxisRaw("Horizontal");
+            if (cameraScript.GetCameraRotating())
+                return;
 
             Vector3 moveVec;
 
@@ -140,9 +177,8 @@ namespace HelloWorld
                 rigidBody.useGravity = false;
 
                 moveVec = new Vector3(0, 0, 0);
-                moveVec += h * speed * 0.5f * Camera.main.transform.right;
+                moveVec += h * speed * 0.5f * mainCamera.transform.right;
 
-                float v = Input.GetAxisRaw("Vertical");
                 moveVec += v * speed * 0.5f * Vector3.up;
             }
             else
@@ -150,7 +186,7 @@ namespace HelloWorld
                 rigidBody.useGravity = true;
 
                 moveVec = new Vector3(0, rigidBody.linearVelocity.y, 0);
-                moveVec += h * speed * Camera.main.transform.right;
+                moveVec += h * speed * mainCamera.transform.right;
             }
 
             rigidBody.linearVelocity = moveVec;
@@ -158,18 +194,44 @@ namespace HelloWorld
 
         private void Jump()
         {
-            if (Input.GetButtonDown("Jump"))
+            if (cameraScript.GetCameraRotating())
             {
-                rigidBody.AddForce(Vector2.up * jumpHeight, ForceMode.Impulse);
+                if (!needRestoreVelocity)
+                {
+                    savedVelocity = rigidBody.linearVelocity;
+                    needRestoreVelocity = true;
+                }
+
+                rigidBody.linearVelocity = Vector3.zero;
+                rigidBody.useGravity = false;
+                jump = false;
+                climbJump = false;
+                return;
             }
+            else
+            {
+                if (needRestoreVelocity)
+                {
+                    rigidBody.linearVelocity = savedVelocity;
+                    needRestoreVelocity = false;
+                    rigidBody.useGravity = true;
+                }
+            }
+
+            if (IsGrounded(transform.position) || climbJump)
+            {
+                if (jump)
+                {
+                    rigidBody.AddForce(Vector2.up * jumpHeight, ForceMode.Impulse);
+                }
+            }
+            jump = false;
+            climbJump = false;
         }
 
         //위치를 옮겨야...// 나중에
         private void PlayerAnimation()
         {
-            //좌우이동 애니메이션
-            float h = Input.GetAxisRaw("Horizontal");
-
             if (h > 0)
             {
                 spriteRenderer.flipX = false;
@@ -193,8 +255,6 @@ namespace HelloWorld
             //    animator.SetBool("isJumping", true);
             //}
         }
-
-        //카메라 회전 중 게임 멈춰야
 
         private void RayTop()
         {
@@ -275,7 +335,7 @@ namespace HelloWorld
 
         private void RaySide(string leftRight)
         {
-            if (!IsVisible())
+            if (!IsVisible() || cameraScript.GetCameraRotating())
                 return;
 
             int dir = 0;
@@ -301,21 +361,21 @@ namespace HelloWorld
             boxSize.y *= 0.98f;
 
             //콜라이더 하드코딩1
-            Vector3 sideOffset = Camera.main.transform.right * dir * 0.415f;
-            Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (cameraRaySize / 2);
+            Vector3 sideOffset = mainCamera.transform.right * dir * 0.415f;
+            Vector3 rayStartDefault = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
-            Debug.DrawRay(rayStartDefault + sideOffset, Camera.main.transform.forward * cameraRaySize, new Color(1, 0, 0));
+            Debug.DrawRay(rayStartDefault + sideOffset, mainCamera.transform.forward * cameraRaySize, new Color(1, 0, 0));
 
             RaycastHit rayHitSidePlatform;
-            Physics.BoxCast(rayStartDefault + sideOffset, boxSize, Camera.main.transform.forward, out rayHitSidePlatform, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
+            Physics.BoxCast(rayStartDefault + sideOffset, boxSize, mainCamera.transform.forward, out rayHitSidePlatform, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
 
             //콜라이더 하드코딩2
-            Vector3 downSideOffset = Camera.main.transform.right * dir * 0.4f - Camera.main.transform.up * 0.51f;
+            Vector3 downSideOffset = mainCamera.transform.right * dir * 0.4f - mainCamera.transform.up * 0.51f;
 
-            Debug.DrawRay(rayStartDefault + downSideOffset, Camera.main.transform.forward * cameraRaySize, new Color(1, 0, 0));
+            Debug.DrawRay(rayStartDefault + downSideOffset, mainCamera.transform.forward * cameraRaySize, new Color(1, 0, 0));
 
             RaycastHit rayHitDownSidePlatform;
-            Physics.Raycast(rayStartDefault + downSideOffset, Camera.main.transform.forward, out rayHitDownSidePlatform, cameraRaySize, LayerMask.GetMask("Platform"));
+            Physics.Raycast(rayStartDefault + downSideOffset, mainCamera.transform.forward, out rayHitDownSidePlatform, cameraRaySize, LayerMask.GetMask("Platform"));
 
 
 
@@ -325,7 +385,7 @@ namespace HelloWorld
 
             if (rayHitSidePlatform.collider != null)
             {
-                Vector3 targetPosition1 = rayStartDefault + Camera.main.transform.forward.normalized * rayHitSidePlatform.distance + rayHitSidePlatform.normal * offset;
+                Vector3 targetPosition1 = rayStartDefault + mainCamera.transform.forward.normalized * rayHitSidePlatform.distance + rayHitSidePlatform.normal * offset;
 
                 if (!Physics.CheckBox(targetPosition1, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
                 {
@@ -360,21 +420,21 @@ namespace HelloWorld
             }
 
             //콜라이더 하드코딩 0.4 0.5
-            Vector3 rightOffset = Camera.main.transform.right * 0.4f;
+            Vector3 rightOffset = mainCamera.transform.right * 0.4f;
             Vector3 topOffset = Vector3.up * 0.5f;
-            Vector3 rayStartDefault = transform.position - Camera.main.transform.forward * (cameraRaySize / 2);
+            Vector3 rayStartDefault = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
             //player 꼭짓점에 ray
             Vector3[] offsets = new Vector3[]
             {
-            //topRight
-            topOffset + rightOffset,
-            //topLeft
-            topOffset - rightOffset,
-            //downRight
-            -topOffset + rightOffset,
-            //downLeft
-            -topOffset - rightOffset
+        //topRight
+        topOffset + rightOffset,
+        //topLeft
+        topOffset - rightOffset,
+        //downRight
+        -topOffset + rightOffset,
+        //downLeft
+        -topOffset - rightOffset
             };
 
             RaycastHit ivyHit;
@@ -384,7 +444,7 @@ namespace HelloWorld
             foreach (var offset in offsets)
             {
                 //null이 아니고
-                if (Physics.Raycast(rayStartDefault + offset, Camera.main.transform.forward, out ivyHit, cameraRaySize, mask))
+                if (Physics.Raycast(rayStartDefault + offset, mainCamera.transform.forward, out ivyHit, cameraRaySize, mask))
                 {
                     if (ivyHit.collider.gameObject.layer == ivy)
                     {
@@ -402,6 +462,7 @@ namespace HelloWorld
             if (climbState && Input.GetButtonDown("Jump"))
             {
                 climbState = false;
+                climbJump = true;
                 return;
             }
 
@@ -413,6 +474,64 @@ namespace HelloWorld
             if (climbState && !canClimb)
             {
                 climbState = false;
+            }
+        }
+
+        private void Attack()
+        {
+            if (!attack)
+                return;
+        }
+
+        public void OnDamaged()
+        {
+            //콜라이더 하드코딩 0.4 0.5
+            Vector3 rightOffset = mainCamera.transform.right * 0.4f;
+            Vector3 topOffset = Vector3.up * 0.5f;
+            Vector3 rayStartDefault = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
+
+            //player 꼭짓점에 ray
+            Vector3[] offsets = new Vector3[]
+            {
+                //topRight
+                topOffset + rightOffset,
+                //topLeft
+                topOffset - rightOffset,
+                //downRight
+                -topOffset + rightOffset,
+                //downLeft
+                -topOffset - rightOffset
+            };
+
+            Debug.Log("Func true");
+
+            RaycastHit enemyHit;
+            int enemy = LayerMask.NameToLayer("Enemy");
+            int mask = ~(1 << LayerMask.NameToLayer("Player"));
+
+            foreach (var offset in offsets)
+            {
+                //null이 아니고
+                if (Physics.Raycast(rayStartDefault + offset, mainCamera.transform.forward, out enemyHit, cameraRaySize, mask))
+                {
+                    if (enemyHit.collider.gameObject.layer == enemy)
+                    {
+                        Debug.Log("Damaged");
+                        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+                        bool isX = Mathf.Abs(transform.rotation.y) == 90 ? false : true;
+                        int dirc;
+                        if (isX)
+                        {
+                            dirc = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;
+                            rigidBody.AddForce(new Vector3(dirc, 1, 0) * 7, ForceMode.Impulse);
+                        }
+                        else
+                        {
+                            dirc = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
+                            rigidBody.AddForce(new Vector3(0, 1, dirc) * 7, ForceMode.Impulse);
+                        }
+                    }
+                }
             }
         }
     }
