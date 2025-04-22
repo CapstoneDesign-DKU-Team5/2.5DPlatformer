@@ -175,7 +175,6 @@ namespace HelloWorld
                 rigidBody.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
                 animator.SetBool("isJumping", true);
                 noSameFrame = true;
-                Debug.Log("SetBool 실행됨: " + animator.GetBool("isJumping"));
             }
 
             if (IsGrounded(transform.position) && rigidBody.linearVelocity.y < 0 && !noSameFrame) 
@@ -276,7 +275,6 @@ namespace HelloWorld
 
             int dir = (leftRight == "Right") ? 1 : -1;
 
-            //없어도 될듯. test
             if (h != dir && !damaged)
                 return;
 
