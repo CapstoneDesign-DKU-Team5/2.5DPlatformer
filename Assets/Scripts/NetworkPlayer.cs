@@ -259,6 +259,7 @@ namespace HelloWorld
 
             if (rigidBody.linearVelocity.y < -0.01f)
             {
+
                 if (Physics.BoxCast(rayStart - rayDownOffset, boxSize, mainCamera.transform.forward, out RaycastHit hit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform")))
                 {
                     Vector3 target = rayStart + mainCamera.transform.forward.normalized * hit.distance - hit.normal * offset;
@@ -276,8 +277,8 @@ namespace HelloWorld
             int dir = (leftRight == "Right") ? 1 : -1;
 
             //없어도 될듯. test
-            //if (h != dir)
-            //    return;
+            if (h != dir && !damaged)
+                return;
 
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.x = 0.15f;
