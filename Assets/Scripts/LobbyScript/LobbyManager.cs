@@ -21,7 +21,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public Button closeButton;
     public TMP_InputField inviteCodeInput;
 
-
     private string currentInviteCode = "";
 
     private void Awake()
@@ -39,21 +38,21 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();
 
         matchmakingButton.interactable = false;
-        connectionInfoText.text = "¸¶½ºÅÍ ¼­¹ö¿¡ Á¢¼Ó Áß...";
+        connectionInfoText.text = "ë§ˆìŠ¤í„° ì„œë²„ì— ì ‘ì† ì¤‘...";
         lobbyCreatePanel.SetActive(false);
     }
 
     public override void OnConnectedToMaster()
     {
         matchmakingButton.interactable = true;
-        connectionInfoText.text = "¿Â¶óÀÎ: ¸¶½ºÅÍ ¼­¹ö¿¡ ¿¬°áµÊ";
+        connectionInfoText.text = "ì˜¨ë¼ì¸: ë§ˆìŠ¤í„° ì„œë²„ì— ì—°ê²°ë¨";
     }
 
     public override void OnDisconnected(DisconnectCause cause)
     {
         matchmakingButton.interactable = false;
 
-        connectionInfoText.text = "¿ÀÇÁ¶óÀÎ: ¸¶½ºÅÍ ¼­¹ö¿Í ¿¬°áµÇÁö ¾ÊÀ½\nÁ¢¼Ó Àç½ÃµµÁß...";
+        connectionInfoText.text = "ì˜¤í”„ë¼ì¸: ë§ˆìŠ¤í„° ì„œë²„ì™€ ì—°ê²°ë˜ì§€ ì•ŠìŒ\nì ‘ì† ì¬ì‹œë„ì¤‘...";
         PhotonNetwork.ConnectUsingSettings();
     }
 
@@ -63,31 +62,31 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.IsConnected)
         {
-            connectionInfoText.text = "Âü°¡ °¡´ÉÇÑ °ÔÀÓÀ» Ã£´ÂÁß...";
+            connectionInfoText.text = "ì°¸ê°€ ê°€ëŠ¥í•œ ê²Œì„ì„ ì°¾ëŠ”ì¤‘...";
             var expectedProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", false } };
             PhotonNetwork.JoinRandomRoom(expectedProperties, 0);
         }
         else
         {
-            connectionInfoText.text = "¿ÀÇÁ¶óÀÎ: ¸¶½ºÅÍ ¼­¹ö¿Í ¿¬°áµÇÁö ¾ÊÀ½ \nÁ¢¼Ó Àç½Ãµµ Áß...";
+            connectionInfoText.text = "ì˜¤í”„ë¼ì¸: ë§ˆìŠ¤í„° ì„œë²„ì™€ ì—°ê²°ë˜ì§€ ì•ŠìŒ \nì ‘ì† ì¬ì‹œë„ ì¤‘...";
             PhotonNetwork.ConnectUsingSettings();
         }
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        // Matchmaking¿ë ·ë¸¸ »ı¼º
+        // Matchmakingìš© ë£¸ë§Œ ìƒì„±
         PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 2, CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", false } }, CustomRoomPropertiesForLobby = new[] { "inviteOnly" } });
     }
 
     public override void OnJoinedRoom()
     {
-        connectionInfoText.text = "¹æ Âü°¡ ¼º°ø";
+        connectionInfoText.text = "ë°© ì°¸ê°€ ì„±ê³µ";
         PhotonNetwork.LoadLevel("GameScene");
     }
 
     /// <summary>
-    /// ·Îºñ ÆĞ³Î ¿­±â
+    /// ë¡œë¹„ íŒ¨ë„ ì—´ê¸°
     /// </summary>
     private void OpenLobbyPanel()
     {
@@ -95,7 +94,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     }
 
     /// <summary>
-    /// ÃÊ´ë ÄÚµå ±â¹İ ·ë »ı¼º
+    /// ì´ˆëŒ€ ì½”ë“œ ê¸°ë°˜ ë£¸ ìƒì„±
     /// </summary>
     private void CreateInviteRoom()
     {
@@ -109,12 +108,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
         PhotonNetwork.CreateRoom(currentInviteCode, options);
 
-        Debug.Log($"[ÃÊ´ë ÄÚµå] ÀÌ ¹æÀÇ ÃÊ´ë ÄÚµå´Â: {currentInviteCode}");
+        Debug.Log($"[ì´ˆëŒ€ ì½”ë“œ] ì´ ë°©ì˜ ì´ˆëŒ€ ì½”ë“œëŠ”: {currentInviteCode}");
     }
 
-    /// <summary>
-    /// ÃÊ´ë ÄÚµå ±â¹İ ·ë Âü°¡ ½Ãµµ
-    /// </summary>
     private void JoinInviteRoom()
     {
         string inputCode = inviteCodeInput.text.Trim();
@@ -124,19 +120,20 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            Debug.LogWarning("ÃÊ´ë ÄÚµå¸¦ ÀÔ·ÂÇÏ¼¼¿ä.");
-            connectionInfoText.text = "ÃÊ´ë ÄÚµå¸¦ ÀÔ·ÂÇÏ¼¼¿ä.";
+            Debug.LogWarning("ì´ˆëŒ€ ì½”ë“œë¥¼ ì…ë ¥í•˜ì„¸ìš”.");
+            connectionInfoText.text = "ì´ˆëŒ€ ì½”ë“œë¥¼ ì…ë ¥í•˜ì„¸ìš”.";
         }
     }
 
+
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
-        Debug.LogWarning($"¹æ Âü°¡ ½ÇÆĞ: {message}");
-        connectionInfoText.text = "ÃÊ´ëµÈ ¹æÀÌ Á¸ÀçÇÏÁö ¾Ê°Å³ª ÀÎ¿øÀÌ °¡µæ Ã¡½À´Ï´Ù.";
+        Debug.LogWarning($"ë°© ì°¸ê°€ ì‹¤íŒ¨: {message}");
+        connectionInfoText.text = "ì´ˆëŒ€ëœ ë°©ì´ ì¡´ì¬í•˜ì§€ ì•Šê±°ë‚˜ ì¸ì›ì´ ê°€ë“ ì°¼ìŠµë‹ˆë‹¤.";
     }
 
     /// <summary>
-    /// °£´ÜÇÑ ·£´ı ÃÊ´ëÄÚµå »ı¼º±â (¿¹: 6ÀÚ¸® ´ë¹®ÀÚ/¼ıÀÚ)
+    /// ê°„ë‹¨í•œ ëœë¤ ì´ˆëŒ€ì½”ë“œ ìƒì„±ê¸° (ì˜ˆ: 6ìë¦¬ ëŒ€ë¬¸ì/ìˆ«ì)
     /// </summary>
     private string GenerateInviteCode()
     {
@@ -154,4 +151,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         lobbyCreatePanel.SetActive(false);
     }
+
 }
+
