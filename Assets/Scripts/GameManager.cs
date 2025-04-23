@@ -46,6 +46,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+   
+
     private void Start()
     {
         // 플레이어 스폰 위치 결정
