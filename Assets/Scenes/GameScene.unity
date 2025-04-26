@@ -4304,7 +4304,7 @@ GameObject:
   m_Component:
   - component: {fileID: 170303508}
   - component: {fileID: 170303509}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Block11
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12667,7 +12667,7 @@ GameObject:
   - component: {fileID: 550022384}
   - component: {fileID: 550022388}
   - component: {fileID: 550022387}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12712,7 +12712,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f47185c4c3e2b44294889c0d10fdd4d, type: 2}
+  - {fileID: 2100000, guid: 45b23764b3e0dd1439fd21d88fda5c77, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -27640,7 +27640,8 @@ GameObject:
   - component: {fileID: 1443979476}
   - component: {fileID: 1443979480}
   - component: {fileID: 1443979479}
-  m_Layer: 8
+  - component: {fileID: 1443979481}
+  m_Layer: 10
   m_Name: Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27685,7 +27686,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f47185c4c3e2b44294889c0d10fdd4d, type: 2}
+  - {fileID: 2100000, guid: 45b23764b3e0dd1439fd21d88fda5c77, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -27715,6 +27716,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1443979475}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &1443979481
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1443979475}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 0.01}
+  m_Center: {x: 0.5, y: -0.5, z: -0.5}
 --- !u!1 &1474997840
 GameObject:
   m_ObjectHideFlags: 0
@@ -29715,7 +29737,7 @@ GameObject:
   - component: {fileID: 1622321381}
   - component: {fileID: 1622321385}
   - component: {fileID: 1622321384}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29760,7 +29782,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f47185c4c3e2b44294889c0d10fdd4d, type: 2}
+  - {fileID: 2100000, guid: 45b23764b3e0dd1439fd21d88fda5c77, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -31528,7 +31550,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1735897562}
   - component: {fileID: 1735897564}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Block10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37770,7 +37792,7 @@ GameObject:
   - component: {fileID: 2123146061}
   - component: {fileID: 2123146065}
   - component: {fileID: 2123146064}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37815,7 +37837,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f47185c4c3e2b44294889c0d10fdd4d, type: 2}
+  - {fileID: 2100000, guid: 45b23764b3e0dd1439fd21d88fda5c77, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
