@@ -34,6 +34,7 @@ namespace HelloWorld
 
         bool isAttacking = false;
         bool isAir = false;
+        bool isVisible = true;
 
         private bool flipState = false;
 
@@ -64,7 +65,7 @@ namespace HelloWorld
 
             InputKey();
             UpdateClimbState();
-            PlayerAnimation();
+            PlayerMoveAni();
             PlayerLookCamera();
         }
 
@@ -72,7 +73,10 @@ namespace HelloWorld
         {
             if (!photonView.IsMine || mainCamera == null || cameraScript == null)
                 return;
+
+            IsVisible();
             IsAir();
+
             Move();
             Jump();
             RaySide("Right");
@@ -88,7 +92,7 @@ namespace HelloWorld
             transform.rotation = Quaternion.Euler(0, mainCamera.transform.eulerAngles.y, 0);
         }
 
-        private bool IsVisible()
+        private void IsVisible()
         {
             RaycastHit rayHitPlayer;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
@@ -96,10 +100,15 @@ namespace HelloWorld
             if (Physics.Raycast(rayStart, mainCamera.transform.forward, out rayHitPlayer, cameraRaySize))
             {
                 int playerLayer = LayerMask.NameToLayer("Player");
-                return rayHitPlayer.collider.gameObject.layer == playerLayer;
+                if(rayHitPlayer.collider.gameObject.layer == playerLayer)
+                {
+                    isVisible = true;
+                    return;
+                }
+                //return rayHitPlayer.collider.gameObject.layer == playerLayer;
             }
-
-            return false;
+            isVisible = false;
+            //return false;
         }
 
         private bool IsGrounded(Vector3 position)
@@ -202,7 +211,7 @@ namespace HelloWorld
             climbJump = false;
         }
 
-        private void PlayerAnimation()
+        private void PlayerMoveAni()
         {
             if (h > 0)
             {
@@ -218,6 +227,10 @@ namespace HelloWorld
                 {
                     photonView.RPC(nameof(SetFlipState), RpcTarget.AllBuffered, true);
                 }
+                animator.SetBool("isWalking", true);
+            }
+            else if (v != 0)
+            {
                 animator.SetBool("isWalking", true);
             }
             else
@@ -237,7 +250,7 @@ namespace HelloWorld
 
         private void RayTop()
         {
-            if (!photonView.IsMine || !IsVisible())
+            if (!photonView.IsMine || !isVisible)
                 return;
 
             float offset = 0.5f;
@@ -261,7 +274,7 @@ namespace HelloWorld
 
         private void RayDown()
         {
-            if (!photonView.IsMine || !IsVisible())
+            if (!photonView.IsMine || !isVisible)
                 return;
 
             float offset = 0.5f;
@@ -286,7 +299,7 @@ namespace HelloWorld
 
         private void RaySide(string leftRight)
         {
-            if (!photonView.IsMine || !IsVisible() || cameraScript.GetCameraRotating())
+            if (!photonView.IsMine || !isVisible || cameraScript.GetCameraRotating())
                 return;
 
             int dir = (leftRight == "Right") ? 1 : -1;
@@ -316,8 +329,7 @@ namespace HelloWorld
                 Vector3 target = rayStart + mainCamera.transform.forward.normalized * sideHit.distance + sideHit.normal * 0.5f;
                 if (!Physics.CheckBox(target, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
                 {
-                    //이 부분 isAir 바꾸면 문제 생김
-                    if (IsGrounded(transform.position) && IsGrounded(target) || !IsGrounded(transform.position))
+                    if (!isAir && IsGrounded(target) || isAir)
                     {
                         transform.position = target;
                         return;
