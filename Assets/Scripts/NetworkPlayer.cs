@@ -33,6 +33,7 @@ namespace HelloWorld
         private bool needRestoreVelocity = false;
 
         bool isAttacking = false;
+        bool isAir = false;
 
         private bool flipState = false;
 
@@ -71,8 +72,7 @@ namespace HelloWorld
         {
             if (!photonView.IsMine || mainCamera == null || cameraScript == null)
                 return;
-
-            CanClimb();
+            IsAir();
             Move();
             Jump();
             RaySide("Right");
@@ -108,6 +108,24 @@ namespace HelloWorld
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.y = 0.1f;
             return Physics.BoxCast(position, boxSize, Vector3.down, out hit, Quaternion.identity, 0.51f, LayerMask.GetMask("Platform"));
+        }
+
+        private void IsAir()
+        {
+            RaycastHit hit;
+            Vector3 boxSize = playerCollider.bounds.extents;
+            boxSize.y = 0.1f;
+            if (Physics.BoxCast(transform.position, boxSize, Vector3.down, out hit, Quaternion.identity, 0.51f, LayerMask.GetMask("Platform")))
+            {
+                isAir = false;
+                animator.SetBool("isAir", false);
+            }
+            else
+            {
+                isAir = true;
+                animator.SetBool("isAir", true);
+            }
+
         }
 
         private void InputKey()
@@ -169,18 +187,16 @@ namespace HelloWorld
                 rigidBody.useGravity = true;
             }
 
-            bool noSameFrame = false;
-            if ((IsGrounded(transform.position) || climbJump) && jump)
+            //bool noSameFrame = false;
+            if ((!isAir || climbJump) && jump)
             {
                 rigidBody.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
-                animator.SetBool("isJumping", true);
-                noSameFrame = true;
+                //noSameFrame = true;
             }
 
-            if (IsGrounded(transform.position) && rigidBody.linearVelocity.y < 0 && !noSameFrame) 
-            {
-                animator.SetBool("isJumping", false);
-            }
+            //if (!isAir && rigidBody.linearVelocity.y < 0 && !noSameFrame) 
+            //{
+            //}
 
             jump = false;
             climbJump = false;
@@ -300,6 +316,7 @@ namespace HelloWorld
                 Vector3 target = rayStart + mainCamera.transform.forward.normalized * sideHit.distance + sideHit.normal * 0.5f;
                 if (!Physics.CheckBox(target, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
                 {
+                    //이 부분 isAir 바꾸면 문제 생김
                     if (IsGrounded(transform.position) && IsGrounded(target) || !IsGrounded(transform.position))
                     {
                         transform.position = target;
@@ -321,7 +338,7 @@ namespace HelloWorld
 
         private bool CanClimb()
         {
-            if (IsGrounded(transform.position))
+            if (!isAir)
                 return false;
 
             Vector3 rightOffset = mainCamera.transform.right * 0.4f;
@@ -361,17 +378,20 @@ namespace HelloWorld
             {
                 climbState = false;
                 climbJump = true;
+                animator.SetBool("isClimbIdle", false);
                 return;
             }
 
             if (Input.GetButtonDown("Jump") && canClimb)
             {
                 climbState = true;
+                animator.SetBool("isClimbIdle", true);
             }
 
             if (climbState && !canClimb)
             {
                 climbState = false;
+                animator.SetBool("isClimbIdle", false);
             }
         }
 
@@ -474,6 +494,7 @@ namespace HelloWorld
                             if (climbState)
                             {
                                 climbState = false;
+                                animator.SetBool("isClimbIdle", false);
                                 rigidBody.useGravity = true;
                             }
                             
