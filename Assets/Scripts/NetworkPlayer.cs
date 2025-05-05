@@ -33,6 +33,8 @@ namespace HelloWorld
         private bool needRestoreVelocity = false;
 
         bool isAttacking = false;
+        bool isAir = false;
+        bool isVisible = true;
 
         private bool flipState = false;
 
@@ -63,7 +65,7 @@ namespace HelloWorld
 
             InputKey();
             UpdateClimbState();
-            PlayerAnimation();
+            PlayerMoveAni();
             PlayerLookCamera();
         }
 
@@ -72,7 +74,9 @@ namespace HelloWorld
             if (!photonView.IsMine || mainCamera == null || cameraScript == null)
                 return;
 
-            CanClimb();
+            IsVisible();
+            IsAir();
+
             Move();
             Jump();
             RaySide("Right");
@@ -88,7 +92,7 @@ namespace HelloWorld
             transform.rotation = Quaternion.Euler(0, mainCamera.transform.eulerAngles.y, 0);
         }
 
-        private bool IsVisible()
+        private void IsVisible()
         {
             RaycastHit rayHitPlayer;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
@@ -96,10 +100,15 @@ namespace HelloWorld
             if (Physics.Raycast(rayStart, mainCamera.transform.forward, out rayHitPlayer, cameraRaySize))
             {
                 int playerLayer = LayerMask.NameToLayer("Player");
-                return rayHitPlayer.collider.gameObject.layer == playerLayer;
+                if(rayHitPlayer.collider.gameObject.layer == playerLayer)
+                {
+                    isVisible = true;
+                    return;
+                }
+                //return rayHitPlayer.collider.gameObject.layer == playerLayer;
             }
-
-            return false;
+            isVisible = false;
+            //return false;
         }
 
         private bool IsGrounded(Vector3 position)
@@ -108,6 +117,24 @@ namespace HelloWorld
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.y = 0.1f;
             return Physics.BoxCast(position, boxSize, Vector3.down, out hit, Quaternion.identity, 0.51f, LayerMask.GetMask("Platform"));
+        }
+
+        private void IsAir()
+        {
+            RaycastHit hit;
+            Vector3 boxSize = playerCollider.bounds.extents;
+            boxSize.y = 0.1f;
+            if (Physics.BoxCast(transform.position, boxSize, Vector3.down, out hit, Quaternion.identity, 0.51f, LayerMask.GetMask("Platform")))
+            {
+                isAir = false;
+                animator.SetBool("isAir", false);
+            }
+            else
+            {
+                isAir = true;
+                animator.SetBool("isAir", true);
+            }
+
         }
 
         private void InputKey()
@@ -169,24 +196,22 @@ namespace HelloWorld
                 rigidBody.useGravity = true;
             }
 
-            bool noSameFrame = false;
-            if ((IsGrounded(transform.position) || climbJump) && jump)
+            //bool noSameFrame = false;
+            if ((!isAir || climbJump) && jump)
             {
                 rigidBody.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
-                animator.SetBool("isJumping", true);
-                noSameFrame = true;
+                //noSameFrame = true;
             }
 
-            if (IsGrounded(transform.position) && rigidBody.linearVelocity.y < 0 && !noSameFrame) 
-            {
-                animator.SetBool("isJumping", false);
-            }
+            //if (!isAir && rigidBody.linearVelocity.y < 0 && !noSameFrame) 
+            //{
+            //}
 
             jump = false;
             climbJump = false;
         }
 
-        private void PlayerAnimation()
+        private void PlayerMoveAni()
         {
             if (h > 0)
             {
@@ -202,6 +227,10 @@ namespace HelloWorld
                 {
                     photonView.RPC(nameof(SetFlipState), RpcTarget.AllBuffered, true);
                 }
+                animator.SetBool("isWalking", true);
+            }
+            else if (v != 0)
+            {
                 animator.SetBool("isWalking", true);
             }
             else
@@ -221,7 +250,7 @@ namespace HelloWorld
 
         private void RayTop()
         {
-            if (!photonView.IsMine || !IsVisible())
+            if (!photonView.IsMine || !isVisible)
                 return;
 
             float offset = 0.5f;
@@ -245,7 +274,7 @@ namespace HelloWorld
 
         private void RayDown()
         {
-            if (!photonView.IsMine || !IsVisible())
+            if (!photonView.IsMine || !isVisible)
                 return;
 
             float offset = 0.5f;
@@ -270,7 +299,7 @@ namespace HelloWorld
 
         private void RaySide(string leftRight)
         {
-            if (!photonView.IsMine || !IsVisible() || cameraScript.GetCameraRotating())
+            if (!photonView.IsMine || !isVisible || cameraScript.GetCameraRotating())
                 return;
 
             int dir = (leftRight == "Right") ? 1 : -1;
@@ -300,7 +329,7 @@ namespace HelloWorld
                 Vector3 target = rayStart + mainCamera.transform.forward.normalized * sideHit.distance + sideHit.normal * 0.5f;
                 if (!Physics.CheckBox(target, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
                 {
-                    if (IsGrounded(transform.position) && IsGrounded(target) || !IsGrounded(transform.position))
+                    if (!isAir && IsGrounded(target) || isAir)
                     {
                         transform.position = target;
                         return;
@@ -321,7 +350,7 @@ namespace HelloWorld
 
         private bool CanClimb()
         {
-            if (IsGrounded(transform.position))
+            if (!isAir)
                 return false;
 
             Vector3 rightOffset = mainCamera.transform.right * 0.4f;
@@ -361,17 +390,20 @@ namespace HelloWorld
             {
                 climbState = false;
                 climbJump = true;
+                animator.SetBool("isClimbIdle", false);
                 return;
             }
 
             if (Input.GetButtonDown("Jump") && canClimb)
             {
                 climbState = true;
+                animator.SetBool("isClimbIdle", true);
             }
 
             if (climbState && !canClimb)
             {
                 climbState = false;
+                animator.SetBool("isClimbIdle", false);
             }
         }
 
@@ -474,6 +506,7 @@ namespace HelloWorld
                             if (climbState)
                             {
                                 climbState = false;
+                                animator.SetBool("isClimbIdle", false);
                                 rigidBody.useGravity = true;
                             }
                             
