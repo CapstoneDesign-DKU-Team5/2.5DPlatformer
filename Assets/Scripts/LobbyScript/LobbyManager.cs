@@ -1,91 +1,156 @@
+using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
-using UnityEngine;
 using UnityEngine.UI;
-
+using System;
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
     private string gameVersion = "1.0";
-    [Header("References")]
-    [Tooltip("ConnectionInfo,MatchMaker")]
+
+    [Header("UI References")]
     public TextMeshProUGUI connectionInfoText;
     public Button matchmakingButton;
+    public Button lobbyButton;
+
+    [Header("Lobby Panel")]
+    public GameObject lobbyCreatePanel;
+    public Button createRoomButton;
+    public Button joinRoomButton;
+    public Button closeButton;
+    public TMP_InputField inviteCodeInput;
+
+    private string currentInviteCode = "";
 
     private void Awake()
     {
         matchmakingButton.onClick.AddListener(Connect);
+        lobbyButton.onClick.AddListener(OpenLobbyPanel);
+        createRoomButton.onClick.AddListener(CreateInviteRoom);
+        joinRoomButton.onClick.AddListener(JoinInviteRoom);
+        closeButton.onClick.AddListener(CloseLobbyPanel);
     }
-    //°ÔÀÓ ½ÇÇà°ú µ¿½Ã¿¡ ¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ½Ãµµ
+
     private void Start()
     {
-        //°ÔÀÓ¹öÀü ¼³Á¤
         PhotonNetwork.GameVersion = gameVersion;
-        //¸¶½ºÅÍ¼­¹ö Á¢¼Ó ½Ãµµ
         PhotonNetwork.ConnectUsingSettings();
 
-        //·ë Á¢¼Ó ¹öÆ° Àá½Ã ºñÈ°¼ºÈ­
         matchmakingButton.interactable = false;
-
-        //Á¢¼Ó ½Ãµµ ·ÎµùÁß ÅØ½ºÆ®
-        connectionInfoText.text = "¸¶½ºÅÍ ¼­¹ö¿¡ Á¢¼Ó Áß...";
+        connectionInfoText.text = "ë§ˆìŠ¤í„° ì„œë²„ì— ì ‘ì† ì¤‘...";
+        lobbyCreatePanel.SetActive(false);
     }
-    // ¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ¼º°ø ½Ã ÀÚµ¿ ½ÇÇà
+
     public override void OnConnectedToMaster()
     {
-        //·ë Á¢¼Ó ¹öÆ° È°¼ºÈ­
         matchmakingButton.interactable = true;
-        //Á¢¼Ó Á¤º¸ Ç¥½Ã
-        connectionInfoText.text = "¿Â¶óÀÎ: ¸¶½ºÅÍ ¼­¹ö¿¡ ¿¬°áµÊ";
+        connectionInfoText.text = "ì˜¨ë¼ì¸: ë§ˆìŠ¤í„° ì„œë²„ì— ì—°ê²°ë¨";
     }
-    //¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ½ÇÆĞ ½Ã ÀÚµ¿ ½ÇÇà
+
     public override void OnDisconnected(DisconnectCause cause)
     {
-        // ·ë Á¢¼Ó ¹öÆ° ºñÈ°¼ºÈ­
         matchmakingButton.interactable = false;
-        // Á¢¼Ó Á¤º¸ Ç¥½Ã º¯°æ
-        connectionInfoText.text = "¿ÀÇÁ¶óÀÎ: ¸¶½ºÅÍ ¼­¹ö¿Í ¿¬°áµÇÁö ¾ÊÀ½ \n Á¢¼Ó Àç½ÃµµÁß...";
 
-        // ÀçÁ¢¼Ó ½Ãµµ
+        connectionInfoText.text = "ì˜¤í”„ë¼ì¸: ë§ˆìŠ¤í„° ì„œë²„ì™€ ì—°ê²°ë˜ì§€ ì•ŠìŒ\nì ‘ì† ì¬ì‹œë„ì¤‘...";
         PhotonNetwork.ConnectUsingSettings();
     }
 
-    //·ë Á¢¼Ó ½Ãµµ
     public void Connect()
     {
-        //Áßº¹ Á¢¼ÓÀ» ¸·±âÀ§ÇÑ Á¶Ä¡
         matchmakingButton.interactable = false;
 
-        //¸¶½ºÅÍ ¼­¹ö Á¢¼ÓÁß
-        if(PhotonNetwork.IsConnected)
+        if (PhotonNetwork.IsConnected)
         {
-            //·ë Á¢¼Ó ½ÇÇà
-            connectionInfoText.text = "Âü°¡ °¡´ÉÇÑ °ÔÀÓÀ» Ã£´ÂÁß...";
-            PhotonNetwork.JoinRandomRoom();
-
+            connectionInfoText.text = "ì°¸ê°€ ê°€ëŠ¥í•œ ê²Œì„ì„ ì°¾ëŠ”ì¤‘...";
+            var expectedProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", false } };
+            PhotonNetwork.JoinRandomRoom(expectedProperties, 0);
         }
         else
         {
-            //¸¶½ºÅÍ ¼­¹ö¿¡ Á¢¼Ó ÁßÀÌ ¾Æ´Ï¶ó¸é ´Ù½Ã Á¢¼Ó ½Ãµµ
-            connectionInfoText.text = "¿ÀÇÁ¶óÀÎ: ¸¶½ºÅÍ ¼­¹ö¿Í ¿¬°áµÇÁö ¾ÊÀ½ \nÁ¢¼Ó Àç½Ãµµ Áß...";
+            connectionInfoText.text = "ì˜¤í”„ë¼ì¸: ë§ˆìŠ¤í„° ì„œë²„ì™€ ì—°ê²°ë˜ì§€ ì•ŠìŒ \nì ‘ì† ì¬ì‹œë„ ì¤‘...";
             PhotonNetwork.ConnectUsingSettings();
         }
     }
 
-    //·£´ı ·ë Âü°¡¿¡ ½ÇÆĞÇÑ °æ¿ì ÀÚµ¿ ½ÇÇà
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        //4¸í ¼ö¿ë°¡´ÉÇÑ ºó ¹æ »ı¼º
-        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 2 });
+        // Matchmakingìš© ë£¸ë§Œ ìƒì„±
+        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 2, CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", false } }, CustomRoomPropertiesForLobby = new[] { "inviteOnly" } });
     }
 
-    //·ë¿¡ Âü°¡ ¿Ï·áµÈ °æ¿ì ÀÚµ¿ ½ÇÇà
     public override void OnJoinedRoom()
     {
-        connectionInfoText.text = "¹æ Âü°¡ ¼º°ø";
+        connectionInfoText.text = "ë°© ì°¸ê°€ ì„±ê³µ";
         PhotonNetwork.LoadLevel("GameScene");
     }
 
+    /// <summary>
+    /// ë¡œë¹„ íŒ¨ë„ ì—´ê¸°
+    /// </summary>
+    private void OpenLobbyPanel()
+    {
+        lobbyCreatePanel.SetActive(true);
+    }
+
+    /// <summary>
+    /// ì´ˆëŒ€ ì½”ë“œ ê¸°ë°˜ ë£¸ ìƒì„±
+    /// </summary>
+    private void CreateInviteRoom()
+    {
+        currentInviteCode = GenerateInviteCode();
+        RoomOptions options = new RoomOptions
+        {
+            MaxPlayers = 2,
+            CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", true }, { "code", currentInviteCode } },
+            CustomRoomPropertiesForLobby = new[] { "inviteOnly", "code" }
+        };
+
+        PhotonNetwork.CreateRoom(currentInviteCode, options);
+
+        Debug.Log($"[ì´ˆëŒ€ ì½”ë“œ] ì´ ë°©ì˜ ì´ˆëŒ€ ì½”ë“œëŠ”: {currentInviteCode}");
+    }
+
+    private void JoinInviteRoom()
+    {
+        string inputCode = inviteCodeInput.text.Trim();
+        if (!string.IsNullOrEmpty(inputCode))
+        {
+            PhotonNetwork.JoinRoom(inputCode);
+        }
+        else
+        {
+            Debug.LogWarning("ì´ˆëŒ€ ì½”ë“œë¥¼ ì…ë ¥í•˜ì„¸ìš”.");
+            connectionInfoText.text = "ì´ˆëŒ€ ì½”ë“œë¥¼ ì…ë ¥í•˜ì„¸ìš”.";
+        }
+    }
+
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        Debug.LogWarning($"ë°© ì°¸ê°€ ì‹¤íŒ¨: {message}");
+        connectionInfoText.text = "ì´ˆëŒ€ëœ ë°©ì´ ì¡´ì¬í•˜ì§€ ì•Šê±°ë‚˜ ì¸ì›ì´ ê°€ë“ ì°¼ìŠµë‹ˆë‹¤.";
+    }
+
+    /// <summary>
+    /// ê°„ë‹¨í•œ ëœë¤ ì´ˆëŒ€ì½”ë“œ ìƒì„±ê¸° (ì˜ˆ: 6ìë¦¬ ëŒ€ë¬¸ì/ìˆ«ì)
+    /// </summary>
+    private string GenerateInviteCode()
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        System.Random random = new System.Random();
+        char[] code = new char[6];
+        for (int i = 0; i < 6; i++)
+        {
+            code[i] = chars[random.Next(chars.Length)];
+        }
+        return new string(code);
+    }
+
+    private void CloseLobbyPanel()
+    {
+        lobbyCreatePanel.SetActive(false);
+    }
 
 }
+
