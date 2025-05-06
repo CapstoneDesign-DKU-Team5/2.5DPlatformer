@@ -10,6 +10,7 @@ namespace HelloWorld
         private SpriteRenderer spriteRenderer;
         private Rigidbody rigidBody;
         private Collider playerCollider;
+        private BoxCollider boxColider;
 
         private Camera mainCamera;
         private RotateCamera cameraScript;
@@ -45,6 +46,7 @@ namespace HelloWorld
             animator = GetComponent<Animator>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             playerCollider = GetComponent<Collider>();
+            boxColider = GetComponent<BoxCollider>();
         }
 
         private void Start()
@@ -161,8 +163,9 @@ namespace HelloWorld
 
             if (climbState)
             {
+                float slow = 0.5f;
                 rigidBody.useGravity = false;
-                moveVec = h * speed * 0.5f * mainCamera.transform.right + v * speed * 0.5f * Vector3.up;
+                moveVec = h * speed * slow * mainCamera.transform.right + v * speed * slow * Vector3.up;
             }
             else
             {
@@ -353,8 +356,8 @@ namespace HelloWorld
             if (!isAir)
                 return false;
 
-            Vector3 rightOffset = mainCamera.transform.right * 0.4f;
-            Vector3 topOffset = Vector3.up * 0.5f;
+            Vector3 rightOffset = mainCamera.transform.right * boxColider.size.x / 2f;
+            Vector3 topOffset = Vector3.up * boxColider.size.y / 2f;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
             Vector3[] offsets = new Vector3[]
@@ -422,11 +425,10 @@ namespace HelloWorld
 
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
-            //player 중심으로부터 범위
-            Vector3 attackRange = attackDir == 1 ? mainCamera.transform.right * 0.4f : -mainCamera.transform.right * 0.4f;
+            //player 중심으로부터 좌우 범위
+            Vector3 attackRange = attackDir == 1 ? mainCamera.transform.right * 0.45f : -mainCamera.transform.right * 0.45f;
             //player 공격 상 하 범위
             Vector3 attackHalfHeight = Vector3.up * 0.1f;
-            //스프라이트 적용 후 조절
             //공격 중심 시작 높이
             Vector3 attackHeight = Vector3.up * 0.1f;
 
@@ -469,9 +471,10 @@ namespace HelloWorld
 
         public void OnDamaged()
         {
-            //콜라이더 하드코딩 0.2 0.45  새로운 sprite 기준
-            Vector3 rightOffset = mainCamera.transform.right * 0.2f;
-            Vector3 topOffset = Vector3.up * 0.45f;
+            //판정 이상하면 조금 늘려야
+            Vector3 rightOffset = mainCamera.transform.right * boxColider.size.x / 2f;
+            //절반보다 조금 더 줄임
+            Vector3 topOffset = Vector3.up * boxColider.size.y / 2.2f;
             Vector3 rayStartDefault = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
             //player 꼭짓점에 ray
