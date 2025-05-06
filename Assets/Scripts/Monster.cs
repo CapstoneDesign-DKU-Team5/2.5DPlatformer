@@ -24,15 +24,20 @@ public class Monster : MonoBehaviour
     {
         if (target == null)
         {
-            GameObject playerObj = GameObject.FindWithTag("Player");
-            if (playerObj != null)
+            GameObject p = GameObject.FindWithTag("Player");
+            if (p != null)
             {
-                target = playerObj.transform;
+                target = p.transform;
+                navMeshAgent.enabled = true;   // ★ 여기서 한 번만 켜줌
             }
+            return;                     // 아직 못 찾았으면 종료
         }
-        else
+
+        if (navMeshAgent.enabled && navMeshAgent.isOnNavMesh)
         {
-            navMeshAgent.enabled = true;
+            navMeshAgent.updateRotation = false;
+            navMeshAgent.updateUpAxis = false;
+
             navMeshAgent.SetDestination(target.position);
         }
     }
