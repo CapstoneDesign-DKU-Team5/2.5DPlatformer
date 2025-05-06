@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Monster : MonoBehaviour
 {
@@ -7,11 +8,33 @@ public class Monster : MonoBehaviour
     protected SpriteRenderer spriteRenderer;
     protected bool damaged = false;
 
+    protected NavMeshAgent navMeshAgent;
+    public Transform target;
+
     protected virtual void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        navMeshAgent = GetComponent<NavMeshAgent>();
+        navMeshAgent.enabled = false;
+    }
+
+    protected virtual void Update()
+    {
+        if (target == null)
+        {
+            GameObject playerObj = GameObject.FindWithTag("Player");
+            if (playerObj != null)
+            {
+                target = playerObj.transform;
+            }
+        }
+        else
+        {
+            navMeshAgent.enabled = true;
+            navMeshAgent.SetDestination(target.position);
+        }
     }
 
     public virtual void OnDamaged(Vector3 attackerPos) {
