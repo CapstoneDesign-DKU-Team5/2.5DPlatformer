@@ -448,7 +448,12 @@ namespace HelloWorld
                 {
                     if (enemyHits[i].collider.gameObject.layer == enemy)
                     {
-                        Debug.Log("Enemy Hit");
+                        Monster monster = enemyHits[i].collider.GetComponent<Monster>();
+                        if (monster != null)
+                        {
+                            monster.OnDamaged(transform.position);
+                        }
+
                         break;
                     }
                 }
@@ -544,6 +549,12 @@ namespace HelloWorld
         {
             spriteRenderer.color = new Color(1, 1, 1, 1);
             damaged = false;
+
+            //attck = true하고 damaged = true 같은 프레임에 실행되면
+            //StartAttack이 무시되거나? EndAttack ani 출력안되서 무시 됨.
+            //일단 해결 위해서
+            attack = false;
+            isAttacking = false;
         }
     }
 }
