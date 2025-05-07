@@ -256,14 +256,14 @@ namespace HelloWorld
             if (!photonView.IsMine || !isVisible)
                 return;
 
-            float offset = 0.6f;
+            float offset = 0.5f;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
             Vector3 rayTopOffset = Vector3.up * boxColider.size.y;
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.y = boxSize.y / 2f;
             boxSize.x = boxSize.x / 2f;
 
-            Debug.DrawRay(rayStart + rayTopOffset, mainCamera.transform.forward * cameraRaySize, Color.green);
+            //Debug.DrawRay(rayStart + rayTopOffset, mainCamera.transform.forward * cameraRaySize, Color.green);
 
             if (rigidBody.linearVelocity.y > 0f)
             {
@@ -281,14 +281,14 @@ namespace HelloWorld
             if (!photonView.IsMine || !isVisible)
                 return;
 
-            float offset = 0.6f;
+            float offset = 0.5f;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
             Vector3 rayDownOffset = Vector3.up * boxColider.size.y;
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.y = boxSize.y / 2f;
             boxSize.x = boxSize.x / 2f;
 
-            Debug.DrawRay(rayStart - rayDownOffset, mainCamera.transform.forward * cameraRaySize, Color.green);
+            //Debug.DrawRay(rayStart - rayDownOffset, mainCamera.transform.forward * cameraRaySize, Color.green);
 
             if (rigidBody.linearVelocity.y < -0.01f)
             {
@@ -319,16 +319,16 @@ namespace HelloWorld
             Vector3 sideOffset = mainCamera.transform.right * dir * (boxColider.size.x / 2f + boxSize.x);
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
-            //Debug.DrawRay(rayStart + sideOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
+            Debug.DrawRay(rayStart + sideOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
             Physics.BoxCast(rayStart + sideOffset, boxSize, mainCamera.transform.forward, out RaycastHit sideHit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
 
-            Vector3 downOffset = mainCamera.transform.right * dir * boxColider.size.x / 2f - mainCamera.transform.up * (boxColider.size.y + 0.01f);
-            //Debug.DrawRay(rayStart + downOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
+            Vector3 downOffset = mainCamera.transform.right * dir * boxColider.size.x / 2f - mainCamera.transform.up * (boxColider.size.y / 2 + 0.01f);
+            Debug.DrawRay(rayStart + downOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
             Physics.Raycast(rayStart + downOffset, mainCamera.transform.forward, out RaycastHit downHit, cameraRaySize, LayerMask.GetMask("Platform"));
 
             Vector3 playerBox = playerCollider.bounds.extents;
             playerBox.y *= 0.98f;
-            float offset = 0.6f;
+            float offset = 0.5f;
 
             if (sideHit.collider != null)
             {
