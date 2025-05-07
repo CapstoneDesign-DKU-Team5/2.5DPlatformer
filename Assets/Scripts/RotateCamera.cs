@@ -10,7 +10,8 @@ public class RotateCamera : MonoBehaviour
     private float rotationSpeed = 5f;
     private float moveSpeed = 8f;
 
-    private bool cameraRotating = false;
+    private bool angleRotating = false;
+    private bool distanceRotating = false;
 
     private void Update()
     {
@@ -18,13 +19,15 @@ public class RotateCamera : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            cameraRotating = true;
+            angleRotating = true;
+            distanceRotating = true;
             rotationAng += 90f;
             if (rotationAng > 270f) rotationAng = 0f;
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
-            cameraRotating = true;
+            angleRotating = true;
+            distanceRotating = true;
             rotationAng -= 90f;
             if (rotationAng < 0) rotationAng = 270f;
         }
@@ -37,7 +40,7 @@ public class RotateCamera : MonoBehaviour
         if (Quaternion.Angle(transform.rotation, targetRot) < 0.2f)
         {
             transform.rotation = targetRot;
-            cameraRotating = false;
+            angleRotating = false;
         }
         else
         {
@@ -47,6 +50,7 @@ public class RotateCamera : MonoBehaviour
         if (Vector3.Distance(transform.position, finalPos) < 0.02f)
         {
             transform.position = finalPos;
+            distanceRotating = false;
         }
         else
         {
@@ -56,6 +60,6 @@ public class RotateCamera : MonoBehaviour
 
     public bool GetCameraRotating()
     {
-        return cameraRotating;
+        return angleRotating || distanceRotating;
     }
 }
