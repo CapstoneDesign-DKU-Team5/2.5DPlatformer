@@ -6,23 +6,41 @@ namespace HelloWorld
 {
     public class NetworkPlayer : MonoBehaviourPun
     {
+        [Header("컴포넌트 참조")]
+        [SerializeField, Tooltip("캐릭터 애니메이션을 제어하는 Animator")]
         private Animator animator;
+
+        [SerializeField, Tooltip("스프라이트 반전 및 색상 변경에 사용되는 SpriteRenderer")]
         private SpriteRenderer spriteRenderer;
+
+        [SerializeField, Tooltip("물리 연산에 사용되는 Rigidbody")]
         private Rigidbody rigidBody;
+
+        [SerializeField, Tooltip("플레이어 몸체를 나타내는 주 Collider")]
         private Collider playerCollider;
 
+        [Header("카메라 참조")]
+        [SerializeField, Tooltip("플레이어를 따라다니는 메인 카메라")]
         private Camera mainCamera;
+
+        [SerializeField, Tooltip("카메라 회전을 담당하는 스크립트")]
         private RotateCamera cameraScript;
 
-        public float speed = 2f;
-        public float jumpHeight = 5f;
+        [Header("이동 설정")]
+        [SerializeField, Tooltip("수평 이동 속도 (단위/초)")]
+        private float speed = 2f;
 
+        [SerializeField, Tooltip("점프 시 적용할 힘 (ForceMode.Impulse)")]
+        private float jumpHeight = 5f;
+
+        [SerializeField, Tooltip("전방 레이캐스트 길이의 절반")]
         private float cameraRaySize = 30f;
 
+        // ── 런타임 변수────────────────────────────
         private bool climbState = false;
 
-        private float h = 0;
-        private float v = 0;
+        private float h = 0f;
+        private float v = 0f;
 
         private bool jump = false;
         private bool attack = false;
@@ -32,9 +50,9 @@ namespace HelloWorld
         private Vector3 savedVelocity;
         private bool needRestoreVelocity = false;
 
-        bool isAttacking = false;
-        bool isAir = false;
-        bool isVisible = true;
+        private bool isAttacking = false;
+        private bool isAir = false;
+        private bool isVisible = true;
 
         private bool flipState = false;
 
@@ -416,6 +434,13 @@ namespace HelloWorld
         }
 
         //Animation Event Attack 0:03에서 호출
+        private void AnimEvent_Hit()
+        {
+            // 서버 경유로(Room 안 모든 클라 + 내 클라) Hit() 실행
+            photonView.RPC(nameof(Hit), RpcTarget.AllViaServer);
+        }
+
+        [PunRPC]
         private void Hit()
         {
             float attackDir = spriteRenderer.flipX ? -1f : 1f;

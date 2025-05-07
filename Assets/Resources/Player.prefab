@@ -154,8 +154,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91870dadf244be24b964cd1adca98695, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 2596930642235459831}
+  spriteRenderer: {fileID: 6636843886237227441}
+  rigidBody: {fileID: 4406286287843043854}
+  playerCollider: {fileID: 3432236252499344891}
+  mainCamera: {fileID: 8629334323340540926, guid: e4767852fca246744b2da3265cb8591f, type: 3}
+  cameraScript: {fileID: 6270276928687342281, guid: e4767852fca246744b2da3265cb8591f, type: 3}
   speed: 2
   jumpHeight: 5
+  cameraRaySize: 30
 --- !u!95 &2596930642235459831
 Animator:
   serializedVersion: 7
@@ -243,8 +250,14 @@ MonoBehaviour:
     SynchronizeType: 0
     Name: isDamaged
   - Type: 9
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: doAttack
+  - Type: 4
+    SynchronizeType: 0
+    Name: isClimbIdle
+  - Type: 4
+    SynchronizeType: 0
+    Name: isAir
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
