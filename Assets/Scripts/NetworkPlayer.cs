@@ -256,11 +256,12 @@ namespace HelloWorld
             if (!photonView.IsMine || !isVisible)
                 return;
 
-            float offset = 0.5f;
+            float offset = 0.6f;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
-            Vector3 rayTopOffset = Vector3.up * 0.65f;
+            Vector3 rayTopOffset = Vector3.up * boxColider.size.y;
             Vector3 boxSize = playerCollider.bounds.extents;
-            boxSize.y = rayTopOffset.y - 0.5f;
+            boxSize.y = boxSize.y / 2f;
+            boxSize.x = boxSize.x / 2f;
 
             Debug.DrawRay(rayStart + rayTopOffset, mainCamera.transform.forward * cameraRaySize, Color.green);
 
@@ -280,11 +281,12 @@ namespace HelloWorld
             if (!photonView.IsMine || !isVisible)
                 return;
 
-            float offset = 0.5f;
+            float offset = 0.6f;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
-            Vector3 rayDownOffset = Vector3.up * 0.65f;
+            Vector3 rayDownOffset = Vector3.up * boxColider.size.y;
             Vector3 boxSize = playerCollider.bounds.extents;
-            boxSize.y = rayDownOffset.y - 0.5f;
+            boxSize.y = boxSize.y / 2f;
+            boxSize.x = boxSize.x / 2f;
 
             Debug.DrawRay(rayStart - rayDownOffset, mainCamera.transform.forward * cameraRaySize, Color.green);
 
@@ -314,22 +316,23 @@ namespace HelloWorld
             boxSize.x = 0.15f;
             boxSize.y *= 0.98f;
 
-            Vector3 sideOffset = mainCamera.transform.right * dir * 0.415f;
+            Vector3 sideOffset = mainCamera.transform.right * dir * (boxColider.size.x / 2f + boxSize.x);
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
             //Debug.DrawRay(rayStart + sideOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
             Physics.BoxCast(rayStart + sideOffset, boxSize, mainCamera.transform.forward, out RaycastHit sideHit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
 
-            Vector3 downOffset = mainCamera.transform.right * dir * 0.4f - mainCamera.transform.up * 0.51f;
+            Vector3 downOffset = mainCamera.transform.right * dir * boxColider.size.x / 2f - mainCamera.transform.up * (boxColider.size.y + 0.01f);
             //Debug.DrawRay(rayStart + downOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
             Physics.Raycast(rayStart + downOffset, mainCamera.transform.forward, out RaycastHit downHit, cameraRaySize, LayerMask.GetMask("Platform"));
 
             Vector3 playerBox = playerCollider.bounds.extents;
             playerBox.y *= 0.98f;
+            float offset = 0.6f;
 
             if (sideHit.collider != null)
             {
-                Vector3 target = rayStart + mainCamera.transform.forward.normalized * sideHit.distance + sideHit.normal * 0.5f;
+                Vector3 target = rayStart + mainCamera.transform.forward.normalized * sideHit.distance + sideHit.normal * offset;
                 if (!Physics.CheckBox(target, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
                 {
                     if (!isAir && IsGrounded(target) || isAir)
@@ -342,7 +345,7 @@ namespace HelloWorld
 
             if (downHit.collider != null)
             {
-                Vector3 target = downHit.point - downHit.normal * 0.5f - downOffset;
+                Vector3 target = downHit.point - downHit.normal * offset - downOffset;
                 if (!Physics.CheckBox(target, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
                 {
                     if (IsGrounded(target))
