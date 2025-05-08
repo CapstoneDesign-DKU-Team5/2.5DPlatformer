@@ -41,7 +41,7 @@ public class Monster : MonoBehaviour
         }
 
         damaged = true;
-        Invoke("OffDamaged", 0.9f);
+        Invoke("OffDamaged", 0.6f);
     }
 
     protected virtual void OffDamaged()

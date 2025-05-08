@@ -36,6 +36,8 @@ namespace HelloWorld
         [SerializeField, Tooltip("전방 레이캐스트 길이의 절반")]
         private float cameraRaySize = 30f;
 
+        private BoxCollider boxColider;
+
         // ── 런타임 변수────────────────────────────
         private bool climbState = false;
 
@@ -63,6 +65,7 @@ namespace HelloWorld
             animator = GetComponent<Animator>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             playerCollider = GetComponent<Collider>();
+            boxColider = GetComponent<BoxCollider>();
         }
 
         private void Start()
@@ -273,9 +276,11 @@ namespace HelloWorld
 
             float offset = 0.5f;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
-            Vector3 rayTopOffset = Vector3.up * 0.65f;
             Vector3 boxSize = playerCollider.bounds.extents;
-            boxSize.y = rayTopOffset.y - 0.5f;
+            boxSize.y = boxSize.y / 4f;
+            //boxSize.x = boxSize.x / 2f;
+            Vector3 rayTopOffset = Vector3.up * (boxColider.size.y / 2f + boxSize.y);
+
 
             Debug.DrawRay(rayStart + rayTopOffset, mainCamera.transform.forward * cameraRaySize, Color.green);
 
@@ -296,10 +301,11 @@ namespace HelloWorld
                 return;
 
             float offset = 0.5f;
-            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
-            Vector3 rayDownOffset = Vector3.up * 0.65f;
+            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);            
             Vector3 boxSize = playerCollider.bounds.extents;
-            boxSize.y = rayDownOffset.y - 0.5f;
+            boxSize.y = boxSize.y / 4f;
+            boxSize.x = boxSize.x * 0.99f;
+            Vector3 rayDownOffset = Vector3.up * (boxColider.size.y / 2f + boxSize.y);
 
             Debug.DrawRay(rayStart - rayDownOffset, mainCamera.transform.forward * cameraRaySize, Color.green);
 
@@ -329,22 +335,23 @@ namespace HelloWorld
             boxSize.x = 0.15f;
             boxSize.y *= 0.98f;
 
-            Vector3 sideOffset = mainCamera.transform.right * dir * 0.415f;
+            Vector3 sideOffset = mainCamera.transform.right * dir * (boxColider.size.x / 2f + boxSize.x);
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
-            //Debug.DrawRay(rayStart + sideOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
+            Debug.DrawRay(rayStart + sideOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
             Physics.BoxCast(rayStart + sideOffset, boxSize, mainCamera.transform.forward, out RaycastHit sideHit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
 
-            Vector3 downOffset = mainCamera.transform.right * dir * 0.4f - mainCamera.transform.up * 0.51f;
-            //Debug.DrawRay(rayStart + downOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
+            Vector3 downOffset = mainCamera.transform.right * dir * boxColider.size.x / 2f - mainCamera.transform.up * (boxColider.size.y / 2 + 0.01f);
+            Debug.DrawRay(rayStart + downOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
             Physics.Raycast(rayStart + downOffset, mainCamera.transform.forward, out RaycastHit downHit, cameraRaySize, LayerMask.GetMask("Platform"));
 
             Vector3 playerBox = playerCollider.bounds.extents;
             playerBox.y *= 0.98f;
+            float offset = 0.5f;
 
             if (sideHit.collider != null)
             {
-                Vector3 target = rayStart + mainCamera.transform.forward.normalized * sideHit.distance + sideHit.normal * 0.5f;
+                Vector3 target = rayStart + mainCamera.transform.forward.normalized * sideHit.distance + sideHit.normal * offset;
                 if (!Physics.CheckBox(target, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
                 {
                     if (!isAir && IsGrounded(target) || isAir)
@@ -357,7 +364,7 @@ namespace HelloWorld
 
             if (downHit.collider != null)
             {
-                Vector3 target = downHit.point - downHit.normal * 0.5f - downOffset;
+                Vector3 target = downHit.point - downHit.normal * offset - downOffset;
                 if (!Physics.CheckBox(target, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
                 {
                     if (IsGrounded(target))
@@ -371,8 +378,8 @@ namespace HelloWorld
             if (!isAir)
                 return false;
 
-            Vector3 rightOffset = mainCamera.transform.right * 0.4f;
-            Vector3 topOffset = Vector3.up * 0.5f;
+            Vector3 rightOffset = mainCamera.transform.right * boxColider.size.x / 2f;
+            Vector3 topOffset = Vector3.up * boxColider.size.y / 2f;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
             Vector3[] offsets = new Vector3[]
@@ -448,10 +455,9 @@ namespace HelloWorld
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
             //player 중심으로부터 범위
-            Vector3 attackRange = attackDir == 1 ? mainCamera.transform.right * 0.4f : -mainCamera.transform.right * 0.4f;
+            Vector3 attackRange = attackDir == 1 ? mainCamera.transform.right * 0.45f : -mainCamera.transform.right * 0.45f;
             //player 공격 상 하 범위
             Vector3 attackHalfHeight = Vector3.up * 0.1f;
-            //스프라이트 적용 후 조절
             //공격 중심 시작 높이
             Vector3 attackHeight = Vector3.up * 0.1f;
 
@@ -494,9 +500,10 @@ namespace HelloWorld
 
         public void OnDamaged()
         {
-            //콜라이더 하드코딩 0.2 0.45  새로운 sprite 기준
-            Vector3 rightOffset = mainCamera.transform.right * 0.2f;
-            Vector3 topOffset = Vector3.up * 0.45f;
+            //판정 이상하면 조금 늘려야
+            Vector3 rightOffset = mainCamera.transform.right * boxColider.size.x / 2f;
+            //절반보다 조금 더 줄임
+            Vector3 topOffset = Vector3.up * boxColider.size.y / 2.2f;
             Vector3 rayStartDefault = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
             //player 꼭짓점에 ray
