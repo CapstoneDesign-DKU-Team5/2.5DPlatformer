@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Monster : MonoBehaviour
 {
@@ -7,14 +9,82 @@ public class Monster : MonoBehaviour
     protected SpriteRenderer spriteRenderer;
     protected bool damaged = false;
 
-    protected virtual void Awake()
+    protected NavMeshAgent navMeshAgent;
+    public Transform target;
+
+    float HP = 3;
+
+    enum State
     {
-        rigidBody = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        IDLE,
+        CHASE,
+        ATTACK,
+        KILLED
     }
 
-    public virtual void OnDamaged(Vector3 attackerPos) {
+    State state;
+
+    protected virtual void Awake()
+    {
+        rigidBody = GetComponent<Rigidbody>();       
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
+        animator = GetComponent<Animator>();
+        navMeshAgent = GetComponent<NavMeshAgent>();
+        navMeshAgent.enabled = false;
+        state = State.IDLE;
+        HP = 3;
+        StartCoroutine(StateMachine());
+    }
+
+    protected IEnumerator StateMachine()
+    {
+        while (HP > 0)
+        {
+            yield return StartCoroutine(state.ToString());
+        }
+    }
+    protected IEnumerator IDLE()
+    {
+        AnimatorStateInfo curAnimStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        if (curAnimStateInfo.IsName("IdleNormal") == false)
+        {
+            animator.Play("IdleNormal", 0, 0);
+        }
+
+        yield return null;
+    }
+
+    protected IEnumerator CHASE()
+    {
+        Debug.Log("범위 내부로 들어옴");
+        yield return null;
+    }
+
+    public void SetTarget(Transform t)
+    {
+        target = t;
+        navMeshAgent.enabled = true;
+        state = State.CHASE;
+    }
+
+    protected IEnumerator ATTACK()
+    {
+        return null;
+    }
+
+    protected IEnumerator KILLED()
+    {
+        return null;
+    }
+
+    protected virtual void Update()
+    {
+
+    }
+
+    public virtual void OnDamaged(Vector3 attackerPos)
+    {
 
         if (damaged)
         {
