@@ -463,7 +463,7 @@ namespace HelloWorld
 
             RaycastHit[] enemyHits = new RaycastHit[2];
             int enemy = LayerMask.NameToLayer("Enemy");
-            int mask = ~(1 << LayerMask.NameToLayer("Player"));
+            int mask = ~((1 << LayerMask.NameToLayer("Player")) | (1 << LayerMask.NameToLayer("ChaseRange")));
 
             Vector3[] offsets = new Vector3[]
 {
@@ -521,7 +521,7 @@ namespace HelloWorld
 
             RaycastHit enemyHit;
             int enemy = LayerMask.NameToLayer("Enemy");
-            int mask = ~(1 << LayerMask.NameToLayer("Player"));
+            int mask = ~((1 << LayerMask.NameToLayer("Player")) | (1 << LayerMask.NameToLayer("ChaseRange")));
 
             foreach (var offset in offsets)
             {
