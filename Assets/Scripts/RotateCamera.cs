@@ -3,13 +3,24 @@ using Photon.Pun;
 
 public class RotateCamera : MonoBehaviour
 {
+    [Tooltip("카메라가 따라갈 플레이어 Transform")]
     public Transform playerTransform;
 
+    [Header("카메라 회전 설정")]
+    [SerializeField, Tooltip("현재 카메라의 회전 각도 (0, 90, 180, 270)")]
     private float rotationAng = 0f;
+
+    [SerializeField, Tooltip("플레이어로부터의 카메라 거리")]
     private float radius = 20f;
+
+    [SerializeField, Tooltip("카메라 회전 속도")]
     private float rotationSpeed = 5f;
+
+    [SerializeField, Tooltip("카메라 위치 이동 속도")]
     private float moveSpeed = 8f;
 
+    [Header("카메라 상태")]
+    [SerializeField, Tooltip("카메라가 회전 중인지 여부")]
     private bool cameraRotating = false;
 
     private void Update()
