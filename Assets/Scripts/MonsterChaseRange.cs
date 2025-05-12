@@ -4,7 +4,7 @@ public class MonsterChaseRange : MonoBehaviour
 {
  
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
@@ -15,5 +15,7 @@ public class MonsterChaseRange : MonoBehaviour
             }
         }
     }
+
+
 }
 
