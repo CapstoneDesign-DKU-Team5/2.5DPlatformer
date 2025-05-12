@@ -498,7 +498,7 @@ namespace HelloWorld
             //공격 중심 시작 높이
             Vector3 attackHeight = Vector3.up * 0.1f;
 
-            RaycastHit[] enemyHits = new RaycastHit[2];
+            RaycastHit enemyHit;
             int enemy = LayerMask.NameToLayer("Enemy");
             int mask = ~((1 << LayerMask.NameToLayer("Player")) | (1 << LayerMask.NameToLayer("ChaseRange")));
 
@@ -512,17 +512,22 @@ namespace HelloWorld
             {
                 Debug.DrawRay(rayStart + offsets[i], mainCamera.transform.forward * cameraRaySize, Color.blue);
 
-                if (Physics.Raycast(rayStart + offsets[i], mainCamera.transform.forward, out enemyHits[i], cameraRaySize, mask))
+                if (Physics.Raycast(rayStart + offsets[i], mainCamera.transform.forward, out enemyHit, cameraRaySize, mask))
                 {
-                    if (enemyHits[i].collider.gameObject.layer == enemy)
+                    if (enemyHit.collider.gameObject.layer == enemy)
                     {
-                        Monster monster = enemyHits[i].collider.GetComponent<Monster>();
-                        if (monster != null)
+                        float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
+                        if (CorrectDir % 180f == 0 ? true : false)
                         {
-                            monster.OnDamaged(transform.position);
+                            Monster monster = enemyHit.collider.GetComponent<Monster>();
+                            if (monster != null)
+                            {
+                                monster.OnDamaged(transform.position);
+                            }
+
+                            break;
                         }
 
-                        break;
                     }
                 }
             }
@@ -608,6 +613,7 @@ namespace HelloWorld
                             }
                             damaged = true;
                             Invoke("OffDamaged", 0.9f);
+                            break;
                         }
                     }
                 }

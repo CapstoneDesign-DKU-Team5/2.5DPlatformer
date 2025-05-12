@@ -110,7 +110,7 @@
 
             remainingDistance = Mathf.Abs(remainingDistance);
 
-            if (remainingDistance <= navMeshAgent.stoppingDistance && vDistance < 1f)
+            if (remainingDistance <= navMeshAgent.stoppingDistance && vDistance < 1f && isSameDir(target)) 
             {
                 Debug.Log("Attack");
                 //state = State.ATTACK;
