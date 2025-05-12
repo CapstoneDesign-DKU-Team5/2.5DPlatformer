@@ -153,8 +153,9 @@ namespace HelloWorld
         {
             RaycastHit rayHitPlayer;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
+            int mask = ~((1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("ChaseRange")));
 
-            if (Physics.Raycast(rayStart, mainCamera.transform.forward, out rayHitPlayer, cameraRaySize))
+            if (Physics.Raycast(rayStart, mainCamera.transform.forward, out rayHitPlayer, cameraRaySize, mask))
             {
                 int playerLayer = LayerMask.NameToLayer("Player");
                 if(rayHitPlayer.collider.gameObject.layer == playerLayer)
