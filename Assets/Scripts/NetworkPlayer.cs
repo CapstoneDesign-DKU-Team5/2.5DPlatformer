@@ -441,6 +441,19 @@ namespace HelloWorld
             return false;
         }
 
+        [PunRPC]
+        private void SetClimbState(bool isClimbing)
+        {
+            climbState = isClimbing;
+            animator.SetBool("isClimbIdle", isClimbing);
+        }
+
+        [PunRPC]
+        private void SetClimbJump(bool value)
+        {
+            climbJump = value;
+        }
+
         private void UpdateClimbState()
         {
             if (!photonView.IsMine) return;
@@ -449,22 +462,19 @@ namespace HelloWorld
 
             if (climbState && Input.GetButtonDown("Jump"))
             {
-                climbState = false;
-                climbJump = true;
-                animator.SetBool("isClimbIdle", false);
+                photonView.RPC(nameof(SetClimbState), RpcTarget.AllBuffered, false);
+                photonView.RPC(nameof(SetClimbJump), RpcTarget.AllBuffered, true);
                 return;
             }
 
             if (Input.GetButtonDown("Jump") && canClimb)
             {
-                climbState = true;
-                animator.SetBool("isClimbIdle", true);
+                photonView.RPC(nameof(SetClimbState), RpcTarget.AllBuffered, true);
             }
 
             if (climbState && !canClimb)
             {
-                climbState = false;
-                animator.SetBool("isClimbIdle", false);
+                photonView.RPC(nameof(SetClimbState), RpcTarget.AllBuffered, false);
             }
         }
 
@@ -534,25 +544,24 @@ namespace HelloWorld
             isAttacking = false;
         }
 
+        [PunRPC]
+        private void SetDamagedVisual()
+        {
+            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+            animator.SetTrigger("isDamaged");
+        }
         public void OnDamaged()
         {
-            //판정 이상하면 조금 늘려야
             Vector3 rightOffset = mainCamera.transform.right * boxColider.size.x / 2f;
-            //절반보다 조금 더 줄임
             Vector3 topOffset = Vector3.up * boxColider.size.y / 2.2f;
             Vector3 rayStartDefault = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
 
-            //player 꼭짓점에 ray
             Vector3[] offsets = new Vector3[]
             {
-                //topRight
-                topOffset + rightOffset,
-                //topLeft
-                topOffset - rightOffset,
-                //downRight
-                -topOffset + rightOffset,
-                //downLeft
-                -topOffset - rightOffset
+        topOffset + rightOffset,
+        topOffset - rightOffset,
+        -topOffset + rightOffset,
+        -topOffset - rightOffset
             };
 
             RaycastHit enemyHit;
@@ -561,66 +570,59 @@ namespace HelloWorld
 
             foreach (var offset in offsets)
             {
-                //null이 아니고
                 if (Physics.Raycast(rayStartDefault + offset, mainCamera.transform.forward, out enemyHit, cameraRaySize, mask))
                 {
                     if (enemyHit.collider.gameObject.layer == enemy)
                     {
                         if (damaged)
-                        {
                             return;
-                        }
 
-                        //카메라에서 보여야만 -> 180도 차이나야
                         float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
                         if (CorrectDir % 180f == 0 ? true : false)
                         {
-                            //매달리기 상태 문제 해결
                             if (climbState)
                             {
-                                climbState = false;
-                                animator.SetBool("isClimbIdle", false);
+                                photonView.RPC(nameof(SetClimbState), RpcTarget.AllBuffered, false);
                                 rigidBody.useGravity = true;
                             }
-                            
-                            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
-                            animator.SetTrigger("isDamaged");
 
-                            //플레이어 x로 튕겨야 할지 z로 튕겨야 할지 결정
+                            //  damaged 상태와 애니메이션 + 색상 RPC 처리
+                            photonView.RPC(nameof(SetDamagedVisual), RpcTarget.AllBuffered);
+                            damaged = true;
+                            Invoke(nameof(OffDamagedRPC), 0.9f);
+
+                            // 튕겨나가는 힘 (자기 클라만 적용)
                             bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
 
                             int dir;
+                            rigidBody.linearVelocity = Vector3.zero;
                             if (isXOrZ)
                             {
-                                rigidBody.linearVelocity = Vector3.zero;
-                                dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;                                
+                                dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;
                                 Vector3 dirVec = new Vector3(dir, 4f, 0);
                                 rigidBody.AddForce(dirVec, ForceMode.Impulse);
-
                             }
                             else
                             {
-                                rigidBody.linearVelocity = Vector3.zero;
                                 dir = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
-                                Vector3 dirVec =  new Vector3(0, 4f, dir);
+                                Vector3 dirVec = new Vector3(0, 4f, dir);
                                 rigidBody.AddForce(dirVec, ForceMode.Impulse);
                             }
-                            damaged = true;
-                            Invoke("OffDamaged", 0.9f);
                         }
                     }
                 }
             }
         }
 
-        void OffDamaged()
+        private void OffDamagedRPC()
+        {
+            photonView.RPC(nameof(OffDamaged), RpcTarget.AllBuffered);
+        }
+        [PunRPC]
+        private void OffDamaged()
         {
             spriteRenderer.color = new Color(1, 1, 1, 1);
             damaged = false;
-
-            //attck = true하고 damaged = true 같은 프레임에 실행되면
-            //StartAttack이 무시되거나? EndAttack ani 출력안되서 무시 됨.
-            //일단 해결 위해서
             attack = false;
             isAttacking = false;
         }

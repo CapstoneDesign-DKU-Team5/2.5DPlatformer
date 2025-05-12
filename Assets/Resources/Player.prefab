@@ -273,7 +273,7 @@ MonoBehaviour:
     SynchronizeType: 2
     Name: isJumping
   - Type: 9
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isDamaged
   - Type: 9
     SynchronizeType: 2

@@ -42,6 +42,10 @@ MonoBehaviour:
   - SetFlipState
   - Hit
   - SetUsernameText
+  - OffDamaged
+  - SetClimbState
+  - SetDamagedVisual
+  - SetClimbJump
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 0

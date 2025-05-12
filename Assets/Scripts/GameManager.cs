@@ -3,6 +3,8 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.SceneManagement;
 using TMPro; // 추가
+using UnityEngine.UI;
+using HelloWorld;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -23,6 +25,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [Header("Player & Room Info")]
     public GameObject playerPrefab;
     public TextMeshProUGUI inviteCodeText;
+    
+
+    [Header("UI (GameScene)")]
+    public Button startButton; 
+    public Button readyButton;
+
+    [Header("UI Setting (GameScene)")]
+    [SerializeField]
+    private bool isReady = false;
+
     private int height = 0;
     public bool isGameover { get; private set; }
 
@@ -102,6 +114,40 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             inviteCodeText.text = "방 초대 코드: 없음";
         }
     }
+
+    private void OnClickReady()
+    {
+        isReady = !isReady;
+        // 버튼 텍스트 토글 (예: "준비 완료" ↔ "준비 취소")
+        readyButton.GetComponentInChildren<TextMeshProUGUI>().text
+            = isReady ? "준비 취소" : "준비 완료";
+
+        // MasterClient 쪽 StartButton 활성화 상태 RPC 요청
+        photonView.RPC(nameof(RPC_SetStartInteractable), RpcTarget.MasterClient, isReady);
+    }
+
+    private void OnClickStart()
+    {
+        // 모두에게 컨트롤 허용 RPC
+        photonView.RPC(nameof(RPC_EnablePlayerControl), RpcTarget.AllBuffered);
+        startButton.interactable = false; // 다시 꺼두기
+    }
+
+    [PunRPC]
+    private void RPC_SetStartInteractable(bool canStart)
+    {
+        // MasterClient만 통과하므로 바로 처리
+        startButton.interactable = canStart;
+    }
+
+    [PunRPC]
+    private void RPC_EnablePlayerControl()
+    {
+        // 모든 NetworkPlayer에 입력 허용
+        foreach (var np in FindObjectsOfType<NetworkPlayer>())
+            np.EnableControl();
+    }
+
 
 
 
