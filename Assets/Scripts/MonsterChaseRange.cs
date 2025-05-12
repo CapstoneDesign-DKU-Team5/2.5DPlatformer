@@ -11,7 +11,7 @@ public class MonsterChaseRange : MonoBehaviour
             Monster monster = GetComponentInParent<Monster>();
             if (monster != null && monster.target == null)
             {
-                monster.SetTarget(other.transform);
+                monster.TriggerSetTarget(other.transform);
             }
         }
     }

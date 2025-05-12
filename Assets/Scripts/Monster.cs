@@ -35,7 +35,7 @@ public class Monster : MonoBehaviour
 
         childBox = GetComponentInChildren<BoxCollider>();
 
-        rigidBody = GetComponent<Rigidbody>();       
+        rigidBody = GetComponent<Rigidbody>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         animator = GetComponent<Animator>();
@@ -78,16 +78,24 @@ public class Monster : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log("범위 내부로 들어옴");
+        //Debug.Log("범위 내부로 들어옴");
 
-        if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+        float vDistance = Mathf.Abs(transform.position.y - target.position.y);
+
+        float remainingDistance = monsterXOrZ ? target.position.x - transform.position.x : target.position.z - transform.position.z;
+
+        spriteRenderer.flipX = remainingDistance < 0;
+
+        remainingDistance = Mathf.Abs(remainingDistance);
+
+        if (remainingDistance <= navMeshAgent.stoppingDistance && vDistance < 1f)
         {
             Debug.Log("Attack");
-        }
-        else if (navMeshAgent.remainingDistance > childBox.size.x * 5 || !isSameDir(target))
-        {
+            //state = State.ATTACK;
 
-            Debug.Log("멈춤");
+        }
+        else if (navMeshAgent.remainingDistance > childBox.size.x * 5f || !isSameDir(target) || vDistance > 5f)
+        {
             target = null;
             navMeshAgent.SetDestination(transform.position);
             yield return null;
@@ -99,7 +107,7 @@ public class Monster : MonoBehaviour
         }
     }
 
-    public void SetTarget(Transform t)
+    public void TriggerSetTarget(Transform t)
     {
         if (isSameDir(t))
         {
@@ -117,6 +125,7 @@ public class Monster : MonoBehaviour
     protected bool isSameDir(Transform t)
     {
         bool playerXOrZ = Approximately(Mathf.Abs(t.eulerAngles.y) % 180);
+        //Debug.Log(playerXOrZ == monsterXOrZ);
         return playerXOrZ == monsterXOrZ;
     }
 
@@ -143,7 +152,8 @@ public class Monster : MonoBehaviour
     protected IEnumerator ATTACK()
     {
         Debug.Log("공격중");
-        yield return null;
+        yield return new WaitForSeconds(2f);
+        state = State.CHASE;
     }
 
     protected IEnumerator KILLED()
@@ -153,7 +163,7 @@ public class Monster : MonoBehaviour
 
     protected virtual void Update()
     {
-        if(target == null)
+        if (target == null)
         {
             return;
         }
@@ -168,9 +178,6 @@ public class Monster : MonoBehaviour
         {
             return;
         }
-
-        // X로 튕길지 Z로 튕길지 결정
-        bool monsterXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0;
 
         int dir;
         rigidBody.linearVelocity = Vector3.zero;
