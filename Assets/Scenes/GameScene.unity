@@ -11211,8 +11211,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72a00950fd9330e41a84706e593c0f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  childBox: {fileID: 0}
+  rigidBody: {fileID: 0}
+  animator: {fileID: 0}
+  spriteRenderer: {fileID: 0}
+  damaged: 0
+  navMeshAgent: {fileID: 0}
   target: {fileID: 0}
   targetPos: {x: 0, y: 0, z: 0}
+  monsterXOrZ: 0
+  HP: 3
+  state: 0
 --- !u!54 &457492841
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -17787,8 +17796,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72a00950fd9330e41a84706e593c0f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  childBox: {fileID: 0}
+  rigidBody: {fileID: 0}
+  animator: {fileID: 0}
+  spriteRenderer: {fileID: 0}
+  damaged: 0
+  navMeshAgent: {fileID: 0}
   target: {fileID: 0}
   targetPos: {x: 0, y: 0, z: 0}
+  monsterXOrZ: 0
+  HP: 3
+  state: 0
 --- !u!54 &927202640
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -20493,8 +20511,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72a00950fd9330e41a84706e593c0f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  childBox: {fileID: 0}
+  rigidBody: {fileID: 0}
+  animator: {fileID: 0}
+  spriteRenderer: {fileID: 0}
+  damaged: 0
+  navMeshAgent: {fileID: 0}
   target: {fileID: 0}
   targetPos: {x: 0, y: 0, z: 0}
+  monsterXOrZ: 0
+  HP: 3
+  state: 0
 --- !u!95 &1036054333
 Animator:
   serializedVersion: 7
