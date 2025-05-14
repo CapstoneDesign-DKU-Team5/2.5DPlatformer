@@ -40,7 +40,7 @@ namespace HelloWorld
         private float cameraRaySize = 30f;
 
         [Header("UI")]
-        [SerializeField, Tooltip("Playfab 유저네임 표시")] 
+        [SerializeField, Tooltip("Playfab 유저네임 표시")]
         private TMP_Text usernameText;
 
         private BoxCollider boxColider;
@@ -62,6 +62,7 @@ namespace HelloWorld
         private bool isAttacking = false;
         private bool isAir = false;
         private bool isVisible = true;
+        private int isCameraFront = 1;
 
         private bool flipState = false;
 
@@ -158,15 +159,15 @@ namespace HelloWorld
             if (Physics.Raycast(rayStart, mainCamera.transform.forward, out rayHitPlayer, cameraRaySize, mask))
             {
                 int playerLayer = LayerMask.NameToLayer("Player");
-                if(rayHitPlayer.collider.gameObject.layer == playerLayer)
+                if (rayHitPlayer.collider.gameObject.layer == playerLayer)
                 {
                     isVisible = true;
+                    isCameraFront = 1;
                     return;
                 }
-                //return rayHitPlayer.collider.gameObject.layer == playerLayer;
             }
+            isCameraFront = -1;
             isVisible = false;
-            //return false;
         }
 
         private bool IsGrounded(Vector3 position)
@@ -192,7 +193,6 @@ namespace HelloWorld
                 isAir = true;
                 animator.SetBool("isAir", true);
             }
-
         }
 
         private void InputKey()
@@ -254,16 +254,10 @@ namespace HelloWorld
                 rigidBody.useGravity = true;
             }
 
-            //bool noSameFrame = false;
             if ((!isAir || climbJump) && jump)
             {
                 rigidBody.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
-                //noSameFrame = true;
             }
-
-            //if (!isAir && rigidBody.linearVelocity.y < 0 && !noSameFrame) 
-            //{
-            //}
 
             jump = false;
             climbJump = false;
@@ -308,24 +302,25 @@ namespace HelloWorld
 
         private void RayTop()
         {
-            if (!photonView.IsMine || !isVisible)
+            if (!photonView.IsMine/* || !isVisible*/)
                 return;
 
             float offset = 0.5f;
-            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
+
+            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * isCameraFront;
+
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.y = boxSize.y / 4f;
-            //boxSize.x = boxSize.x / 2f;
+
             Vector3 rayTopOffset = Vector3.up * (boxColider.size.y / 2f + boxSize.y);
 
-
-            Debug.DrawRay(rayStart + rayTopOffset, mainCamera.transform.forward * cameraRaySize, Color.green);
+            Debug.DrawRay(rayStart + rayTopOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.black);
 
             if (rigidBody.linearVelocity.y > 0f)
             {
-                if (Physics.BoxCast(rayStart + rayTopOffset, boxSize, mainCamera.transform.forward, out RaycastHit hit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform")))
+                if (Physics.BoxCast(rayStart + rayTopOffset, boxSize, mainCamera.transform.forward * isCameraFront, out RaycastHit hit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform")))
                 {
-                    Vector3 target = rayStart + mainCamera.transform.forward.normalized * hit.distance + hit.normal * offset;
+                    Vector3 target = rayStart + mainCamera.transform.forward.normalized * isCameraFront * hit.distance + hit.normal * offset;
                     if (!Physics.CheckBox(target, playerCollider.bounds.extents, Quaternion.identity, LayerMask.GetMask("Platform")))
                         transform.position = target;
                 }
@@ -334,24 +329,26 @@ namespace HelloWorld
 
         private void RayDown()
         {
-            if (!photonView.IsMine || !isVisible)
+            if (!photonView.IsMine/* || !isVisible*/)
                 return;
 
             float offset = 0.5f;
-            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);            
+
+            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * isCameraFront;
+
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.y = boxSize.y / 4f;
             boxSize.x = boxSize.x * 0.99f;
+
             Vector3 rayDownOffset = Vector3.up * (boxColider.size.y / 2f + boxSize.y);
 
-            Debug.DrawRay(rayStart - rayDownOffset, mainCamera.transform.forward * cameraRaySize, Color.green);
+            Debug.DrawRay(rayStart - rayDownOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.black);
 
             if (rigidBody.linearVelocity.y < -0.01f)
             {
-
-                if (Physics.BoxCast(rayStart - rayDownOffset, boxSize, mainCamera.transform.forward, out RaycastHit hit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform")))
+                if (Physics.BoxCast(rayStart - rayDownOffset, boxSize, mainCamera.transform.forward * isCameraFront, out RaycastHit hit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform")))
                 {
-                    Vector3 target = rayStart + mainCamera.transform.forward.normalized * hit.distance - hit.normal * offset;
+                    Vector3 target = rayStart + mainCamera.transform.forward.normalized * isCameraFront * hit.distance - hit.normal * offset;
                     if (!Physics.CheckBox(target, playerCollider.bounds.extents, Quaternion.identity, LayerMask.GetMask("Platform")))
                         transform.position = target;
                 }
@@ -360,7 +357,7 @@ namespace HelloWorld
 
         private void RaySide(string leftRight)
         {
-            if (!photonView.IsMine || !isVisible || cameraScript.GetCameraRotating())
+            if (!photonView.IsMine/* || !isVisible */|| cameraScript.GetCameraRotating())
                 return;
 
             int dir = (leftRight == "Right") ? 1 : -1;
@@ -373,14 +370,15 @@ namespace HelloWorld
             boxSize.y *= 0.98f;
 
             Vector3 sideOffset = mainCamera.transform.right * dir * (boxColider.size.x / 2f + boxSize.x);
-            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
+            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * isCameraFront;
 
-            Debug.DrawRay(rayStart + sideOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
-            Physics.BoxCast(rayStart + sideOffset, boxSize, mainCamera.transform.forward, out RaycastHit sideHit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
+            Debug.DrawRay(rayStart + sideOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.red);
+            Physics.BoxCast(rayStart + sideOffset, boxSize, mainCamera.transform.forward * isCameraFront, out RaycastHit sideHit, Quaternion.identity, cameraRaySize, LayerMask.GetMask("Platform"));
 
             Vector3 downOffset = mainCamera.transform.right * dir * boxColider.size.x / 2f - mainCamera.transform.up * (boxColider.size.y / 2 + 0.01f);
-            Debug.DrawRay(rayStart + downOffset, mainCamera.transform.forward * cameraRaySize, Color.red);
-            Physics.Raycast(rayStart + downOffset, mainCamera.transform.forward, out RaycastHit downHit, cameraRaySize, LayerMask.GetMask("Platform"));
+
+            Debug.DrawRay(rayStart + downOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.red);
+            Physics.Raycast(rayStart + downOffset, mainCamera.transform.forward * isCameraFront, out RaycastHit downHit, cameraRaySize, LayerMask.GetMask("Platform"));
 
             Vector3 playerBox = playerCollider.bounds.extents;
             playerBox.y *= 0.98f;
@@ -388,7 +386,7 @@ namespace HelloWorld
 
             if (sideHit.collider != null)
             {
-                Vector3 target = rayStart + mainCamera.transform.forward.normalized * sideHit.distance + sideHit.normal * offset;
+                Vector3 target = rayStart + mainCamera.transform.forward.normalized * isCameraFront * sideHit.distance + sideHit.normal * offset;
                 if (!Physics.CheckBox(target, playerBox, Quaternion.identity, LayerMask.GetMask("Platform")))
                 {
                     if (!isAir && IsGrounded(target) || isAir)
@@ -489,7 +487,7 @@ namespace HelloWorld
         {
             float attackDir = spriteRenderer.flipX ? -1f : 1f;
 
-            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
+            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * isCameraFront;
 
             //player 중심으로부터 범위
             Vector3 attackRange = attackDir == 1 ? mainCamera.transform.right * 0.45f : -mainCamera.transform.right * 0.45f;
@@ -510,9 +508,9 @@ namespace HelloWorld
 
             for (int i = 0; i < offsets.Length; i++)
             {
-                Debug.DrawRay(rayStart + offsets[i], mainCamera.transform.forward * cameraRaySize, Color.blue);
+                Debug.DrawRay(rayStart + offsets[i], mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.blue);
 
-                if (Physics.Raycast(rayStart + offsets[i], mainCamera.transform.forward, out enemyHit, cameraRaySize, mask))
+                if (Physics.Raycast(rayStart + offsets[i], mainCamera.transform.forward * isCameraFront, out enemyHit, cameraRaySize, mask))
                 {
                     if (enemyHit.collider.gameObject.layer == enemy)
                     {
@@ -524,7 +522,6 @@ namespace HelloWorld
                             {
                                 monster.OnDamaged(transform.position);
                             }
-
                             break;
                         }
 
@@ -546,7 +543,7 @@ namespace HelloWorld
             Vector3 rightOffset = mainCamera.transform.right * boxColider.size.x / 2f;
             //절반보다 조금 더 줄임
             Vector3 topOffset = Vector3.up * boxColider.size.y / 2.2f;
-            Vector3 rayStartDefault = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
+            Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * isCameraFront;
 
             //player 꼭짓점에 ray
             Vector3[] offsets = new Vector3[]
@@ -568,7 +565,7 @@ namespace HelloWorld
             foreach (var offset in offsets)
             {
                 //null이 아니고
-                if (Physics.Raycast(rayStartDefault + offset, mainCamera.transform.forward, out enemyHit, cameraRaySize, mask))
+                if (Physics.Raycast(rayStart + offset, mainCamera.transform.forward * isCameraFront, out enemyHit, cameraRaySize, mask))
                 {
                     if (enemyHit.collider.gameObject.layer == enemy)
                     {
@@ -588,7 +585,7 @@ namespace HelloWorld
                                 animator.SetBool("isClimbIdle", false);
                                 rigidBody.useGravity = true;
                             }
-                            
+
                             spriteRenderer.color = new Color(1, 1, 1, 0.4f);
                             animator.SetTrigger("isDamaged");
 
@@ -599,7 +596,7 @@ namespace HelloWorld
                             if (isXOrZ)
                             {
                                 rigidBody.linearVelocity = Vector3.zero;
-                                dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;                                
+                                dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;
                                 Vector3 dirVec = new Vector3(dir, 4f, 0);
                                 rigidBody.AddForce(dirVec, ForceMode.Impulse);
 
@@ -608,7 +605,7 @@ namespace HelloWorld
                             {
                                 rigidBody.linearVelocity = Vector3.zero;
                                 dir = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
-                                Vector3 dirVec =  new Vector3(0, 4f, dir);
+                                Vector3 dirVec = new Vector3(0, 4f, dir);
                                 rigidBody.AddForce(dirVec, ForceMode.Impulse);
                             }
                             damaged = true;
