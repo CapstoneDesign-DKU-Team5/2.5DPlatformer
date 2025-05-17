@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class MonsterChaseRange : MonoBehaviour
 {
- 
-
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
@@ -15,7 +13,5 @@ public class MonsterChaseRange : MonoBehaviour
             }
         }
     }
-
-
 }
 
