@@ -7,7 +7,7 @@
     {
     [Header("컴포넌트 참조")]
     [SerializeField, Tooltip("자식 BoxCollider (충돌 판정용)")]
-    protected BoxCollider childBox;
+    protected BoxCollider childBoxCollider;
 
     [SerializeField, Tooltip("물리 반응용 Rigidbody")]
     protected Rigidbody rigidBody;
@@ -55,7 +55,7 @@
         {
             monsterXOrZ = Approximately(Mathf.Abs(transform.eulerAngles.y % 180f));
 
-            childBox = GetComponentInChildren<BoxCollider>();
+            childBoxCollider = transform.Find("ChaseRange").GetComponentInChildren<BoxCollider>();
 
             rigidBody = GetComponent<Rigidbody>();
             spriteRenderer = GetComponent<SpriteRenderer>();
@@ -85,13 +85,11 @@
             {
                 animator.Play("IdleNormal", 0, 0);
             }
-
             yield return null;
         }
 
         protected IEnumerator CHASE()
         {
-
             AnimatorStateInfo curAnimStateInfo = animator.GetCurrentAnimatorStateInfo(0);
             if (curAnimStateInfo.IsName("Walk") == false)
             {
@@ -116,7 +114,7 @@
                 //state = State.ATTACK;
 
             }
-            else if (navMeshAgent.remainingDistance > childBox.size.x * 5f || !isSameDir(target) || vDistance > 5f)
+            else if (remainingDistance > (childBoxCollider.size.x / 2) || !isSameDir(target) || vDistance > 5f)
             {
                 target = null;
                 navMeshAgent.SetDestination(transform.position);
@@ -131,7 +129,7 @@
 
         public void TriggerSetTarget(Transform t)
         {
-            if (isSameDir(t))
+            if (isSameDir(t) && state != State.CHASE)
             {
                 target = t;
                 navMeshAgent.enabled = true;
