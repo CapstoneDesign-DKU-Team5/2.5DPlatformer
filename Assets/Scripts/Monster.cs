@@ -1,3 +1,4 @@
+using HelloWorld;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -99,8 +100,6 @@ public class Monster : MonoBehaviour
             yield return null;
         }
 
-        //Debug.Log("범위 내부로 들어옴");
-
         float vDistance = Mathf.Abs(transform.position.y - target.position.y);
 
         float remainingDistance = monsterXOrZ ? target.position.x - transform.position.x : target.position.z - transform.position.z;
@@ -111,9 +110,7 @@ public class Monster : MonoBehaviour
 
         if (remainingDistance <= navMeshAgent.stoppingDistance && vDistance < 1f && isSameDir(target))
         {
-            Debug.Log("Attack");
             state = State.ATTACK;
-
         }
         else if (remainingDistance > (childBoxCollider.size.x / 2) || !isSameDir(target) || vDistance > 5f)
         {
@@ -132,7 +129,6 @@ public class Monster : MonoBehaviour
     {
         if (isSameDir(t) && state != State.CHASE/* && state != State.ATTACK*/)
         {
-            Debug.Log("trigger");
             target = t;
             navMeshAgent.enabled = true;
 
@@ -147,7 +143,6 @@ public class Monster : MonoBehaviour
     protected bool isSameDir(Transform t)
     {
         bool playerXOrZ = Approximately(Mathf.Abs(t.eulerAngles.y) % 180);
-        //Debug.Log(playerXOrZ == monsterXOrZ);
         return playerXOrZ == monsterXOrZ;
     }
 
@@ -192,6 +187,21 @@ public class Monster : MonoBehaviour
 
     }
 
+    //animation event Monster_A Attack 0:03에서 호출
+    public virtual void Hit()
+    {
+        Debug.Log("Hit 호출");
+        float vDistance = Mathf.Abs(transform.position.y - target.position.y);
+        float remainingDistance = monsterXOrZ ? target.position.x - transform.position.x : target.position.z - transform.position.z;
+        remainingDistance = Mathf.Abs(remainingDistance);
+        if (remainingDistance <= navMeshAgent.stoppingDistance && vDistance < 0.8f && isSameDir(target))
+        {
+            Debug.Log("Hit 성공");
+            NetworkPlayer player = target.GetComponent<NetworkPlayer>();
+            //player.OnDamaged();
+        }
+    }
+
     protected IEnumerator KILLED()
     {
         return null;
@@ -209,11 +219,12 @@ public class Monster : MonoBehaviour
 
     public virtual void OnDamaged(Vector3 attackerPos)
     {
-
         if (damaged)
         {
             return;
         }
+
+        Debug.Log("attacked A");
 
         int dir;
         rigidBody.linearVelocity = Vector3.zero;
