@@ -9,6 +9,7 @@ public class PlayFabLogin : MonoBehaviour
     [Header("Panels")]
     public GameObject registerPanel;
     public GameObject playfabUIPanel;
+    public GameObject loginPanel;
 
     [Header("Register Fields")]
     public TMP_InputField registerEmailInput;
@@ -167,10 +168,12 @@ public class PlayFabLogin : MonoBehaviour
     public void ShowRegisterPanel()
     {
         registerPanel.SetActive(true);
+        loginPanel.SetActive(false);
     }
 
     public void HideRegisterPanel()
     {
         registerPanel.SetActive(false);
+        loginPanel.SetActive(true);
     }
 }
