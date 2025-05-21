@@ -3,12 +3,15 @@ using UnityEngine.UI;
 using TMPro;
 using PlayFab;
 using PlayFab.ClientModels;
+using System.Collections;
 
 public class PlayFabLogin : MonoBehaviour
 {
     [Header("Panels")]
     public GameObject registerPanel;
     public GameObject playfabUIPanel;
+    public GameObject loginPanel;
+    public GameObject MainPanel;
 
     [Header("Register Fields")]
     public TMP_InputField registerEmailInput;
@@ -21,37 +24,52 @@ public class PlayFabLogin : MonoBehaviour
     public TMP_InputField loginEmailInput;
     public TMP_InputField loginPasswordInput;
     public Button loginButton;
-    public Button loginRegisterButton; // 🔘 회원가입 창 열기 버튼
+    public Button loginRegisterButton;
 
     [Header("UI Feedback")]
     public TMP_Text loginInfoText;
+    public TMP_Text usernameText;
+
+    [Header("Loading UI")]
+    public GameObject loadingPanel;
+    public TMP_Text loadingText;
+    public Image loadingImage;
+    public Sprite[] loadingSprites;
+
+    private Coroutine loadingCoroutine;
 
     private void Start()
     {
         if (string.IsNullOrEmpty(PlayFabSettings.staticSettings.TitleId))
         {
-            PlayFabSettings.staticSettings.TitleId = "12E6A8"; // 본인의 Title ID
+            PlayFabSettings.staticSettings.TitleId = "12E6A8";
         }
 
-        // 초기에는 회원가입 패널 숨김
         registerPanel.SetActive(false);
+        loadingPanel.SetActive(false);
+        MainPanel.SetActive(false);
 
-        // 버튼 이벤트 연결
         playfabRegisterButton.onClick.AddListener(OnClickRegister);
         loginButton.onClick.AddListener(OnClickLogin);
         registerCloseButton.onClick.AddListener(HideRegisterPanel);
-        loginRegisterButton.onClick.AddListener(ShowRegisterPanel); // 🔘 회원가입 버튼
+        loginRegisterButton.onClick.AddListener(ShowRegisterPanel);
 
         loginInfoText.text = "로그인 후 입장 가능합니다!";
     }
 
+    #region Login
     private void OnClickLogin()
     {
-        loginInfoText.text = "🔐 로그인 시도 중...";
+        loginInfoText.text = "";
+        ShowLoadingPanel("로그인 중");
         var request = new LoginWithEmailAddressRequest
         {
             Email = loginEmailInput.text,
             Password = loginPasswordInput.text,
+            InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
+            {
+                GetPlayerProfile = true 
+            }
         };
 
         PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
@@ -70,23 +88,24 @@ public class PlayFabLogin : MonoBehaviour
 
         if (!IsValidEmail(email))
         {
-            loginInfoText.text = "📧 올바른 이메일 형식이 아닙니다.";
+            loginInfoText.text = "올바른 이메일 형식이 아닙니다.";
             return;
         }
 
         if (password.Length < 6)
         {
-            loginInfoText.text = "🔑 비밀번호는 최소 6자 이상이어야 합니다.";
+            loginInfoText.text = "비밀번호는 최소 6자 이상이어야 합니다.";
             return;
         }
 
         if (string.IsNullOrEmpty(username))
         {
-            loginInfoText.text = "👤 사용자 이름을 입력해주세요.";
+            loginInfoText.text = "사용자 이름을 입력해주세요.";
             return;
         }
 
-        loginInfoText.text = "📝 회원가입 시도 중...";
+        loginInfoText.text = "";
+        ShowLoadingPanel("회원가입 중");
         var request = new RegisterPlayFabUserRequest
         {
             Email = email,
@@ -101,19 +120,26 @@ public class PlayFabLogin : MonoBehaviour
 
     private void OnLoginSuccess(LoginResult result)
     {
+        HideLoadingPanel();
         Debug.Log("로그인 성공! PlayFab ID: " + result.PlayFabId);
-        loginInfoText.text = $"✅ 로그인 성공!\nPlayFab ID: {result.PlayFabId}";
+
+        string displayName = result.InfoResultPayload?.PlayerProfile?.DisplayName ?? "Guest"; 
+        PlayerPrefs.SetString("displayName", displayName);
+        usernameText.text = displayName;
 
         if (playfabUIPanel != null)
             playfabUIPanel.SetActive(false);
+
+        if (MainPanel != null)
+            MainPanel.SetActive(true);
+
     }
 
     private void OnRegisterSuccess(RegisterPlayFabUserResult result)
     {
         Debug.Log("회원가입 성공! 새로운 계정이 생성되었습니다.");
-        loginInfoText.text = "🎉 회원가입 성공! 자동 로그인 진행 중...";
+        loadingText.text = "회원가입 성공! 자동 로그인 진행 중...";
 
-        // 👉 회원가입에 사용된 정보를 그대로 로그인 시도
         var request = new LoginWithEmailAddressRequest
         {
             Email = registerEmailInput.text,
@@ -124,10 +150,10 @@ public class PlayFabLogin : MonoBehaviour
         PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
     }
 
-
     private void OnLoginFailure(PlayFabError error)
     {
-        string userMessage = "❌ 오류 발생: ";
+        HideLoadingPanel();
+        string userMessage = "오류 발생: ";
 
         switch (error.Error)
         {
@@ -163,14 +189,54 @@ public class PlayFabLogin : MonoBehaviour
         loginInfoText.text = userMessage;
         Debug.LogError($"[PlayFab 오류] Code: {error.Error}, Message: {error.ErrorMessage}");
     }
+    #endregion
 
+    #region Loading
+    private void ShowLoadingPanel(string initialMessage)
+    {
+        loadingPanel.SetActive(true);
+        loadingCoroutine = StartCoroutine(LoadingDots(initialMessage));
+    }
+
+    private void HideLoadingPanel()
+    {
+        if (loadingCoroutine != null)
+        {
+            StopCoroutine(loadingCoroutine);
+            loadingCoroutine = null;
+        }
+        loadingPanel.SetActive(false);
+    }
+
+    private IEnumerator LoadingDots(string baseMessage)
+    {
+        int dotCount = 0;
+        int spriteIndex = 0;
+        while (true)
+        {
+            loadingText.text = baseMessage + new string('.', dotCount % 4);
+            if (loadingImage != null && loadingSprites.Length > 0)
+            {
+                loadingImage.sprite = loadingSprites[spriteIndex % loadingSprites.Length];
+                spriteIndex++;
+            }
+            dotCount++;
+            yield return new WaitForSeconds(0.3f);
+        }
+    }
+    #endregion
+
+    #region Register
     public void ShowRegisterPanel()
     {
         registerPanel.SetActive(true);
+        loginPanel.SetActive(false);
     }
 
     public void HideRegisterPanel()
     {
         registerPanel.SetActive(false);
+        loginPanel.SetActive(true);
     }
+    #endregion
 }
