@@ -1,57 +1,60 @@
 using UnityEngine;
+using Photon.Pun;
 
 public class RotateCamera : MonoBehaviour
 {
+    [Tooltip("카메라가 따라갈 플레이어 Transform")]
     public Transform playerTransform;
 
-    //회전 각도 0 ~ 270
+    [Header("카메라 회전 설정")]
+    [SerializeField, Tooltip("현재 카메라의 회전 각도 (0, 90, 180, 270)")]
     private float rotationAng = 0f;
-    //플레이어와 카메라 거리
+
+    [SerializeField, Tooltip("플레이어로부터의 카메라 거리")]
     private float radius = 20f;
 
+    [SerializeField, Tooltip("카메라 회전 속도")]
     private float rotationSpeed = 5f;
+
+    [SerializeField, Tooltip("카메라 위치 이동 속도")]
     private float moveSpeed = 8f;
+
+    [Header("카메라 상태")]
+    [SerializeField, Tooltip("카메라가 회전 중인지 여부")]
+    private bool cameraRotating = false;
 
     private void Update()
     {
+        if (playerTransform == null) return;
+
         if (Input.GetKeyDown(KeyCode.Q))
         {
+            cameraRotating = true;
             rotationAng += 90f;
-            if(rotationAng > 270f)
-            {
-                rotationAng = 0f;
-            }
+            if (rotationAng > 270f) rotationAng = 0f;
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
+            cameraRotating = true;
             rotationAng -= 90f;
-            if (rotationAng < 0)
-            {
-                rotationAng = 270f;
-            }
+            if (rotationAng < 0) rotationAng = 270f;
         }
 
-        Vector3 start = new Vector3(0, 0, -radius);
+        Vector3 offset = new Vector3(0, 0, -radius);
+        Quaternion targetRot = Quaternion.Euler(0, rotationAng, 0);
+        Vector3 finalPos = targetRot * offset + playerTransform.position;
 
-        Quaternion rotationY = Quaternion.Euler(0, rotationAng, 0);
 
-        //원 점을 기준으로 카메라 회전
-        Vector3 movedPos = rotationY * start;
-
-        //플레이어 위치로 위치 재설정
-        Vector3 finalPos = movedPos + playerTransform.position;
-
-        //카메라 각도 회전
-        if (Quaternion.Angle(transform.rotation, rotationY) < 0.2f)
+        if (Quaternion.Angle(transform.rotation, targetRot) < 0.2f)
         {
-            transform.rotation = rotationY;
+            transform.rotation = targetRot;
+            cameraRotating = false;
         }
         else
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotationY, Time.deltaTime * rotationSpeed);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * rotationSpeed);
         }
 
-        //플레이어를 축으로 카메라 회전
         if (Vector3.Distance(transform.position, finalPos) < 0.02f)
         {
             transform.position = finalPos;
@@ -60,5 +63,10 @@ public class RotateCamera : MonoBehaviour
         {
             transform.position = Vector3.Lerp(transform.position, finalPos, Time.deltaTime * moveSpeed);
         }
+    }
+
+    public bool GetCameraRotating()
+    {
+        return cameraRotating;
     }
 }
