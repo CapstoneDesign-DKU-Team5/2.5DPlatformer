@@ -11,6 +11,7 @@ public class PlayFabLogin : MonoBehaviour
     public GameObject registerPanel;
     public GameObject playfabUIPanel;
     public GameObject loginPanel;
+    public GameObject MainPanel;
 
     [Header("Register Fields")]
     public TMP_InputField registerEmailInput;
@@ -27,10 +28,13 @@ public class PlayFabLogin : MonoBehaviour
 
     [Header("UI Feedback")]
     public TMP_Text loginInfoText;
+    public TMP_Text usernameText;
 
     [Header("Loading UI")]
     public GameObject loadingPanel;
     public TMP_Text loadingText;
+    public Image loadingImage;
+    public Sprite[] loadingSprites;
 
     private Coroutine loadingCoroutine;
 
@@ -38,18 +42,17 @@ public class PlayFabLogin : MonoBehaviour
     {
         if (string.IsNullOrEmpty(PlayFabSettings.staticSettings.TitleId))
         {
-            PlayFabSettings.staticSettings.TitleId = "12E6A8"; // 본인의 Title ID
+            PlayFabSettings.staticSettings.TitleId = "12E6A8";
         }
 
-        // 초기에는 회원가입,로딩 패널 숨김
         registerPanel.SetActive(false);
         loadingPanel.SetActive(false);
+        MainPanel.SetActive(false);
 
-        // 버튼 이벤트 연결
         playfabRegisterButton.onClick.AddListener(OnClickRegister);
         loginButton.onClick.AddListener(OnClickLogin);
         registerCloseButton.onClick.AddListener(HideRegisterPanel);
-        loginRegisterButton.onClick.AddListener(ShowRegisterPanel); // 🔘 회원가입 버튼
+        loginRegisterButton.onClick.AddListener(ShowRegisterPanel);
 
         loginInfoText.text = "로그인 후 입장 가능합니다!";
     }
@@ -63,6 +66,10 @@ public class PlayFabLogin : MonoBehaviour
         {
             Email = loginEmailInput.text,
             Password = loginPasswordInput.text,
+            InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
+            {
+                GetPlayerProfile = true 
+            }
         };
 
         PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
@@ -116,8 +123,16 @@ public class PlayFabLogin : MonoBehaviour
         HideLoadingPanel();
         Debug.Log("로그인 성공! PlayFab ID: " + result.PlayFabId);
 
+        string displayName = result.InfoResultPayload?.PlayerProfile?.DisplayName ?? "Guest"; 
+        PlayerPrefs.SetString("displayName", displayName);
+        usernameText.text = displayName;
+
         if (playfabUIPanel != null)
             playfabUIPanel.SetActive(false);
+
+        if (MainPanel != null)
+            MainPanel.SetActive(true);
+
     }
 
     private void OnRegisterSuccess(RegisterPlayFabUserResult result)
@@ -125,7 +140,6 @@ public class PlayFabLogin : MonoBehaviour
         Debug.Log("회원가입 성공! 새로운 계정이 생성되었습니다.");
         loadingText.text = "회원가입 성공! 자동 로그인 진행 중...";
 
-        // 👉 회원가입에 사용된 정보를 그대로 로그인 시도
         var request = new LoginWithEmailAddressRequest
         {
             Email = registerEmailInput.text,
@@ -135,7 +149,6 @@ public class PlayFabLogin : MonoBehaviour
         loginPasswordInput.text = registerPasswordInput.text;
         PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
     }
-
 
     private void OnLoginFailure(PlayFabError error)
     {
@@ -198,11 +211,17 @@ public class PlayFabLogin : MonoBehaviour
     private IEnumerator LoadingDots(string baseMessage)
     {
         int dotCount = 0;
+        int spriteIndex = 0;
         while (true)
         {
             loadingText.text = baseMessage + new string('.', dotCount % 4);
+            if (loadingImage != null && loadingSprites.Length > 0)
+            {
+                loadingImage.sprite = loadingSprites[spriteIndex % loadingSprites.Length];
+                spriteIndex++;
+            }
             dotCount++;
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.3f);
         }
     }
     #endregion

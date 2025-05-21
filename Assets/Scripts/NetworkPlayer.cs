@@ -102,17 +102,6 @@ namespace HelloWorld
                 mainCamera = camObj.GetComponent<Camera>();
                 cameraScript = camObj.GetComponent<RotateCamera>();
                 cameraScript.playerTransform = transform;
-                PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), result =>
-                {
-                    string displayName = result.AccountInfo.TitleInfo.DisplayName;
-                    PlayerPrefs.SetString("displayName", displayName); // 다음 세션에서도 사용 가능하게 저장
-                    photonView.RPC(nameof(SetUsernameText), RpcTarget.AllBuffered, displayName);
-                },
-           error =>
-           {
-               Debug.LogError("유저 이름 가져오기 실패: " + error.GenerateErrorReport());
-               photonView.RPC(nameof(SetUsernameText), RpcTarget.AllBuffered, "Unknown");
-           });
             }
         }
 
