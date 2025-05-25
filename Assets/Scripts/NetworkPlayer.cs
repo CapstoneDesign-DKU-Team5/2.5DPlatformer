@@ -54,7 +54,8 @@ namespace HelloWorld
         private bool jump = false;
         private bool attack = false;
         private bool climbJump = false;
-        private bool damaged = false;
+        private bool isControlLocked = false;
+        private bool isInvincible = false;
 
         private Vector3 savedVelocity;
         private bool needRestoreVelocity = false;
@@ -131,7 +132,7 @@ namespace HelloWorld
             RayTop();
             RayDown();
             StartAttack();
-            OnDamaged();
+            CheckCollisionDamage();
         }
 
         private void PlayerLookCamera()
@@ -201,7 +202,7 @@ namespace HelloWorld
 
         private void Move()
         {
-            if (cameraScript.GetCameraRotating() || damaged)
+            if (cameraScript.GetCameraRotating() || isControlLocked)
                 return;
 
             Vector3 moveVec;
@@ -351,7 +352,7 @@ namespace HelloWorld
 
             int dir = (leftRight == "Right") ? 1 : -1;
 
-            if (h != dir && !damaged)
+            if (h != dir && !isControlLocked)
                 return;
 
             Vector3 boxSize = playerCollider.bounds.extents;
@@ -458,7 +459,7 @@ namespace HelloWorld
 
         private void StartAttack()
         {
-            if (!attack || damaged || climbState || isAttacking)
+            if (!attack || isControlLocked || climbState || isAttacking)
                 return;
             animator.SetTrigger("doAttack");
             isAttacking = true;
@@ -526,7 +527,7 @@ namespace HelloWorld
             isAttacking = false;
         }
 
-        public void OnDamaged()
+        public void CheckCollisionDamage()
         {
             //판정 이상하면 조금 늘려야
             Vector3 rightOffset = mainCamera.transform.right * boxColider.size.x / 2f;
@@ -558,7 +559,7 @@ namespace HelloWorld
                 {
                     if (enemyHit.collider.gameObject.layer == enemy)
                     {
-                        if (damaged)
+                        if (isInvincible)
                         {
                             return;
                         }
@@ -567,38 +568,7 @@ namespace HelloWorld
                         float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
                         if (CorrectDir % 180f == 0 ? true : false)
                         {
-                            //매달리기 상태 문제 해결
-                            if (climbState)
-                            {
-                                climbState = false;
-                                animator.SetBool("isClimbIdle", false);
-                                rigidBody.useGravity = true;
-                            }
-
-                            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
-                            animator.SetTrigger("isDamaged");
-
-                            //플레이어 x로 튕겨야 할지 z로 튕겨야 할지 결정
-                            bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
-
-                            int dir;
-                            if (isXOrZ)
-                            {
-                                rigidBody.linearVelocity = Vector3.zero;
-                                dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;
-                                Vector3 dirVec = new Vector3(dir, 4f, 0);
-                                rigidBody.AddForce(dirVec, ForceMode.Impulse);
-
-                            }
-                            else
-                            {
-                                rigidBody.linearVelocity = Vector3.zero;
-                                dir = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
-                                Vector3 dirVec = new Vector3(0, 4f, dir);
-                                rigidBody.AddForce(dirVec, ForceMode.Impulse);
-                            }
-                            damaged = true;
-                            Invoke("OffDamaged", 0.9f);
+                            OnDamaged(enemyHit.transform.position);
                             break;
                         }
                     }
@@ -606,10 +576,54 @@ namespace HelloWorld
             }
         }
 
+        public void OnDamaged(Vector3 monsterPos)
+        {
+            //매달리기 상태 문제 해결
+            if (climbState)
+            {
+                climbState = false;
+                animator.SetBool("isClimbIdle", false);
+                rigidBody.useGravity = true;
+            }
+
+            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+            animator.SetTrigger("isDamaged");
+
+            //플레이어 x로 튕겨야 할지 z로 튕겨야 할지 결정
+            bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
+
+            int dir;
+            if (isXOrZ)
+            {
+                rigidBody.linearVelocity = Vector3.zero;
+                dir = transform.position.x - monsterPos.x > 0 ? 1 : -1;
+                Vector3 dirVec = new Vector3(dir, 4f, 0);
+                rigidBody.AddForce(dirVec, ForceMode.Impulse);
+
+            }
+            else
+            {
+                rigidBody.linearVelocity = Vector3.zero;
+                dir = transform.position.z - monsterPos.z > 0 ? 1 : -1;
+                Vector3 dirVec = new Vector3(0, 4f, dir);
+                rigidBody.AddForce(dirVec, ForceMode.Impulse);
+            }
+            isControlLocked = true;
+            isInvincible = true;
+
+            Invoke("UnlockControl", 0.5f);
+            Invoke("OffDamaged", 0.9f);
+        }
+
+        void UnlockControl() 
+        {
+            isControlLocked = false;
+        }
+
         void OffDamaged()
         {
             spriteRenderer.color = new Color(1, 1, 1, 1);
-            damaged = false;
+            isInvincible = false;
 
             //attck = true하고 damaged = true 같은 프레임에 실행되면
             //StartAttack이 무시되거나? EndAttack ani 출력안되서 무시 됨.

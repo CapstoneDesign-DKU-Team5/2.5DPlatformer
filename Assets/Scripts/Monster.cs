@@ -198,7 +198,7 @@ public class Monster : MonoBehaviour
         {
             Debug.Log("Hit ¼º°ø");
             NetworkPlayer player = target.GetComponent<NetworkPlayer>();
-            //player.OnDamaged();
+            player.OnDamaged(transform.position);
         }
     }
 
