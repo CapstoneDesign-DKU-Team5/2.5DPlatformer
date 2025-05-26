@@ -69,7 +69,7 @@ public class Monster : MonoBehaviour
         navMeshAgent.updateRotation = false;
 
         state = State.IDLE;
-        HP = 3;
+        HP = 10;
         StartCoroutine(StateMachine());
     }
 
@@ -215,6 +215,7 @@ public class Monster : MonoBehaviour
 
     protected IEnumerator KILLED()
     {
+        gameObject.layer = LayerMask.NameToLayer("Dead");
         animator.Play("Dead", 0, 0);
 
         float duration = 1.5f;
@@ -262,6 +263,8 @@ public class Monster : MonoBehaviour
             return;
         }
 
+        AnimatorStateInfo curAnimStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+
         //∏ÛΩ∫≈Õ ≥ÀπÈ
         //rigidBody.isKinematic = false;
         //int dir;
@@ -289,23 +292,19 @@ public class Monster : MonoBehaviour
         }
         else
         {
-            animator.Play("Damaged", 0, 0);
+            if (!curAnimStateInfo.IsName("Attack"))
+            {
+                animator.Play("Damaged", 0, 0);
+            }
         }
 
         damaged = true;
         Invoke("OffDamaged", 0.6f);
     }
 
-    //protected IEnumerator Damaged()
-    //{
-    //    animator.Play("Damaged", 0, 0);
-    //    AnimatorStateInfo curAnimStateInfo = animator.GetCurrentAnimatorStateInfo(0);
-    //    yield return StartCoroutine(Wait(curAnimStateInfo.length));
-    //}
-
     protected void OffDamaged()
     {
-        ///rigidBody.isKinematic = true;
+        //rigidBody.isKinematic = true;
         damaged = false;
     }
 }
