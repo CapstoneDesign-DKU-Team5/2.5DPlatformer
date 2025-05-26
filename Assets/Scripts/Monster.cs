@@ -53,7 +53,7 @@ public class Monster : MonoBehaviour
     private State state;
 
 
-    protected virtual void Awake()
+    protected void Awake()
     {
         monsterXOrZ = Approximately(Mathf.Abs(transform.eulerAngles.y % 180f));
 
@@ -123,7 +123,7 @@ public class Monster : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSeconds(curAnimStateInfo.length);
+            yield return StartCoroutine(Wait(curAnimStateInfo.length));
         }
     }
 
@@ -189,13 +189,13 @@ public class Monster : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSeconds(curAnimStateInfo.length * 2f);
+            yield return StartCoroutine(Wait(curAnimStateInfo.length * 2f));
         }
 
     }
 
     //animation event Monster_A Attack 0:03에서 호출
-    public virtual void Hit()
+    public void Hit()
     {
         if (target == null)
         {
@@ -236,7 +236,16 @@ public class Monster : MonoBehaviour
         Destroy(gameObject);
     }
 
-    protected virtual void Update()
+    protected IEnumerator Wait(float t)
+    {
+        while (t > 0 && state != State.KILLED)
+        {
+            t -= Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    protected void Update()
     {
         if (target == null || state == State.ATTACK)
         {
@@ -246,14 +255,12 @@ public class Monster : MonoBehaviour
         navMeshAgent.SetDestination(targetPos);
     }
 
-    public virtual void OnDamaged(Vector3 attackerPos, int damage)
+    public void OnDamaged(Vector3 attackerPos, int damage)
     {
         if (damaged)
         {
             return;
         }
-
-        HP -= damage;
 
         //몬스터 넉백
         //rigidBody.isKinematic = false;
@@ -271,6 +278,9 @@ public class Monster : MonoBehaviour
         //    Vector3 dirVec = new Vector3(0, 0, dir);
         //    rigidBody.AddForce(dirVec, ForceMode.Impulse);
         //}
+
+        HP -= damage;
+
         if (HP <= 0)
         {
             target = null;
@@ -286,7 +296,14 @@ public class Monster : MonoBehaviour
         Invoke("OffDamaged", 0.6f);
     }
 
-    protected virtual void OffDamaged()
+    //protected IEnumerator Damaged()
+    //{
+    //    animator.Play("Damaged", 0, 0);
+    //    AnimatorStateInfo curAnimStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+    //    yield return StartCoroutine(Wait(curAnimStateInfo.length));
+    //}
+
+    protected void OffDamaged()
     {
         ///rigidBody.isKinematic = true;
         damaged = false;
