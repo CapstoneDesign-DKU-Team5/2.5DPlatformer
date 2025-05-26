@@ -510,7 +510,7 @@ namespace HelloWorld
                             Monster monster = enemyHit.collider.GetComponent<Monster>();
                             if (monster != null)
                             {
-                                monster.OnDamaged(transform.position);
+                                monster.OnDamaged(transform.position, 1);
                             }
                             break;
                         }

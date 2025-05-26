@@ -75,11 +75,13 @@ public class Monster : MonoBehaviour
 
     protected IEnumerator StateMachine()
     {
-        while (HP > 0)
+        while (state != State.KILLED)
         {
             yield return StartCoroutine(state.ToString());
         }
+        yield return StartCoroutine(State.KILLED.ToString());
     }
+
     protected IEnumerator IDLE()
     {
         AnimatorStateInfo curAnimStateInfo = animator.GetCurrentAnimatorStateInfo(0);
@@ -127,6 +129,11 @@ public class Monster : MonoBehaviour
 
     public void TriggerSetTarget(Transform t)
     {
+        if (state == State.KILLED)
+        {
+            return;
+        }
+
         if (isSameDir(t) && state != State.CHASE/* && state != State.ATTACK*/)
         {
             target = t;
@@ -190,6 +197,10 @@ public class Monster : MonoBehaviour
     //animation event Monster_A Attack 0:03에서 호출
     public virtual void Hit()
     {
+        if (target == null)
+        {
+            return;
+        }
         Debug.Log("Hit 호출");
         float vDistance = Mathf.Abs(transform.position.y - target.position.y);
         float remainingDistance = monsterXOrZ ? target.position.x - transform.position.x : target.position.z - transform.position.z;
@@ -218,12 +229,14 @@ public class Monster : MonoBehaviour
         navMeshAgent.SetDestination(targetPos);
     }
 
-    public virtual void OnDamaged(Vector3 attackerPos)
+    public virtual void OnDamaged(Vector3 attackerPos, int damage)
     {
         if (damaged)
         {
             return;
         }
+
+        HP -= damage;
 
         //몬스터 넉백
         //rigidBody.isKinematic = false;
@@ -241,8 +254,16 @@ public class Monster : MonoBehaviour
         //    Vector3 dirVec = new Vector3(0, 0, dir);
         //    rigidBody.AddForce(dirVec, ForceMode.Impulse);
         //}
-
-        animator.Play("Damaged", 0, 0);
+        if (HP <= 0)
+        {
+            target = null;
+            state = State.KILLED;
+            return;
+        }
+        else
+        {
+            animator.Play("Damaged", 0, 0);
+        }
 
         damaged = true;
         Invoke("OffDamaged", 0.6f);
