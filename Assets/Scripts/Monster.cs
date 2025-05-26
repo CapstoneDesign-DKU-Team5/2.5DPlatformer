@@ -216,7 +216,24 @@ public class Monster : MonoBehaviour
     protected IEnumerator KILLED()
     {
         animator.Play("Dead", 0, 0);
-        yield return null;
+
+        float duration = 1.5f;
+        float timer = 0f;
+
+        Color color = spriteRenderer.material.color;
+
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, timer / duration);
+
+            color.a = alpha;
+            spriteRenderer.material.color = color;
+
+            yield return null;
+        }
+
+        Destroy(gameObject);
     }
 
     protected virtual void Update()
