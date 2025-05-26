@@ -204,7 +204,8 @@ public class Monster : MonoBehaviour
 
     protected IEnumerator KILLED()
     {
-        return null;
+        animator.Play("Dead", 0, 0);
+        yield return null;
     }
 
     protected virtual void Update()
@@ -224,23 +225,24 @@ public class Monster : MonoBehaviour
             return;
         }
 
-        Debug.Log("attacked A");
+        //¸ó½ºÅÍ ³Ë¹é
+        //rigidBody.isKinematic = false;
+        //int dir;
+        //rigidBody.linearVelocity = Vector3.zero;
+        //if (monsterXOrZ)
+        //{
+        //    dir = transform.position.x - attackerPos.x > 0 ? 1 : -1;
+        //    Vector3 dirVec = new Vector3(dir, 0, 0);
+        //    rigidBody.AddForce(dirVec, ForceMode.Impulse);
+        //}
+        //else
+        //{
+        //    dir = transform.position.z - attackerPos.z > 0 ? 1 : -1;
+        //    Vector3 dirVec = new Vector3(0, 0, dir);
+        //    rigidBody.AddForce(dirVec, ForceMode.Impulse);
+        //}
 
-        int dir;
-        rigidBody.linearVelocity = Vector3.zero;
-
-        if (monsterXOrZ)
-        {
-            dir = transform.position.x - attackerPos.x > 0 ? 1 : -1;
-            Vector3 dirVec = new Vector3(dir * 2, 0, 0);
-            rigidBody.AddForce(dirVec, ForceMode.Impulse);
-        }
-        else
-        {
-            dir = transform.position.z - attackerPos.z > 0 ? 1 : -1;
-            Vector3 dirVec = new Vector3(0, 0, dir * 2);
-            rigidBody.AddForce(dirVec, ForceMode.Impulse);
-        }
+        animator.Play("Damaged", 0, 0);
 
         damaged = true;
         Invoke("OffDamaged", 0.6f);
@@ -248,6 +250,7 @@ public class Monster : MonoBehaviour
 
     protected virtual void OffDamaged()
     {
+        ///rigidBody.isKinematic = true;
         damaged = false;
     }
 }
