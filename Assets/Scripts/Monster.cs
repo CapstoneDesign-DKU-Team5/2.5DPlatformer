@@ -36,12 +36,12 @@ public class Monster : MonoBehaviour
 
     [Header("기타 상태 값")]
     [SerializeField, Tooltip("몬스터가 X축을 기준으로 움직이는지 여부")]
-    private bool monsterXOrZ; // true면 x축 이동
+    protected bool monsterXOrZ; // true면 x축 이동
 
     [SerializeField, Tooltip("현재 체력")]
-    private float HP = 3;
+    protected float HP = 3;
 
-    private enum State
+    protected enum State
     {
         IDLE,
         CHASE,
@@ -50,7 +50,7 @@ public class Monster : MonoBehaviour
     }
 
     [SerializeField, Tooltip("현재 몬스터 상태")]
-    private State state;
+    protected State state;
 
 
     protected void Awake()
@@ -65,7 +65,7 @@ public class Monster : MonoBehaviour
         animator = GetComponent<Animator>();
         navMeshAgent = GetComponent<NavMeshAgent>();
 
-        navMeshAgent.enabled = false;
+        //navMeshAgent.enabled = false;
         navMeshAgent.updateRotation = false;
 
         state = State.IDLE;
@@ -82,7 +82,7 @@ public class Monster : MonoBehaviour
         yield return StartCoroutine(State.KILLED.ToString());
     }
 
-    protected IEnumerator IDLE()
+    protected virtual IEnumerator IDLE()
     {
         AnimatorStateInfo curAnimStateInfo = animator.GetCurrentAnimatorStateInfo(0);
         if (curAnimStateInfo.IsName("IdleNormal") == false)
@@ -137,7 +137,7 @@ public class Monster : MonoBehaviour
         if (isSameDir(t) && state != State.CHASE/* && state != State.ATTACK*/)
         {
             target = t;
-            navMeshAgent.enabled = true;
+            //navMeshAgent.enabled = true;
 
             CalTargetPos();
 
