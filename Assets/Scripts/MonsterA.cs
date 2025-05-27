@@ -4,9 +4,9 @@ using UnityEngine.AI;
 
 public class MonsterA : Monster
 {
-    private float moveTimeout = 5f;
+    private float moveTimeout = 4f;
     private float waitTime = 5f;
-    private float patrolProbability = 0.8f;
+    private float patrolProbability = 0.9f;
 
     protected override IEnumerator IDLE()
     {
@@ -17,19 +17,21 @@ public class MonsterA : Monster
             Vector3 randomPoint = GetRandomPoint();
 
             navMeshAgent.SetDestination(randomPoint);
-            Debug.Log(transform.position - randomPoint);
+            Debug.Log(randomPoint);
 
             AnimatorStateInfo curAnimStateInfo = animator.GetCurrentAnimatorStateInfo(0);
             if (curAnimStateInfo.IsName("Walk") == false)
             {
                 animator.Play("Walk", 0, 0);
             }
+
             float remainingDistance = monsterXOrZ ? randomPoint.x - transform.position.x : randomPoint.z - transform.position.z;
             spriteRenderer.flipX = remainingDistance < 0;
+            remainingDistance = Mathf.Abs(remainingDistance);
 
             float timer = 0f;
 
-            while (navMeshAgent.remainingDistance > 0.65f)
+            while (remainingDistance > navMeshAgent.stoppingDistance)
             {
                 timer += Time.deltaTime;
 
@@ -40,9 +42,12 @@ public class MonsterA : Monster
                 }
 
                 yield return null;
+
+                remainingDistance = monsterXOrZ ? randomPoint.x - transform.position.x : randomPoint.z - transform.position.z;
+                remainingDistance = Mathf.Abs(remainingDistance);
             }
         }
-        else if(randomValue >= patrolProbability && state != State.IDLE)
+        else if(randomValue >= patrolProbability/* && state == State.IDLE*/)
         {
             navMeshAgent.SetDestination(transform.position);
             Debug.Log("Á¦ÀÚ¸®");
@@ -57,7 +62,7 @@ public class MonsterA : Monster
 
     private Vector3 GetRandomPoint()
     {
-        float minDistance = 2f;
+        float minDistance = 3f;
         float maxDistance = 5f;
 
         float sign = Random.value < 0.5f ? -1f : 1f;
