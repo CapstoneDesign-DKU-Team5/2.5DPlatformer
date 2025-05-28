@@ -578,6 +578,11 @@ namespace HelloWorld
 
         public void OnDamaged(Vector3 monsterPos)
         {
+            if (isInvincible)
+            {
+                return;
+            }
+
             //매달리기 상태 문제 해결
             if (climbState)
             {
@@ -612,7 +617,7 @@ namespace HelloWorld
             isInvincible = true;
 
             Invoke("UnlockControl", 0.5f);
-            Invoke("OffDamaged", 0.9f);
+            Invoke("OffDamaged", 1.5f);
         }
 
         void UnlockControl() 
