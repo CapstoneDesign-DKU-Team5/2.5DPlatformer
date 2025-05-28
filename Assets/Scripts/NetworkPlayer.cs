@@ -63,6 +63,7 @@ namespace HelloWorld
         private bool isAttacking = false;
         private bool isAir = false;
         private bool isVisible = true;
+        private bool isInvisibleFrontAndBack = false;
         private int isCameraFront = 1;
 
         private bool flipState = false;
@@ -123,6 +124,7 @@ namespace HelloWorld
                 return;
 
             IsVisible();
+            IsVisibleFromBack();
             IsAir();
 
             Move();
@@ -144,13 +146,14 @@ namespace HelloWorld
         {
             RaycastHit rayHitPlayer;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
-            int mask = ~((1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("ChaseRange")));
+            int mask = ~((1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("ChaseRange")) | (1 << LayerMask.NameToLayer("Dead")));
 
             if (Physics.Raycast(rayStart, mainCamera.transform.forward, out rayHitPlayer, cameraRaySize, mask))
             {
                 int playerLayer = LayerMask.NameToLayer("Player");
                 if (rayHitPlayer.collider.gameObject.layer == playerLayer)
                 {
+                    isInvisibleFrontAndBack = false;
                     isVisible = true;
                     isCameraFront = 1;
                     return;
@@ -158,6 +161,29 @@ namespace HelloWorld
             }
             isCameraFront = -1;
             isVisible = false;
+        }
+
+        private void IsVisibleFromBack()
+        {
+            if (!isVisible)
+            {
+                RaycastHit rayHitPlayer;
+                Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * -1;
+                int mask = ~((1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("ChaseRange")) | (1 << LayerMask.NameToLayer("Dead")));
+
+                if (Physics.Raycast(rayStart, -mainCamera.transform.forward, out rayHitPlayer, cameraRaySize, mask))
+                {
+                    Debug.DrawRay(rayStart, -mainCamera.transform.forward * cameraRaySize, Color.black);
+
+                    int playerLayer = LayerMask.NameToLayer("Player");
+                    if (rayHitPlayer.collider.gameObject.layer == playerLayer)
+                    {
+                        isInvisibleFrontAndBack = false;
+                        return;
+                    }
+                    isInvisibleFrontAndBack = true;
+                }
+            }
         }
 
         private bool IsGrounded(Vector3 position)
@@ -292,7 +318,7 @@ namespace HelloWorld
 
         private void RayTop()
         {
-            if (!photonView.IsMine/* || !isVisible*/)
+            if (!photonView.IsMine || isInvisibleFrontAndBack)
                 return;
 
             float offset = 0.5f;
@@ -304,7 +330,7 @@ namespace HelloWorld
 
             Vector3 rayTopOffset = Vector3.up * (boxColider.size.y / 2f + boxSize.y);
 
-            Debug.DrawRay(rayStart + rayTopOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.black);
+            Debug.DrawRay(rayStart + rayTopOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.yellow);
 
             if (rigidBody.linearVelocity.y > 0f)
             {
@@ -319,7 +345,7 @@ namespace HelloWorld
 
         private void RayDown()
         {
-            if (!photonView.IsMine/* || !isVisible*/)
+            if (!photonView.IsMine || isInvisibleFrontAndBack)
                 return;
 
             float offset = 0.5f;
@@ -332,7 +358,7 @@ namespace HelloWorld
 
             Vector3 rayDownOffset = Vector3.up * (boxColider.size.y / 2f + boxSize.y);
 
-            Debug.DrawRay(rayStart - rayDownOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.black);
+            Debug.DrawRay(rayStart - rayDownOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.yellow);
 
             if (rigidBody.linearVelocity.y < -0.01f)
             {
@@ -347,7 +373,7 @@ namespace HelloWorld
 
         private void RaySide(string leftRight)
         {
-            if (!photonView.IsMine/* || !isVisible */|| cameraScript.GetCameraRotating())
+            if (!photonView.IsMine || isInvisibleFrontAndBack || cameraScript.GetCameraRotating())
                 return;
 
             int dir = (leftRight == "Right") ? 1 : -1;
@@ -498,7 +524,7 @@ namespace HelloWorld
 
             for (int i = 0; i < offsets.Length; i++)
             {
-                Debug.DrawRay(rayStart + offsets[i], mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.blue);
+                //Debug.DrawRay(rayStart + offsets[i], mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.blue);
 
                 if (Physics.Raycast(rayStart + offsets[i], mainCamera.transform.forward * isCameraFront, out enemyHit, cameraRaySize, mask))
                 {
