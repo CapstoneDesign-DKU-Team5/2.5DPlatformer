@@ -37,7 +37,8 @@ public class MonsterA : Monster
 
                 if (timer > moveTimeout || state != State.IDLE)
                 {
-                    Debug.Log("time out");
+                    //Debug.Log("time out");
+                    //Debug.Log(state);
                     break;
                 }
 
