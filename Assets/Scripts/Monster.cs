@@ -114,7 +114,7 @@ public class Monster : MonoBehaviour
         {
             state = State.ATTACK;
         }
-        else if (remainingDistance > (childBoxCollider.size.x / 2) || !isSameDir(target) || vDistance > 5f)
+        else if (remainingDistance > (childBoxCollider.size.x / 2) + 0.5f || !isSameDir(target) || vDistance > 5f)
         {
             target = null;
             navMeshAgent.SetDestination(transform.position);

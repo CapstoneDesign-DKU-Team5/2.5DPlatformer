@@ -56,7 +56,7 @@ public class MonsterA : Monster
             {
                 animator.Play("IdleNormal", 0, 0);
             }
-            yield return StartCoroutine(Wait(waitTime));
+            yield return StartCoroutine(Wait2(waitTime));
         }
     }
 
@@ -79,5 +79,14 @@ public class MonsterA : Monster
             point = transform.position + Vector3.forward * randomOffset;
         }
         return point;
+    }
+
+    protected IEnumerator Wait2(float t)
+    {
+        while (t > 0 && state == State.IDLE)
+        {
+            t -= Time.deltaTime;
+            yield return null;
+        }
     }
 }
