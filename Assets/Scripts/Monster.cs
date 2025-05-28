@@ -201,13 +201,13 @@ public class Monster : MonoBehaviour
         {
             return;
         }
-        Debug.Log("Hit 호출");
+        //Debug.Log("Hit 호출");
         float vDistance = Mathf.Abs(transform.position.y - target.position.y);
         float remainingDistance = monsterXOrZ ? target.position.x - transform.position.x : target.position.z - transform.position.z;
         remainingDistance = Mathf.Abs(remainingDistance);
         if (remainingDistance <= navMeshAgent.stoppingDistance && vDistance < 0.8f && isSameDir(target))
         {
-            Debug.Log("Hit 성공");
+            //Debug.Log("Hit 성공");
             NetworkPlayer player = target.GetComponent<NetworkPlayer>();
             player.OnDamaged(transform.position);
         }
@@ -283,7 +283,7 @@ public class Monster : MonoBehaviour
         //}
 
         HP -= damage;
-
+        Debug.Log(HP);
         if (HP <= 0)
         {
             target = null;
