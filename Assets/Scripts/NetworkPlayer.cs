@@ -34,7 +34,7 @@ namespace HelloWorld
         private float speed = 2f;
 
         [SerializeField, Tooltip("점프 시 적용할 힘 (ForceMode.Impulse)")]
-        private float jumpHeight = 5f;
+        private float jumpHeight = 20f;
 
         [SerializeField, Tooltip("전방 레이캐스트 길이의 절반")]
         private float cameraRaySize = 30f;
@@ -76,6 +76,8 @@ namespace HelloWorld
             spriteRenderer = GetComponent<SpriteRenderer>();
             playerCollider = GetComponent<Collider>();
             boxColider = GetComponent<BoxCollider>();
+
+            jumpHeight = 7f;
         }
 
         private void OnEnable()
