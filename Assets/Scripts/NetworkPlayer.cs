@@ -34,7 +34,7 @@ namespace HelloWorld
         private float speed = 2f;
 
         [SerializeField, Tooltip("점프 시 적용할 힘 (ForceMode.Impulse)")]
-        private float jumpHeight = 5f;
+        private float jumpHeight = 20f;
 
         [SerializeField, Tooltip("전방 레이캐스트 길이의 절반")]
         private float cameraRaySize = 30f;
@@ -54,7 +54,8 @@ namespace HelloWorld
         private bool jump = false;
         private bool attack = false;
         private bool climbJump = false;
-        private bool damaged = false;
+        private bool isControlLocked = false;
+        private bool isInvincible = false;
 
         private Vector3 savedVelocity;
         private bool needRestoreVelocity = false;
@@ -62,6 +63,7 @@ namespace HelloWorld
         private bool isAttacking = false;
         private bool isAir = false;
         private bool isVisible = true;
+        private bool isInvisibleFrontAndBack = false;
         private int isCameraFront = 1;
 
         private bool flipState = false;
@@ -74,6 +76,8 @@ namespace HelloWorld
             spriteRenderer = GetComponent<SpriteRenderer>();
             playerCollider = GetComponent<Collider>();
             boxColider = GetComponent<BoxCollider>();
+
+            jumpHeight = 7f;
         }
 
         private void OnEnable()
@@ -122,6 +126,7 @@ namespace HelloWorld
                 return;
 
             IsVisible();
+            IsVisibleFromBack();
             IsAir();
 
             Move();
@@ -131,7 +136,7 @@ namespace HelloWorld
             RayTop();
             RayDown();
             StartAttack();
-            OnDamaged();
+            CheckCollisionDamage();
         }
 
         private void PlayerLookCamera()
@@ -143,13 +148,14 @@ namespace HelloWorld
         {
             RaycastHit rayHitPlayer;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2);
-            int mask = ~((1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("ChaseRange")));
+            int mask = ~((1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("ChaseRange")) | (1 << LayerMask.NameToLayer("Dead")));
 
             if (Physics.Raycast(rayStart, mainCamera.transform.forward, out rayHitPlayer, cameraRaySize, mask))
             {
                 int playerLayer = LayerMask.NameToLayer("Player");
                 if (rayHitPlayer.collider.gameObject.layer == playerLayer)
                 {
+                    isInvisibleFrontAndBack = false;
                     isVisible = true;
                     isCameraFront = 1;
                     return;
@@ -157,6 +163,29 @@ namespace HelloWorld
             }
             isCameraFront = -1;
             isVisible = false;
+        }
+
+        private void IsVisibleFromBack()
+        {
+            if (!isVisible)
+            {
+                RaycastHit rayHitPlayer;
+                Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * -1;
+                int mask = ~((1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("ChaseRange")) | (1 << LayerMask.NameToLayer("Dead")));
+
+                if (Physics.Raycast(rayStart, -mainCamera.transform.forward, out rayHitPlayer, cameraRaySize, mask))
+                {
+                    Debug.DrawRay(rayStart, -mainCamera.transform.forward * cameraRaySize, Color.black);
+
+                    int playerLayer = LayerMask.NameToLayer("Player");
+                    if (rayHitPlayer.collider.gameObject.layer == playerLayer)
+                    {
+                        isInvisibleFrontAndBack = false;
+                        return;
+                    }
+                    isInvisibleFrontAndBack = true;
+                }
+            }
         }
 
         private bool IsGrounded(Vector3 position)
@@ -201,7 +230,7 @@ namespace HelloWorld
 
         private void Move()
         {
-            if (cameraScript.GetCameraRotating() || damaged)
+            if (cameraScript.GetCameraRotating() || isControlLocked)
                 return;
 
             Vector3 moveVec;
@@ -291,7 +320,7 @@ namespace HelloWorld
 
         private void RayTop()
         {
-            if (!photonView.IsMine/* || !isVisible*/)
+            if (!photonView.IsMine || isInvisibleFrontAndBack)
                 return;
 
             float offset = 0.5f;
@@ -303,7 +332,7 @@ namespace HelloWorld
 
             Vector3 rayTopOffset = Vector3.up * (boxColider.size.y / 2f + boxSize.y);
 
-            Debug.DrawRay(rayStart + rayTopOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.black);
+            Debug.DrawRay(rayStart + rayTopOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.yellow);
 
             if (rigidBody.linearVelocity.y > 0f)
             {
@@ -318,7 +347,7 @@ namespace HelloWorld
 
         private void RayDown()
         {
-            if (!photonView.IsMine/* || !isVisible*/)
+            if (!photonView.IsMine || isInvisibleFrontAndBack)
                 return;
 
             float offset = 0.5f;
@@ -331,7 +360,7 @@ namespace HelloWorld
 
             Vector3 rayDownOffset = Vector3.up * (boxColider.size.y / 2f + boxSize.y);
 
-            Debug.DrawRay(rayStart - rayDownOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.black);
+            Debug.DrawRay(rayStart - rayDownOffset, mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.yellow);
 
             if (rigidBody.linearVelocity.y < -0.01f)
             {
@@ -346,12 +375,12 @@ namespace HelloWorld
 
         private void RaySide(string leftRight)
         {
-            if (!photonView.IsMine/* || !isVisible */|| cameraScript.GetCameraRotating())
+            if (!photonView.IsMine || isInvisibleFrontAndBack || cameraScript.GetCameraRotating())
                 return;
 
             int dir = (leftRight == "Right") ? 1 : -1;
 
-            if (h != dir && !damaged)
+            if (h != dir && !isControlLocked)
                 return;
 
             Vector3 boxSize = playerCollider.bounds.extents;
@@ -458,7 +487,7 @@ namespace HelloWorld
 
         private void StartAttack()
         {
-            if (!attack || damaged || climbState || isAttacking)
+            if (!attack || isControlLocked || climbState || isAttacking)
                 return;
             animator.SetTrigger("doAttack");
             isAttacking = true;
@@ -497,7 +526,7 @@ namespace HelloWorld
 
             for (int i = 0; i < offsets.Length; i++)
             {
-                Debug.DrawRay(rayStart + offsets[i], mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.blue);
+                //Debug.DrawRay(rayStart + offsets[i], mainCamera.transform.forward * isCameraFront * cameraRaySize, Color.blue);
 
                 if (Physics.Raycast(rayStart + offsets[i], mainCamera.transform.forward * isCameraFront, out enemyHit, cameraRaySize, mask))
                 {
@@ -509,7 +538,7 @@ namespace HelloWorld
                             Monster monster = enemyHit.collider.GetComponent<Monster>();
                             if (monster != null)
                             {
-                                monster.OnDamaged(transform.position);
+                                monster.OnDamaged(transform.position, 1);
                             }
                             break;
                         }
@@ -526,7 +555,7 @@ namespace HelloWorld
             isAttacking = false;
         }
 
-        public void OnDamaged()
+        public void CheckCollisionDamage()
         {
             //판정 이상하면 조금 늘려야
             Vector3 rightOffset = mainCamera.transform.right * boxColider.size.x / 2f;
@@ -558,7 +587,7 @@ namespace HelloWorld
                 {
                     if (enemyHit.collider.gameObject.layer == enemy)
                     {
-                        if (damaged)
+                        if (isInvincible)
                         {
                             return;
                         }
@@ -567,38 +596,7 @@ namespace HelloWorld
                         float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
                         if (CorrectDir % 180f == 0 ? true : false)
                         {
-                            //매달리기 상태 문제 해결
-                            if (climbState)
-                            {
-                                climbState = false;
-                                animator.SetBool("isClimbIdle", false);
-                                rigidBody.useGravity = true;
-                            }
-
-                            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
-                            animator.SetTrigger("isDamaged");
-
-                            //플레이어 x로 튕겨야 할지 z로 튕겨야 할지 결정
-                            bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
-
-                            int dir;
-                            if (isXOrZ)
-                            {
-                                rigidBody.linearVelocity = Vector3.zero;
-                                dir = transform.position.x - enemyHit.transform.position.x > 0 ? 1 : -1;
-                                Vector3 dirVec = new Vector3(dir, 4f, 0);
-                                rigidBody.AddForce(dirVec, ForceMode.Impulse);
-
-                            }
-                            else
-                            {
-                                rigidBody.linearVelocity = Vector3.zero;
-                                dir = transform.position.z - enemyHit.transform.position.z > 0 ? 1 : -1;
-                                Vector3 dirVec = new Vector3(0, 4f, dir);
-                                rigidBody.AddForce(dirVec, ForceMode.Impulse);
-                            }
-                            damaged = true;
-                            Invoke("OffDamaged", 0.9f);
+                            OnDamaged(enemyHit.transform.position);
                             break;
                         }
                     }
@@ -606,10 +604,59 @@ namespace HelloWorld
             }
         }
 
+        public void OnDamaged(Vector3 monsterPos)
+        {
+            if (isInvincible)
+            {
+                return;
+            }
+
+            //매달리기 상태 문제 해결
+            if (climbState)
+            {
+                climbState = false;
+                animator.SetBool("isClimbIdle", false);
+                rigidBody.useGravity = true;
+            }
+
+            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+            animator.SetTrigger("isDamaged");
+
+            //플레이어 x로 튕겨야 할지 z로 튕겨야 할지 결정
+            bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
+
+            int dir;
+            if (isXOrZ)
+            {
+                rigidBody.linearVelocity = Vector3.zero;
+                dir = transform.position.x - monsterPos.x > 0 ? 1 : -1;
+                Vector3 dirVec = new Vector3(dir, 4f, 0);
+                rigidBody.AddForce(dirVec, ForceMode.Impulse);
+
+            }
+            else
+            {
+                rigidBody.linearVelocity = Vector3.zero;
+                dir = transform.position.z - monsterPos.z > 0 ? 1 : -1;
+                Vector3 dirVec = new Vector3(0, 4f, dir);
+                rigidBody.AddForce(dirVec, ForceMode.Impulse);
+            }
+            isControlLocked = true;
+            isInvincible = true;
+
+            Invoke("UnlockControl", 0.5f);
+            Invoke("OffDamaged", 1.5f);
+        }
+
+        void UnlockControl() 
+        {
+            isControlLocked = false;
+        }
+
         void OffDamaged()
         {
             spriteRenderer.color = new Color(1, 1, 1, 1);
-            damaged = false;
+            isInvincible = false;
 
             //attck = true하고 damaged = true 같은 프레임에 실행되면
             //StartAttack이 무시되거나? EndAttack ani 출력안되서 무시 됨.
