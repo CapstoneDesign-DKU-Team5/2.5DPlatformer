@@ -2,81 +2,94 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
-using UnityEngine.UI;
-using System;
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
     private string gameVersion = "1.0";
 
-    [Header("UI References")]
+    [Header("UI References (LobbyManager)")]
     public TextMeshProUGUI connectionInfoText;
-    public Button matchmakingButton;
-    public Button lobbyButton;
 
-    [Header("Lobby Panel")]
-    public GameObject lobbyCreatePanel;
-    public Button createRoomButton;
-    public Button joinRoomButton;
-    public Button closeButton;
-    public TMP_InputField inviteCodeInput;
-
-    private string currentInviteCode = "";
-
-    private void Awake()
-    {
-        matchmakingButton.onClick.AddListener(Connect);
-        lobbyButton.onClick.AddListener(OpenLobbyPanel);
-        createRoomButton.onClick.AddListener(CreateInviteRoom);
-        joinRoomButton.onClick.AddListener(JoinInviteRoom);
-        closeButton.onClick.AddListener(CloseLobbyPanel);
-    }
+    // 매치메이킹을 요청한 상태인지 저장하는 플래그
+    private bool wantsMatchmaking = false;
 
     private void Start()
     {
+        // Photon 초기 연결 시도
         PhotonNetwork.GameVersion = gameVersion;
         PhotonNetwork.ConnectUsingSettings();
-
-        matchmakingButton.interactable = false;
         connectionInfoText.text = "마스터 서버에 접속 중...";
-        lobbyCreatePanel.SetActive(false);
     }
 
     public override void OnConnectedToMaster()
     {
-        matchmakingButton.interactable = true;
         connectionInfoText.text = "온라인: 마스터 서버에 연결됨";
+
+        // 만약 플레이어가 매치메이킹을 요청한 상태라면, 연결이 완료된 시점에 매치메이킹 흐름을 타도록 한다
+        if (wantsMatchmaking)
+        {
+            wantsMatchmaking = false;
+            TryJoinOrCreateMatchmakingRoom();
+        }
     }
 
     public override void OnDisconnected(DisconnectCause cause)
     {
-        matchmakingButton.interactable = false;
-
-        connectionInfoText.text = "오프라인: 마스터 서버와 연결되지 않음\n접속 재시도중...";
+        connectionInfoText.text = $"오프라인: 마스터 서버와 연결되지 않음\n재접속 시도 중...";
+        // 재접속
         PhotonNetwork.ConnectUsingSettings();
     }
 
-    public void Connect()
+    /// <summary>
+    /// 외부(문에서) 매치메이킹을 요청할 때 호출하는 메서드
+    /// </summary>
+    public void StartMatchmaking()
     {
-        matchmakingButton.interactable = false;
+        wantsMatchmaking = true;
 
-        if (PhotonNetwork.IsConnected)
+        if (PhotonNetwork.IsConnectedAndReady)
         {
-            connectionInfoText.text = "참가 가능한 게임을 찾는중...";
-            var expectedProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", false } };
-            PhotonNetwork.JoinRandomRoom(expectedProperties, 0);
+            // 이미 준비가 끝난 상태라면 즉시 JoinRandomRoom 흐름을 탄다
+            TryJoinOrCreateMatchmakingRoom();
         }
         else
         {
-            connectionInfoText.text = "오프라인: 마스터 서버와 연결되지 않음 \n접속 재시도 중...";
+            // 아직 연결 중이라면, OnConnectedToMaster에서 자동으로 호출되도록 메시지만 띄운다
+            connectionInfoText.text = "매치메이킹 준비 중...";
             PhotonNetwork.ConnectUsingSettings();
         }
     }
 
+    // 실제로 JoinRandomRoom → 실패 시 CreateRoom 을 실행하는 메서드
+    private void TryJoinOrCreateMatchmakingRoom()
+    {
+        connectionInfoText.text = "참가 가능한 게임을 찾는 중...";
+        var expectedProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", false } };
+        PhotonNetwork.JoinRandomRoom(expectedProperties, 0);
+    }
+
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        // Matchmaking용 룸만 생성
-        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 2, CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", false } }, CustomRoomPropertiesForLobby = new[] { "inviteOnly" } });
+        // PhotonNetwork가 준비되지 않았다면(Connecting/Joining 상태) 재연결을 시도
+        if (!PhotonNetwork.IsConnectedAndReady)
+        {
+            wantsMatchmaking = true;
+            connectionInfoText.text = "네트워크 준비 중... 재연결 시도";
+            PhotonNetwork.ConnectUsingSettings();
+            return;
+        }
+
+        // Ready 상태면 방이 없는 것이므로 새 방 생성
+        connectionInfoText.text = "매치메이킹용 방 생성 중...";
+        PhotonNetwork.CreateRoom(
+            null,
+            new RoomOptions
+            {
+                MaxPlayers = 2,
+                CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", false } },
+                CustomRoomPropertiesForLobby = new[] { "inviteOnly" }
+            }
+        );
     }
 
     public override void OnJoinedRoom()
@@ -86,71 +99,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     }
 
     /// <summary>
-    /// 로비 패널 열기
+    /// (Optional) 외부에서 Photon 재연결만 필요할 때 호출할 수 있도록 공개해둔다.
     /// </summary>
-    private void OpenLobbyPanel()
+    public void ConnectToPhoton()
     {
-        lobbyCreatePanel.SetActive(true);
-    }
-
-    /// <summary>
-    /// 초대 코드 기반 룸 생성
-    /// </summary>
-    private void CreateInviteRoom()
-    {
-        currentInviteCode = GenerateInviteCode();
-        RoomOptions options = new RoomOptions
+        if (!PhotonNetwork.IsConnectedAndReady)
         {
-            MaxPlayers = 2,
-            CustomRoomProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", true }, { "code", currentInviteCode } },
-            CustomRoomPropertiesForLobby = new[] { "inviteOnly", "code" }
-        };
-
-        PhotonNetwork.CreateRoom(currentInviteCode, options);
-
-        Debug.Log($"[초대 코드] 이 방의 초대 코드는: {currentInviteCode}");
-    }
-
-    private void JoinInviteRoom()
-    {
-        string inputCode = inviteCodeInput.text.Trim();
-        if (!string.IsNullOrEmpty(inputCode))
-        {
-            PhotonNetwork.JoinRoom(inputCode);
-        }
-        else
-        {
-            Debug.LogWarning("초대 코드를 입력하세요.");
-            connectionInfoText.text = "초대 코드를 입력하세요.";
+            connectionInfoText.text = "네트워크 재연결 중...";
+            PhotonNetwork.ConnectUsingSettings();
         }
     }
-
-
-    public override void OnJoinRoomFailed(short returnCode, string message)
-    {
-        Debug.LogWarning($"방 참가 실패: {message}");
-        connectionInfoText.text = "초대된 방이 존재하지 않거나 인원이 가득 찼습니다.";
-    }
-
-    /// <summary>
-    /// 간단한 랜덤 초대코드 생성기 (예: 6자리 대문자/숫자)
-    /// </summary>
-    private string GenerateInviteCode()
-    {
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        System.Random random = new System.Random();
-        char[] code = new char[6];
-        for (int i = 0; i < 6; i++)
-        {
-            code[i] = chars[random.Next(chars.Length)];
-        }
-        return new string(code);
-    }
-
-    private void CloseLobbyPanel()
-    {
-        lobbyCreatePanel.SetActive(false);
-    }
-
 }
-
