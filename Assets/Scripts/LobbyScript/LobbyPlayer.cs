@@ -137,7 +137,7 @@ namespace HelloWorld
 
         private void RayTop()
         {
-            float offset = 0.5f;
+            float offset = 0.3f;
             Vector3 forwardDir = GetForwardRight().forward;
             Vector3 rayStart = transform.position - forwardDir * (cameraRaySize / 2);
             Vector3 boxSize = playerCollider.bounds.extents;
@@ -156,7 +156,7 @@ namespace HelloWorld
 
         private void RayDown()
         {
-            float offset = 0.5f;
+            float offset = 0.3f;
             Vector3 forwardDir = GetForwardRight().forward;
             Vector3 rayStart = transform.position - forwardDir * (cameraRaySize / 2);
             Vector3 boxSize = playerCollider.bounds.extents;
@@ -177,7 +177,7 @@ namespace HelloWorld
         {
             if (!isAir) return;
 
-            float offset = 0.5f;
+            float offset = 0.3f;
             Vector3 forwardDir = GetForwardRight().forward;
             Vector3 rayStart = transform.position;
             Vector3 boxSize = playerCollider.bounds.extents;

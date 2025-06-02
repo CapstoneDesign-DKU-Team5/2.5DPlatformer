@@ -60,7 +60,7 @@ public class DoorInteraction : MonoBehaviourPunCallbacks
         // Inspector에 LobbyManager를 할당하지 않았다면 자동으로 찾아 연결
         if (lobbyManager == null)
         {
-            lobbyManager = FindObjectOfType<LobbyManager>();
+            lobbyManager = Object.FindAnyObjectByType<LobbyManager>();
             if (lobbyManager == null)
             {
                 Debug.LogError("DoorInteraction: LobbyManager를 찾을 수 없습니다! 씬에 LobbyManager가 있어야 합니다.");
