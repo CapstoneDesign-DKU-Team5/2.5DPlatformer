@@ -3,6 +3,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PlayerStat", menuName = "Stats/PlayerStat")]
 public class PlayerStat : ScriptableObject
 {
-    public int hp = 100;
+    public float hp = 500f;
     public int power = 10;
 }
