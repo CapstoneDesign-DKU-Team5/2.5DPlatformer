@@ -42,6 +42,7 @@ MonoBehaviour:
   - SetFlipState
   - Hit
   - SetUsernameText
+  - RPC_UpdateHealth
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 0
