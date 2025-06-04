@@ -154,7 +154,7 @@ public class DoorInteraction : MonoBehaviourPunCallbacks
             return;
         }
 
-        string inputCode = inviteCodeInput.text.Trim();
+        string inputCode = inviteCodeInput.text.Trim().ToUpper();
         if (!string.IsNullOrEmpty(inputCode))
         {
             PhotonNetwork.JoinRoom(inputCode);

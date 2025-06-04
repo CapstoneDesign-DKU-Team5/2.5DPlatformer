@@ -164,7 +164,7 @@ namespace HelloWorld
 
 
         [PunRPC]
-        private void RPC_UpdateHealth(int newHealth)
+        private void RPC_UpdateHealth(float newHealth)
         {
             currentHealth = newHealth;
             UpdateHealthBar();
