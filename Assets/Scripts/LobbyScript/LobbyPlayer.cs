@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace HelloWorld
 {
@@ -24,6 +25,7 @@ namespace HelloWorld
         [Header("UI")]
         [SerializeField] private TMP_Text usernameText;
 
+        private Vector3 initialPosition;
 
 
         private BoxCollider boxColider;
@@ -45,6 +47,7 @@ namespace HelloWorld
 
         private void Start()
         {
+            initialPosition = transform.position;
             usernameText.text = PlayerPrefs.GetString("displayName", "Guest");
         }
 
@@ -137,7 +140,7 @@ namespace HelloWorld
 
         private void RayTop()
         {
-            float offset = 0.5f;
+            float offset = 0.3f;
             Vector3 forwardDir = GetForwardRight().forward;
             Vector3 rayStart = transform.position - forwardDir * (cameraRaySize / 2);
             Vector3 boxSize = playerCollider.bounds.extents;
@@ -156,7 +159,7 @@ namespace HelloWorld
 
         private void RayDown()
         {
-            float offset = 0.5f;
+            float offset = 0.3f;
             Vector3 forwardDir = GetForwardRight().forward;
             Vector3 rayStart = transform.position - forwardDir * (cameraRaySize / 2);
             Vector3 boxSize = playerCollider.bounds.extents;
@@ -177,7 +180,7 @@ namespace HelloWorld
         {
             if (!isAir) return;
 
-            float offset = 0.5f;
+            float offset = 0.3f;
             Vector3 forwardDir = GetForwardRight().forward;
             Vector3 rayStart = transform.position;
             Vector3 boxSize = playerCollider.bounds.extents;
@@ -234,7 +237,14 @@ namespace HelloWorld
                 Debug.DrawRay(rayOrigin, dir * interactDistance, Color.green);
             }
         }
+        public void RespawnToStart()
+        {
+            rigidBody.linearVelocity = Vector3.zero; // ³«ÇÏ ÁßÀÏ °æ¿ì ¸ØÃß±â
+            transform.position = initialPosition;
+        }
 
 
     }
+
+
 }

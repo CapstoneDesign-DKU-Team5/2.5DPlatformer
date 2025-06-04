@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47cbcd799fbbae549a039a261aece5d8, type: 3}
+  m_Name: PowerUp
+  m_EditorClassIdentifier: 
+  itemId: PowerPotion
+  displayName: "\uAC15\uD654\uD615 \uBB3C\uC57D"
+  description: "Power + 15, 3\uBD84 \uC9C0\uC18D"
+  icon: {fileID: 21300000, guid: cbdd842a5c77ab740a5e158f5261273b, type: 3}
+  consumable: 1
+  usesPerItem: 1

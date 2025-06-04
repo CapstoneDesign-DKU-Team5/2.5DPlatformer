@@ -3,6 +3,8 @@ using PlayFab.ClientModels;
 using TMPro;
 using UnityEngine;
 using PlayFab;
+using UnityEngine.UI;
+using Unity.VisualScripting;
 
 
 namespace HelloWorld
@@ -42,6 +44,12 @@ namespace HelloWorld
         [Header("UI")]
         [SerializeField, Tooltip("Playfab 유저네임 표시")]
         private TMP_Text usernameText;
+        [SerializeField, Tooltip("PlayerStat ScriptableObject 에셋")]
+        private PlayerStat playerStat;
+        [SerializeField, Tooltip("HealthBar")]
+        private Image healthBarFillImage;
+
+        private float currentHealth;
 
         private BoxCollider boxColider;
 
@@ -88,6 +96,7 @@ namespace HelloWorld
                 photonView.RPC(nameof(SetUsernameText), RpcTarget.AllBuffered, displayName);
             }
         }
+        
 
         [PunRPC]
         private void SetUsernameText(string name)
@@ -106,6 +115,8 @@ namespace HelloWorld
                 mainCamera = camObj.GetComponent<Camera>();
                 cameraScript = camObj.GetComponent<RotateCamera>();
                 cameraScript.playerTransform = transform;
+                currentHealth = playerStat.hp;
+                UpdateHealthBar();
             }
         }
 
@@ -137,6 +148,35 @@ namespace HelloWorld
             RayDown();
             StartAttack();
             CheckCollisionDamage();
+        }
+
+        public void TakeDamage(float damageAmount)
+        {
+            if (!photonView.IsMine) return;
+
+            
+            currentHealth = Mathf.Max(0, currentHealth - damageAmount);
+            UpdateHealthBar();
+
+            
+            photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.OthersBuffered, currentHealth);
+        }
+
+
+        [PunRPC]
+        private void RPC_UpdateHealth(int newHealth)
+        {
+            currentHealth = newHealth;
+            UpdateHealthBar();
+        }
+
+        private void UpdateHealthBar()
+        {
+            if (healthBarFillImage == null || playerStat == null)
+                return;
+
+            float fillRatio = (float)currentHealth / playerStat.hp;
+            healthBarFillImage.fillAmount = Mathf.Clamp01(fillRatio);
         }
 
         private void PlayerLookCamera()
