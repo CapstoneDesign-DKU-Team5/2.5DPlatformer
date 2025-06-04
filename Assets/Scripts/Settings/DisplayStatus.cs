@@ -9,11 +9,13 @@ public class DisplayStatus : MonoBehaviour
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI hpText;
     public TextMeshProUGUI powerText;
+    public TextMeshProUGUI goldText; 
 
     void Start()
     {
         UpdateUI();
-        FetchPlayerName(); 
+        FetchPlayerName();
+        FetchGold(); 
     }
 
     public void UpdateUI()
@@ -37,6 +39,23 @@ public class DisplayStatus : MonoBehaviour
         {
             Debug.LogError("Failed to get DisplayName: " + error.GenerateErrorReport());
             nameText.text = "Unknown";
+        });
+    }
+
+    void FetchGold()
+    {
+        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(), result =>
+        {
+            if (result.VirtualCurrency.ContainsKey("GD"))
+            {
+                int goldAmount = result.VirtualCurrency["GD"];
+                goldText.text = goldAmount.ToString(); 
+            }
+        },
+        error =>
+        {
+            Debug.LogError("Failed to get gold: " + error.GenerateErrorReport());
+            goldText.text = "0";
         });
     }
 }

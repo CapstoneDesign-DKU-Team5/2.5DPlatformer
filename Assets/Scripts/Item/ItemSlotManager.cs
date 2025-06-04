@@ -32,7 +32,12 @@ public class ItemSlotManager : MonoBehaviour
 
                 if (matchedItem != null)
                 {
-                    AssignToSlot(itemSlots[i], matchedItem);
+                    int rawUses = items[i].RemainingUses ?? 1;
+                    int itemCount = matchedItem.usesPerItem > 0 ? rawUses / matchedItem.usesPerItem : rawUses;
+
+                    AssignToSlot(itemSlots[i], matchedItem, itemCount);
+
+
                 }
             }
 
@@ -65,7 +70,7 @@ public class ItemSlotManager : MonoBehaviour
     }
 
 
-    void AssignToSlot(GameObject slot, Item item)
+    void AssignToSlot(GameObject slot, Item item, int quantity)
     {
         Transform iconTransform = slot.transform.Find("IconImg");
 
@@ -74,15 +79,14 @@ public class ItemSlotManager : MonoBehaviour
             iconImage.sprite = item.icon;
         }
 
-        // 이벤트 트리거 컴포넌트 추가 및 설정
         EventTriggerListener trigger = slot.GetComponent<EventTriggerListener>();
         if (trigger == null)
-        {
             trigger = slot.AddComponent<EventTriggerListener>();
-        }
 
         trigger.item = item;
+        trigger.quantity = quantity;
         trigger.tooltipManager = this;
     }
+
 
 }
