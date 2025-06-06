@@ -50,6 +50,7 @@ namespace HelloWorld
         private Image healthBarFillImage;
 
         private float currentHealth;
+        private int currentPower;
 
         private BoxCollider boxColider;
 
@@ -75,6 +76,8 @@ namespace HelloWorld
         private int isCameraFront = 1;
 
         private bool flipState = false;
+
+
 
         private void Awake()
         {
@@ -116,6 +119,7 @@ namespace HelloWorld
                 cameraScript = camObj.GetComponent<RotateCamera>();
                 cameraScript.playerTransform = transform;
                 currentHealth = playerStat.hp;
+                currentPower = playerStat.power;
                 UpdateHealthBar();
             }
         }
@@ -164,7 +168,7 @@ namespace HelloWorld
 
 
         [PunRPC]
-        private void RPC_UpdateHealth(int newHealth)
+        private void RPC_UpdateHealth(float newHealth)
         {
             currentHealth = newHealth;
             UpdateHealthBar();
@@ -178,6 +182,34 @@ namespace HelloWorld
             float fillRatio = (float)currentHealth / playerStat.hp;
             healthBarFillImage.fillAmount = Mathf.Clamp01(fillRatio);
         }
+
+        public void ApplyHeal(float amount)
+        {
+            if (!photonView.IsMine) return;
+            currentHealth = Mathf.Min(playerStat.hp, currentHealth + amount);
+            UpdateHealthBar();
+            photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.OthersBuffered, currentHealth);
+        }
+
+        public int GetPower()
+        {
+            return currentPower;
+        }
+
+        public void SetPower(int newPower)
+        {
+            if (!photonView.IsMine) return;
+            currentPower = newPower;
+            // 필요하다면 공격 애니메이션/효과 갱신 로직 추가
+            photonView.RPC(nameof(RPC_UpdatePower), RpcTarget.OthersBuffered, currentPower);
+        }
+
+        [PunRPC]
+        private void RPC_UpdatePower(int syncedPower)
+        {
+            currentPower = syncedPower;
+        }
+
 
         private void PlayerLookCamera()
         {
