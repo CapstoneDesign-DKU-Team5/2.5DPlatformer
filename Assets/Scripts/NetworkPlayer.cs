@@ -12,57 +12,57 @@ namespace HelloWorld
 {
     public class NetworkPlayer : MonoBehaviourPun
     {
-        [Header("ÄÄÆ÷³ÍÆ® ÂüÁ¶")]
-        [SerializeField, Tooltip("Ä³¸¯ÅÍ ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Á¦¾îÇÏ´Â Animator")]
+        [Header("ì»´í¬ë„ŒíŠ¸ ì°¸ì¡°")]
+        [SerializeField, Tooltip("ìºë¦­í„° ì• ë‹ˆë©”ì´ì…˜ì„ ì œì–´í•˜ëŠ” Animator")]
         private Animator animator;
 
-        [SerializeField, Tooltip("½ºÇÁ¶óÀÌÆ® ¹İÀü ¹× »ö»ó º¯°æ¿¡ »ç¿ëµÇ´Â SpriteRenderer")]
+        [SerializeField, Tooltip("ìŠ¤í”„ë¼ì´íŠ¸ ë°˜ì „ ë° ìƒ‰ìƒ ë³€ê²½ì— ì‚¬ìš©ë˜ëŠ” SpriteRenderer")]
         private SpriteRenderer spriteRenderer;
 
-        [SerializeField, Tooltip("¹°¸® ¿¬»ê¿¡ »ç¿ëµÇ´Â Rigidbody")]
+        [SerializeField, Tooltip("ë¬¼ë¦¬ ì—°ì‚°ì— ì‚¬ìš©ë˜ëŠ” Rigidbody")]
         private Rigidbody rigidBody;
 
-        [SerializeField, Tooltip("ÇÃ·¹ÀÌ¾î ¸öÃ¼¸¦ ³ªÅ¸³»´Â ÁÖ Collider")]
+        [SerializeField, Tooltip("í”Œë ˆì´ì–´ ëª¸ì²´ë¥¼ ë‚˜íƒ€ë‚´ëŠ” ì£¼ Collider")]
         private Collider playerCollider;
 
-        [Header("Ä«¸Ş¶ó ÂüÁ¶")]
-        [SerializeField, Tooltip("ÇÃ·¹ÀÌ¾î¸¦ µû¶ó´Ù´Ï´Â ¸ŞÀÎ Ä«¸Ş¶ó")]
+        [Header("ì¹´ë©”ë¼ ì°¸ì¡°")]
+        [SerializeField, Tooltip("í”Œë ˆì´ì–´ë¥¼ ë”°ë¼ë‹¤ë‹ˆëŠ” ë©”ì¸ ì¹´ë©”ë¼")]
         private Camera mainCamera;
 
-        [SerializeField, Tooltip("Ä«¸Ş¶ó È¸ÀüÀ» ´ã´çÇÏ´Â ½ºÅ©¸³Æ®")]
+        [SerializeField, Tooltip("ì¹´ë©”ë¼ íšŒì „ì„ ë‹´ë‹¹í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸")]
         private RotateCamera cameraScript;
 
-        [Header("ÀÌµ¿ ¼³Á¤")]
-        [SerializeField, Tooltip("¼öÆò ÀÌµ¿ ¼Óµµ (´ÜÀ§/ÃÊ)")]
+        [Header("ì´ë™ ì„¤ì •")]
+        [SerializeField, Tooltip("ìˆ˜í‰ ì´ë™ ì†ë„ (ë‹¨ìœ„/ì´ˆ)")]
         private float speed = 2f;
 
-        [SerializeField, Tooltip("Á¡ÇÁ ½Ã Àû¿ëÇÒ Èû (ForceMode.Impulse)")]
+        [SerializeField, Tooltip("ì í”„ ì‹œ ì ìš©í•  í˜ (ForceMode.Impulse)")]
         private float jumpHeight = 20f;
 
-        [SerializeField, Tooltip("Àü¹æ ·¹ÀÌÄ³½ºÆ® ±æÀÌÀÇ Àı¹İ")]
+        [SerializeField, Tooltip("ì „ë°© ë ˆì´ìºìŠ¤íŠ¸ ê¸¸ì´ì˜ ì ˆë°˜")]
         private float cameraRaySize = 30f;
 
         [Header("UI")]
-        [SerializeField, Tooltip("Playfab À¯Àú³×ÀÓ Ç¥½Ã")]
+        [SerializeField, Tooltip("Playfab ìœ ì €ë„¤ì„ í‘œì‹œ")]
         private TMP_Text usernameText;
-        [SerializeField, Tooltip("PlayerStat ScriptableObject ¿¡¼Â")]
+        [SerializeField, Tooltip("PlayerStat ScriptableObject ì—ì…‹")]
         private PlayerStat playerStat;
         [SerializeField, Tooltip("HealthBar")]
         private Image healthBarFillImage;
 
         [Header("=== Item Effect Slots ===")]
-        [SerializeField, Tooltip("¾ÆÀÌÅÛ ÀÌÆåÆ®°¡ »ı¼ºµÉ À§Ä¡µé")]
+        [SerializeField, Tooltip("ì•„ì´í…œ ì´í™íŠ¸ê°€ ìƒì„±ë  ìœ„ì¹˜ë“¤")]
         private Transform[] itemEffectSlots = new Transform[3];
 
         private float currentHealth;
         private int currentPower;
         private readonly Vector3 _effectRotateAxis = new Vector3(-1f, 0f, 1f).normalized;
-        private const float _effectRotateSpeed = 90f; // ÃÊ´ç 90µµ
+        private const float _effectRotateSpeed = 90f; // ì´ˆë‹¹ 90ë„
 
 
         private BoxCollider boxColider;
 
-        // ¦¡¦¡ ·±Å¸ÀÓ º¯¼ö¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+        // â”€â”€ ëŸ°íƒ€ì„ ë³€ìˆ˜â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         private bool climbState = false;
 
         private float h = 0f;
@@ -88,19 +88,24 @@ namespace HelloWorld
 
         private Vector3 networkPos;
         private Quaternion networkRot;
+        private Vector3 networkVel;
+        private double networkTimeStamp;
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
             if (stream.IsWriting)
             {
-       
                 stream.SendNext(transform.position);
                 stream.SendNext(transform.rotation);
+                stream.SendNext(rigidBody.linearVelocity);
+                stream.SendNext(PhotonNetwork.Time);
             }
             else
-            { 
+            {
                 networkPos = (Vector3)stream.ReceiveNext();
                 networkRot = (Quaternion)stream.ReceiveNext();
+                networkVel = (Vector3)stream.ReceiveNext();
+                networkTimeStamp = (double)stream.ReceiveNext();
             }
         }
 
@@ -161,12 +166,14 @@ namespace HelloWorld
 
             if (!photonView.IsMine)
             {
-              
+                double lag = PhotonNetwork.Time - networkTimeStamp;
+                Vector3 extrapolated = networkPos + networkVel * (float)lag;
+
                 transform.position = Vector3.Lerp(
-                    transform.position,
-                    networkPos,
-                    Time.deltaTime * 10f  
-                );
+                transform.position,
+                extrapolated,
+                Time.deltaTime * 10f  // ë³´ê°„ ì†ë„: í•„ìš”ì‹œ ì¡°ì ˆ
+            );
                 transform.rotation = Quaternion.Slerp(
                     transform.rotation,
                     networkRot,
@@ -245,7 +252,7 @@ namespace HelloWorld
         {
             if (!photonView.IsMine) return;
             currentPower = newPower;
-            // ÇÊ¿äÇÏ´Ù¸é °ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç/È¿°ú °»½Å ·ÎÁ÷ Ãß°¡
+            // í•„ìš”í•˜ë‹¤ë©´ ê³µê²© ì• ë‹ˆë©”ì´ì…˜/íš¨ê³¼ ê°±ì‹  ë¡œì§ ì¶”ê°€
             photonView.RPC(nameof(RPC_UpdatePower), RpcTarget.OthersBuffered, currentPower);
         }
 
@@ -319,7 +326,7 @@ namespace HelloWorld
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.y = 0.1f;
 
-            // ¶¥¿¡ ´ê¾Æ ÀÖÀ¸¸é grounded=true
+            // ë•…ì— ë‹¿ì•„ ìˆìœ¼ë©´ grounded=true
             bool grounded = Physics.BoxCast(
                 transform.position,
                 boxSize,
@@ -332,13 +339,13 @@ namespace HelloWorld
 
             bool newIsAir = !grounded;
 
-            // »óÅÂ°¡ ¹Ù²ğ ¶§¿¡¸¸ Ã³¸®
+            // ìƒíƒœê°€ ë°”ë€” ë•Œì—ë§Œ ì²˜ë¦¬
             if (newIsAir != lastAirState)
             {
                 isAir = newIsAir;
                 animator.SetBool("isAir", newIsAir);
 
-                // ³» Ä³¸¯ÅÍ¿¡¼­¸¸ RPC È£Ãâ
+                // ë‚´ ìºë¦­í„°ì—ì„œë§Œ RPC í˜¸ì¶œ
                 if (photonView.IsMine)
                 {
                     photonView.RPC(
@@ -425,7 +432,7 @@ namespace HelloWorld
         {
             if (h > 0)
             {
-                if (spriteRenderer.flipX == true) // ¿ø·¡ ÀÌ Á¶°ÇÀÌ¾úÀ½
+                if (spriteRenderer.flipX == true) // ì›ë˜ ì´ ì¡°ê±´ì´ì—ˆìŒ
                 {
                     photonView.RPC(nameof(SetFlipState), RpcTarget.AllBuffered, false);
                 }
@@ -633,10 +640,10 @@ namespace HelloWorld
             isAttacking = true;
         }
 
-        //Animation Event Attack 0:03¿¡¼­ È£Ãâ
+        //Animation Event Attack 0:03ì—ì„œ í˜¸ì¶œ
         private void AnimEvent_Hit()
         {
-            // ¼­¹ö °æÀ¯·Î(Room ¾È ¸ğµç Å¬¶ó + ³» Å¬¶ó) Hit() ½ÇÇà
+            // ì„œë²„ ê²½ìœ ë¡œ(Room ì•ˆ ëª¨ë“  í´ë¼ + ë‚´ í´ë¼) Hit() ì‹¤í–‰
             photonView.RPC(nameof(Hit), RpcTarget.AllViaServer);
         }
 
@@ -647,11 +654,11 @@ namespace HelloWorld
 
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * isCameraFront;
 
-            //player Áß½ÉÀ¸·ÎºÎÅÍ ¹üÀ§
+            //player ì¤‘ì‹¬ìœ¼ë¡œë¶€í„° ë²”ìœ„
             Vector3 attackRange = attackDir == 1 ? mainCamera.transform.right * 0.45f : -mainCamera.transform.right * 0.45f;
-            //player °ø°İ »ó ÇÏ ¹üÀ§
+            //player ê³µê²© ìƒ í•˜ ë²”ìœ„
             Vector3 attackHalfHeight = Vector3.up * 0.1f;
-            //°ø°İ Áß½É ½ÃÀÛ ³ôÀÌ
+            //ê³µê²© ì¤‘ì‹¬ ì‹œì‘ ë†’ì´
             Vector3 attackHeight = Vector3.up * 0.1f;
 
             RaycastHit enemyHit;
@@ -688,7 +695,7 @@ namespace HelloWorld
             }
         }
 
-        //Animation Event Attack 0:06¿¡¼­ È£Ãâ
+        //Animation Event Attack 0:06ì—ì„œ í˜¸ì¶œ
         private void EndAttack()
         {
             attack = false;
@@ -697,13 +704,13 @@ namespace HelloWorld
 
         public void CheckCollisionDamage()
         {
-            //ÆÇÁ¤ ÀÌ»óÇÏ¸é Á¶±İ ´Ã·Á¾ß
+            //íŒì • ì´ìƒí•˜ë©´ ì¡°ê¸ˆ ëŠ˜ë ¤ì•¼
             Vector3 rightOffset = mainCamera.transform.right * boxColider.size.x / 2f;
-            //Àı¹İº¸´Ù Á¶±İ ´õ ÁÙÀÓ
+            //ì ˆë°˜ë³´ë‹¤ ì¡°ê¸ˆ ë” ì¤„ì„
             Vector3 topOffset = Vector3.up * boxColider.size.y / 2.2f;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * isCameraFront;
 
-            //player ²ÀÁşÁ¡¿¡ ray
+            //player ê¼­ì§“ì ì— ray
             Vector3[] offsets = new Vector3[]
             {
                 //topRight
@@ -722,7 +729,7 @@ namespace HelloWorld
 
             foreach (var offset in offsets)
             {
-                //nullÀÌ ¾Æ´Ï°í
+                //nullì´ ì•„ë‹ˆê³ 
                 if (Physics.Raycast(rayStart + offset, mainCamera.transform.forward * isCameraFront, out enemyHit, cameraRaySize, mask))
                 {
                     if (enemyHit.collider.gameObject.layer == enemy)
@@ -732,7 +739,7 @@ namespace HelloWorld
                             return;
                         }
 
-                        //Ä«¸Ş¶ó¿¡¼­ º¸¿©¾ß¸¸ -> 180µµ Â÷ÀÌ³ª¾ß
+                        //ì¹´ë©”ë¼ì—ì„œ ë³´ì—¬ì•¼ë§Œ -> 180ë„ ì°¨ì´ë‚˜ì•¼
                         float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
                         if (CorrectDir % 180f == 0 ? true : false)
                         {
@@ -751,7 +758,7 @@ namespace HelloWorld
                 return;
             }
 
-            //¸Å´Ş¸®±â »óÅÂ ¹®Á¦ ÇØ°á
+            //ë§¤ë‹¬ë¦¬ê¸° ìƒíƒœ ë¬¸ì œ í•´ê²°
             if (climbState)
             {
                 climbState = false;
@@ -762,7 +769,7 @@ namespace HelloWorld
             spriteRenderer.color = new Color(1, 1, 1, 0.4f);
             animator.SetTrigger("isDamaged");
 
-            //ÇÃ·¹ÀÌ¾î x·Î Æ¨°Ü¾ß ÇÒÁö z·Î Æ¨°Ü¾ß ÇÒÁö °áÁ¤
+            //í”Œë ˆì´ì–´ xë¡œ íŠ•ê²¨ì•¼ í• ì§€ zë¡œ íŠ•ê²¨ì•¼ í• ì§€ ê²°ì •
             bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
 
             int dir;
@@ -798,9 +805,9 @@ namespace HelloWorld
             spriteRenderer.color = new Color(1, 1, 1, 1);
             isInvincible = false;
 
-            //attck = trueÇÏ°í damaged = true °°Àº ÇÁ·¹ÀÓ¿¡ ½ÇÇàµÇ¸é
-            //StartAttackÀÌ ¹«½ÃµÇ°Å³ª? EndAttack ani Ãâ·Â¾ÈµÇ¼­ ¹«½Ã µÊ.
-            //ÀÏ´Ü ÇØ°á À§ÇØ¼­
+            //attck = trueí•˜ê³  damaged = true ê°™ì€ í”„ë ˆì„ì— ì‹¤í–‰ë˜ë©´
+            //StartAttackì´ ë¬´ì‹œë˜ê±°ë‚˜? EndAttack ani ì¶œë ¥ì•ˆë˜ì„œ ë¬´ì‹œ ë¨.
+            //ì¼ë‹¨ í•´ê²° ìœ„í•´ì„œ
             attack = false;
             isAttacking = false;
         }
@@ -808,11 +815,11 @@ namespace HelloWorld
         [PunRPC]
         public void RPC_SpawnItemEffect(int slotIndex, string prefabName, float duration)
         {
-            // ¨ç Resources Æú´õ ³»¿¡ effectPrefabÀ» ³Ö¾îµÎ°í, °æ·Î´Â "Effects/"+prefabName ¶ó°í °¡Á¤
+            // â‘  Resources í´ë” ë‚´ì— effectPrefabì„ ë„£ì–´ë‘ê³ , ê²½ë¡œëŠ” "Effects/"+prefabName ë¼ê³  ê°€ì •
             var effectPrefab = Resources.Load<GameObject>($"Effects/{prefabName}");
             if (effectPrefab == null) return;
 
-            // ¨è Instantiate + È¸Àü ÄÚ·çÆ¾ + ÆÄ±«
+            // â‘¡ Instantiate + íšŒì „ ì½”ë£¨í‹´ + íŒŒê´´
             Transform spawnPoint = itemEffectSlots[slotIndex];
             GameObject go = Instantiate(effectPrefab, spawnPoint.position, spawnPoint.rotation, spawnPoint);
             StartCoroutine(RotateEffect(go, duration));
