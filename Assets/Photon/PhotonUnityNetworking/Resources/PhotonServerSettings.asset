@@ -50,6 +50,7 @@ MonoBehaviour:
   - RPC_SetClimbIdle
   - RPC_StartDamageFlash
   - RPC_UpdateHP
+  - OnDamaged
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

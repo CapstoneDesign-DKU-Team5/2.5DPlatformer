@@ -363,7 +363,7 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
     }
 
     [PunRPC]
-    private void RPC_UpdateHP(float newHP)
+    public void RPC_UpdateHP(float newHP)
     {
         HP = newHP;
         UpdateHealthBarUI();
