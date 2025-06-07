@@ -362,6 +362,10 @@ MonoBehaviour:
   usernameText: {fileID: 7682636939860508611}
   playerStat: {fileID: 11400000, guid: d47d793d8863fbf49814a04440301de4, type: 2}
   healthBarFillImage: {fileID: 1286766776402984810}
+  itemEffectSlots:
+  - {fileID: 2919699568744070931}
+  - {fileID: 1305416737577233354}
+  - {fileID: 4576017583896595909}
 --- !u!95 &2596930642235459831
 Animator:
   serializedVersion: 7
@@ -455,7 +459,7 @@ MonoBehaviour:
     SynchronizeType: 2
     Name: isClimbIdle
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isAir
   m_SynchronizeLayers:
   - SynchronizeType: 0

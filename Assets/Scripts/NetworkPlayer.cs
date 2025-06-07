@@ -5,6 +5,7 @@ using UnityEngine;
 using PlayFab;
 using UnityEngine.UI;
 using Unity.VisualScripting;
+using System.Collections;
 
 
 namespace HelloWorld
@@ -49,8 +50,15 @@ namespace HelloWorld
         [SerializeField, Tooltip("HealthBar")]
         private Image healthBarFillImage;
 
+        [Header("=== Item Effect Slots ===")]
+        [SerializeField, Tooltip("아이템 이펙트가 생성될 위치들")]
+        private Transform[] itemEffectSlots = new Transform[3];
+
         private float currentHealth;
         private int currentPower;
+        private readonly Vector3 _effectRotateAxis = new Vector3(-1f, 0f, 1f).normalized;
+        private const float _effectRotateSpeed = 90f; // 초당 90도
+
 
         private BoxCollider boxColider;
 
@@ -74,10 +82,27 @@ namespace HelloWorld
         private bool isVisible = true;
         private bool isInvisibleFrontAndBack = false;
         private int isCameraFront = 1;
+        private bool lastAirState= false;
 
         private bool flipState = false;
 
+        private Vector3 networkPos;
+        private Quaternion networkRot;
 
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (stream.IsWriting)
+            {
+       
+                stream.SendNext(transform.position);
+                stream.SendNext(transform.rotation);
+            }
+            else
+            { 
+                networkPos = (Vector3)stream.ReceiveNext();
+                networkRot = (Quaternion)stream.ReceiveNext();
+            }
+        }
 
         private void Awake()
         {
@@ -90,6 +115,7 @@ namespace HelloWorld
 
             jumpHeight = 7f;
         }
+
 
         private void OnEnable()
         {
@@ -112,6 +138,10 @@ namespace HelloWorld
 
         private void Start()
         {
+            if (!photonView.IsMine)
+            {
+                rigidBody.isKinematic = true;
+            }
             if (photonView.IsMine)
             {
                 GameObject camObj = Instantiate(Resources.Load<GameObject>("CameraPrefab"));
@@ -128,6 +158,21 @@ namespace HelloWorld
         {
             if (!photonView.IsMine || mainCamera == null || cameraScript == null)
                 return;
+
+            if (!photonView.IsMine)
+            {
+              
+                transform.position = Vector3.Lerp(
+                    transform.position,
+                    networkPos,
+                    Time.deltaTime * 10f  
+                );
+                transform.rotation = Quaternion.Slerp(
+                    transform.rotation,
+                    networkRot,
+                    Time.deltaTime * 10f
+                );
+            }
 
             InputKey();
             UpdateClimbState();
@@ -273,17 +318,40 @@ namespace HelloWorld
             RaycastHit hit;
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.y = 0.1f;
-            if (Physics.BoxCast(transform.position, boxSize, Vector3.down, out hit, Quaternion.identity, 0.51f, LayerMask.GetMask("Platform")))
+
+            // 땅에 닿아 있으면 grounded=true
+            bool grounded = Physics.BoxCast(
+                transform.position,
+                boxSize,
+                Vector3.down,
+                out hit,
+                Quaternion.identity,
+                0.51f,
+                LayerMask.GetMask("Platform")
+            );
+
+            bool newIsAir = !grounded;
+
+            // 상태가 바뀔 때에만 처리
+            if (newIsAir != lastAirState)
             {
-                isAir = false;
-                animator.SetBool("isAir", false);
-            }
-            else
-            {
-                isAir = true;
-                animator.SetBool("isAir", true);
+                isAir = newIsAir;
+                animator.SetBool("isAir", newIsAir);
+
+                // 내 캐릭터에서만 RPC 호출
+                if (photonView.IsMine)
+                {
+                    photonView.RPC(
+                        nameof(RPC_SetIsAir),
+                        RpcTarget.Others,
+                        newIsAir
+                    );
+                }
+
+                lastAirState = newIsAir;
             }
         }
+
 
         private void InputKey()
         {
@@ -735,6 +803,38 @@ namespace HelloWorld
             //일단 해결 위해서
             attack = false;
             isAttacking = false;
+        }
+
+        [PunRPC]
+        public void RPC_SpawnItemEffect(int slotIndex, string prefabName, float duration)
+        {
+            // ① Resources 폴더 내에 effectPrefab을 넣어두고, 경로는 "Effects/"+prefabName 라고 가정
+            var effectPrefab = Resources.Load<GameObject>($"Effects/{prefabName}");
+            if (effectPrefab == null) return;
+
+            // ② Instantiate + 회전 코루틴 + 파괴
+            Transform spawnPoint = itemEffectSlots[slotIndex];
+            GameObject go = Instantiate(effectPrefab, spawnPoint.position, spawnPoint.rotation, spawnPoint);
+            StartCoroutine(RotateEffect(go, duration));
+            if (duration > 0f)
+                Destroy(go, duration);
+        }
+
+        [PunRPC]
+        public void RPC_SetIsAir(bool newIsAir)
+        {
+            animator.SetBool("isAir", newIsAir);
+        }
+
+        private IEnumerator RotateEffect(GameObject go, float duration)
+        {
+            float elapsed = 0f;
+            while (go != null && (duration <= 0f || elapsed < duration))
+            {
+                go.transform.Rotate(_effectRotateAxis, _effectRotateSpeed * Time.deltaTime, Space.World);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
         }
     }
 }

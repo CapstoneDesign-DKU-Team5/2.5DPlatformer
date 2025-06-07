@@ -44,6 +44,8 @@ MonoBehaviour:
   - SetUsernameText
   - RPC_UpdateHealth
   - RPC_UpdatePower
+  - RPC_SetIsAir
+  - RPC_SpawnItemEffect
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

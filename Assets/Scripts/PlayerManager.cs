@@ -215,7 +215,28 @@ public class PlayerManager : MonoBehaviour
         {
             slotUses[index]--;
 
-            ApplyItemEffect(matchedItem);
+            
+            if (targetPlayer != null)
+            {
+                float effectDuration = 0f;
+                switch (matchedItem.effectType)
+                {
+                    case ItemEffectType.Heal:
+                        effectDuration = 60f;
+                        break;
+                    case ItemEffectType.DamageBuff:
+                        effectDuration = 180f;
+                        break;
+                    case ItemEffectType.SpeedBoost:
+                        effectDuration = matchedItem.buffDuration;
+                        break;             
+                }
+                string prefabName = matchedItem.EffectPrefab.name;
+                targetPlayer.photonView.RPC(nameof(NetworkPlayer.RPC_SpawnItemEffect),
+                                            RpcTarget.AllBuffered,
+                                            index, prefabName, effectDuration);
+                ApplyItemEffect(matchedItem);
+            }
 
             if (slotUses[index] <= 0)
             {
