@@ -6,6 +6,7 @@ using PlayFab;
 using UnityEngine.UI;
 using Unity.VisualScripting;
 using System.Collections;
+using System.Threading;
 
 
 namespace HelloWorld
@@ -616,6 +617,7 @@ namespace HelloWorld
                 climbState = false;
                 climbJump = true;
                 animator.SetBool("isClimbIdle", false);
+                photonView.RPC(nameof(RPC_SetClimbIdle), RpcTarget.Others, false);
                 return;
             }
 
@@ -623,12 +625,14 @@ namespace HelloWorld
             {
                 climbState = true;
                 animator.SetBool("isClimbIdle", true);
+                photonView.RPC(nameof(RPC_SetClimbIdle), RpcTarget.Others, true);
             }
 
             if (climbState && !canClimb)
             {
                 climbState = false;
                 animator.SetBool("isClimbIdle", false);
+                photonView.RPC(nameof(RPC_SetClimbIdle), RpcTarget.Others, false);
             }
         }
 
@@ -685,7 +689,7 @@ namespace HelloWorld
                             Monster monster = enemyHit.collider.GetComponent<Monster>();
                             if (monster != null)
                             {
-                                monster.OnDamaged(transform.position, 1);
+                                monster.OnDamaged(transform.position, currentPower);
                             }
                             break;
                         }
@@ -743,7 +747,13 @@ namespace HelloWorld
                         float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
                         if (CorrectDir % 180f == 0 ? true : false)
                         {
-                            OnDamaged(enemyHit.transform.position);
+                            Monster monster = enemyHit.collider.GetComponent<Monster>();
+                            if (monster != null)
+                            {
+                                OnDamaged(enemyHit.transform.position, monster.stats.power);
+
+                            }
+                                
                             break;
                         }
                     }
@@ -751,12 +761,12 @@ namespace HelloWorld
             }
         }
 
-        public void OnDamaged(Vector3 monsterPos)
+        [PunRPC]
+        public void OnDamaged(Vector3 monsterPos, int damageAmount)
         {
-            if (isInvincible)
-            {
-                return;
-            }
+            if (!photonView.IsMine || isInvincible) return;
+            currentHealth = Mathf.Max(0, currentHealth - damageAmount);
+            UpdateHealthBar();
 
             //매달리기 상태 문제 해결
             if (climbState)
@@ -768,7 +778,7 @@ namespace HelloWorld
 
             spriteRenderer.color = new Color(1, 1, 1, 0.4f);
             animator.SetTrigger("isDamaged");
-
+            photonView.RPC(nameof(RPC_StartDamageFlash), RpcTarget.Others);
             //플레이어 x로 튕겨야 할지 z로 튕겨야 할지 결정
             bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
 
@@ -793,6 +803,13 @@ namespace HelloWorld
 
             Invoke("UnlockControl", 0.5f);
             Invoke("OffDamaged", 1.5f);
+            Invoke(nameof(SendEndFlashRPC), 1.5f);
+        }
+
+        private void SendEndFlashRPC()
+        {
+            if (photonView.IsMine)
+                photonView.RPC(nameof(RPC_EndDamageFlash), RpcTarget.Others);
         }
 
         void UnlockControl() 
@@ -843,5 +860,27 @@ namespace HelloWorld
                 yield return null;
             }
         }
+
+        [PunRPC]
+        private void RPC_StartDamageFlash()
+        {
+            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+            animator.SetTrigger("isDamaged");
+        }
+
+        // 2) 깜박거림 끝나고 원래 상태로 복구
+        [PunRPC]
+        private void RPC_EndDamageFlash()
+        {
+            spriteRenderer.color = new Color(1, 1, 1, 1f);
+        }
+
+        [PunRPC]
+        private void RPC_SetClimbIdle(bool climbIdle)
+        {
+            animator.SetBool("isClimbIdle", climbIdle);
+        }
     }
+
+
 }

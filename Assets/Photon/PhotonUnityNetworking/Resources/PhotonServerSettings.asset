@@ -19,7 +19,7 @@ MonoBehaviour:
     AppIdVoice: 
     AppVersion: 
     UseNameServer: 1
-    FixedRegion: 
+    FixedRegion: kr
     Server: 
     Port: 0
     ProxyServer: 
@@ -46,6 +46,11 @@ MonoBehaviour:
   - RPC_UpdatePower
   - RPC_SetIsAir
   - RPC_SpawnItemEffect
+  - RPC_EndDamageFlash
+  - RPC_SetClimbIdle
+  - RPC_StartDamageFlash
+  - RPC_UpdateHP
+  - OnDamaged
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
