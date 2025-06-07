@@ -25,3 +25,4 @@ MonoBehaviour:
   speedMultiplier: 0
   shieldAmount: 0
   damageMultiplier: 0
+  effectPrefab: {fileID: 3531603613278951321, guid: 33271563b606707478f0230bb3a4dbd7, type: 3}

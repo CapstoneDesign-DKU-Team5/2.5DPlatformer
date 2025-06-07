@@ -17,6 +17,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         // Photon 초기 연결 시도
         PhotonNetwork.GameVersion = gameVersion;
+        PhotonNetwork.PhotonServerSettings.AppSettings.FixedRegion = "kr";
         PhotonNetwork.ConnectUsingSettings();
         connectionInfoText.text = "마스터 서버에 접속 중...";
     }
@@ -65,7 +66,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         connectionInfoText.text = "참가 가능한 게임을 찾는 중...";
         var expectedProperties = new ExitGames.Client.Photon.Hashtable { { "inviteOnly", false } };
-        PhotonNetwork.JoinRandomRoom(expectedProperties, 0);
+        PhotonNetwork.JoinRandomRoom(expectedProperties, (byte)2);
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
