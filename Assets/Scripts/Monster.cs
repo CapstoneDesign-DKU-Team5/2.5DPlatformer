@@ -4,8 +4,10 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SocialPlatforms;
+using Photon.Pun;
+using UnityEngine.UI;
 
-public class Monster : MonoBehaviour
+public class Monster : MonoBehaviourPunCallbacks,IPunObservable
 {
     [Header("컴포넌트 참조")]
     [SerializeField, Tooltip("자식 BoxCollider (충돌 판정용)")]
@@ -38,8 +40,15 @@ public class Monster : MonoBehaviour
     [SerializeField, Tooltip("몬스터가 X축을 기준으로 움직이는지 여부")]
     protected bool monsterXOrZ; // true면 x축 이동
 
-    [SerializeField, Tooltip("현재 체력")]
-    protected float HP = 3;
+    [SerializeField, Tooltip("몬스터 스탯 (HP, Power)")]
+    public MonsterStats stats;
+    protected float HP;
+    protected float Power;
+    private float maxHP;
+
+    [Header("UI")]
+    [SerializeField, Tooltip("체력바 Fill 이미지 (Fill Type)")]
+    private Image healthBarFillImage;
 
     protected enum State
     {
@@ -47,6 +56,28 @@ public class Monster : MonoBehaviour
         CHASE,
         ATTACK,
         KILLED
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            // 내 쪽 HP 상태 내보내기
+            stream.SendNext(HP);
+            // (선택) 위치/회전 동기화도 함께 하고 싶다면 여기서 보내세요:
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            // 상대편에서 보낸 HP 갱신
+            HP = (float)stream.ReceiveNext();
+            UpdateHealthBarUI();
+
+            // 위치/회전 동기화
+            transform.position = (Vector3)stream.ReceiveNext();
+            transform.rotation = (Quaternion)stream.ReceiveNext();
+        }
     }
 
     [SerializeField, Tooltip("현재 몬스터 상태")]
@@ -69,8 +100,16 @@ public class Monster : MonoBehaviour
         navMeshAgent.updateRotation = false;
 
         state = State.IDLE;
-        HP = 10;
+        HP = stats.hp;
+        Power = stats.power;
+        maxHP = stats.hp;
         StartCoroutine(StateMachine());
+    }
+
+    private void Start()
+    {
+        UpdateHealthBarUI();
+        
     }
 
     protected IEnumerator StateMachine()
@@ -209,7 +248,12 @@ public class Monster : MonoBehaviour
         {
             //Debug.Log("Hit 성공");
             NetworkPlayer player = target.GetComponent<NetworkPlayer>();
-            player.OnDamaged(transform.position);
+            player.OnDamaged(transform.position, stats.power);
+            player.photonView.RPC(
+    nameof(NetworkPlayer.OnDamaged),
+    RpcTarget.AllBuffered,
+    transform.position,
+    stats.power);
         }
     }
 
@@ -264,6 +308,10 @@ public class Monster : MonoBehaviour
         }
 
         AnimatorStateInfo curAnimStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        HP -= damage;
+        UpdateHealthBarUI();
+
+        photonView.RPC(nameof(RPC_UpdateHP), RpcTarget.OthersBuffered, HP);
 
         //몬스터 넉백
         //rigidBody.isKinematic = false;
@@ -282,7 +330,7 @@ public class Monster : MonoBehaviour
         //    rigidBody.AddForce(dirVec, ForceMode.Impulse);
         //}
 
-        HP -= damage;
+       
         Debug.Log(HP);
         if (HP <= 0)
         {
@@ -306,5 +354,18 @@ public class Monster : MonoBehaviour
     {
         //rigidBody.isKinematic = true;
         damaged = false;
+    }
+
+    private void UpdateHealthBarUI()
+    {
+        if (healthBarFillImage != null && maxHP > 0)
+            healthBarFillImage.fillAmount = HP / maxHP;
+    }
+
+    [PunRPC]
+    private void RPC_UpdateHP(float newHP)
+    {
+        HP = newHP;
+        UpdateHealthBarUI();
     }
 }
