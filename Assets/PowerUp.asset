@@ -18,3 +18,10 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: cbdd842a5c77ab740a5e158f5261273b, type: 3}
   consumable: 1
   usesPerItem: 1
+  effectType: 3
+  healAmount: 0
+  buffDuration: 180
+  speedMultiplier: 0
+  shieldAmount: 0
+  damageMultiplier: 2
+  effectPrefab: {fileID: 4852772738165091968, guid: e5fb4d100678b42438cbacd18999c3ff, type: 3}

@@ -6576,7 +6576,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &800248952
 Transform:
   m_ObjectHideFlags: 0
@@ -8164,6 +8164,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 101112881596075499, guid: bd4d61e855b1485488417d4408b16549, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1027457119}
+    - targetCorrespondingSourceObject: {fileID: 101112881596075499, guid: bd4d61e855b1485488417d4408b16549, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1027457120}
   m_SourcePrefab: {fileID: 100100000, guid: bd4d61e855b1485488417d4408b16549, type: 3}
 --- !u!4 &1027457114 stripped
 Transform:
@@ -8193,6 +8196,18 @@ MonoBehaviour:
   closeButton: {fileID: 551229951}
   inviteCodeInput: {fileID: 336373207}
   lobbyManager: {fileID: 1129481569}
+--- !u!114 &1027457120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 126738847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d59e66b86de422439b8a6ef737401d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1036076014
 GameObject:
   m_ObjectHideFlags: 0
@@ -12418,6 +12433,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 101112881596075499, guid: bd4d61e855b1485488417d4408b16549, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1542560788}
+    - targetCorrespondingSourceObject: {fileID: 101112881596075499, guid: bd4d61e855b1485488417d4408b16549, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1542560789}
   m_SourcePrefab: {fileID: 100100000, guid: bd4d61e855b1485488417d4408b16549, type: 3}
 --- !u!4 &1542560783 stripped
 Transform:
@@ -12447,6 +12465,18 @@ MonoBehaviour:
   closeButton: {fileID: 551229951}
   inviteCodeInput: {fileID: 336373207}
   lobbyManager: {fileID: 1129481569}
+--- !u!114 &1542560789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 876349490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d59e66b86de422439b8a6ef737401d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1554315604
 GameObject:
   m_ObjectHideFlags: 0
@@ -13490,6 +13520,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 101112881596075499, guid: bd4d61e855b1485488417d4408b16549, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1995269583}
+    - targetCorrespondingSourceObject: {fileID: 101112881596075499, guid: bd4d61e855b1485488417d4408b16549, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1995269584}
   m_SourcePrefab: {fileID: 100100000, guid: bd4d61e855b1485488417d4408b16549, type: 3}
 --- !u!1 &1658910916
 GameObject:
@@ -13768,6 +13801,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 101112881596075499, guid: bd4d61e855b1485488417d4408b16549, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2079472771}
+    - targetCorrespondingSourceObject: {fileID: 101112881596075499, guid: bd4d61e855b1485488417d4408b16549, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2079472772}
   m_SourcePrefab: {fileID: 100100000, guid: bd4d61e855b1485488417d4408b16549, type: 3}
 --- !u!4 &1667082508 stripped
 Transform:
@@ -15991,6 +16027,18 @@ MonoBehaviour:
   closeButton: {fileID: 551229951}
   inviteCodeInput: {fileID: 336373207}
   lobbyManager: {fileID: 1129481569}
+--- !u!114 &1995269584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1995269578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d59e66b86de422439b8a6ef737401d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2002298243
 GameObject:
   m_ObjectHideFlags: 0
@@ -16520,6 +16568,18 @@ MonoBehaviour:
   closeButton: {fileID: 551229951}
   inviteCodeInput: {fileID: 336373207}
   lobbyManager: {fileID: 1129481569}
+--- !u!114 &2079472772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2079472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d59e66b86de422439b8a6ef737401d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2081555449
 GameObject:
   m_ObjectHideFlags: 0
