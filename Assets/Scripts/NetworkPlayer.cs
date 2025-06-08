@@ -176,7 +176,8 @@ namespace HelloWorld
 
         private void Update()
         {
-            if (isDead) return;
+           
+           
             if (!photonView.IsMine || mainCamera == null || cameraScript == null)
                 return;
 
@@ -196,6 +197,13 @@ namespace HelloWorld
                     Time.deltaTime * 10f
                 );
             }
+
+            // 3) 한 번만 죽음 처리
+            if (!isDead && currentHealth <= 0)
+            {
+                Die();
+            }
+            if (isDead) return;
 
             InputKey();
             UpdateClimbState();
@@ -397,6 +405,7 @@ namespace HelloWorld
 
             if (Input.GetButtonDown("Fire1"))
             {
+                if(!isControlLocked)
                 attack = true;
             }
         }
@@ -943,8 +952,15 @@ namespace HelloWorld
             UpdateHealthBar();
             photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.OthersBuffered, currentHealth);
 
+            if (!isDead && currentHealth <= 0)
+            {
+                Die();
+            }
+
+
             // 7) 애니 종료
             StartCoroutine(StopHealingAnim());
+            
         }
 
 
@@ -990,19 +1006,20 @@ namespace HelloWorld
 
         private void Die()
         {
+            if (isDead) return;
             isDead = true;
 
             
             animator.SetTrigger("isDead");   
             DisableControlAndCollisions();
             GameManager.instance.photonView.RPC("RPC_PlayerDied", RpcTarget.All);
-            photonView.RPC(nameof(RPC_TriggerDeath), RpcTarget.Others);
+            photonView.RPC(nameof(RPC_AllTriggerDeath), RpcTarget.AllBuffered);
         }
 
         [PunRPC]
-        private void RPC_TriggerDeath()
+        
+        private void RPC_AllTriggerDeath()
         {
-            // 원격 플레이어 죽음 애니만 보여주고
             animator.SetTrigger("isDead");
             DisableControlAndCollisions();
         }

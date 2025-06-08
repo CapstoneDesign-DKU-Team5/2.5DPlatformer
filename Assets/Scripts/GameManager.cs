@@ -64,13 +64,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             Destroy(gameObject);
         }
+        
+        Debug.Log(aliveCount+"명 있음");
     }
 
    
 
     private void Start()
     {
-
+        aliveCount = PhotonNetwork.CurrentRoom.PlayerCount;
         // 2) UI 초기 상태
         if (uiCanvas != null) uiCanvas.SetActive(true);
         if (gameOverCanvas != null) gameOverCanvas.SetActive(false);
@@ -78,7 +80,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (pauseCanvas != null)
             pauseCanvas.SetActive(false);
 
-        aliveCount = PhotonNetwork.CurrentRoom.PlayerCount;
+        
         isGameover = false;
 
         // Exit 버튼에 리스너 추가
@@ -98,6 +100,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
         // 3) 초대 코드 표시
         ShowInviteCode();
+    }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        aliveCount = PhotonNetwork.CurrentRoom.PlayerCount;
+        Debug.Log($"[GameManager] 플레이어 입장 → aliveCount: {aliveCount}");
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        aliveCount = PhotonNetwork.CurrentRoom.PlayerCount;
+        Debug.Log($"[GameManager] 플레이어 퇴장 → aliveCount: {aliveCount}");
+        CheckGameOver();
     }
 
     private void Update()
@@ -143,18 +158,23 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+
+
     [PunRPC]
     private void RPC_PlayerDied()
     {
         aliveCount--;
+        Debug.Log($"[GameManager] 플레이어 사망 → 남은 aliveCount: {aliveCount}");
+        CheckGameOver();
+    }
 
-        // 모두 죽었으면 게임오버 처리
+    private void CheckGameOver()
+    {
         if (!isGameover && aliveCount <= 0)
         {
             isGameover = true;
-            if (uiCanvas != null) uiCanvas.SetActive(false);
-            if (gameOverCanvas != null) gameOverCanvas.SetActive(true);
+            uiCanvas?.SetActive(false);
+            gameOverCanvas?.SetActive(true);
         }
     }
-
 }
