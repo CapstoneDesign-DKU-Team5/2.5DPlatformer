@@ -73,6 +73,11 @@ namespace HelloWorld
         [SerializeField, Tooltip("골드 줍기 범위")]
         private float goldPickupRange = 2f;
 
+        [Header("Landing Damage Settings")]
+        [Tooltip("낙하 데미지를 주기 시작하는 최소 거리")]
+        [SerializeField]
+        private float minFallRange = 1f;
+
 
         private BoxCollider boxColider;
 
@@ -87,6 +92,7 @@ namespace HelloWorld
         private bool climbJump = false;
         private bool isControlLocked = false;
         private bool isInvincible = false;
+        private float _fallStartY;
 
         private Vector3 savedVelocity;
         private bool needRestoreVelocity = false;
@@ -105,6 +111,8 @@ namespace HelloWorld
         private Quaternion networkRot;
         private Vector3 networkVel;
         private double networkTimeStamp;
+        private Vector3 _startPosition;
+        private Quaternion _startRotation;
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
@@ -134,6 +142,8 @@ namespace HelloWorld
             boxColider = GetComponent<BoxCollider>();
 
             jumpHeight = 7f;
+            _startPosition = transform.position;
+            _startRotation = transform.rotation;
         }
 
 
@@ -376,6 +386,22 @@ namespace HelloWorld
             // 상태가 바뀔 때에만 처리
             if (newIsAir != lastAirState)
             {
+                // ① 공중으로 떠오를 때 Y 저장
+                if (newIsAir)
+                {
+                    _fallStartY = transform.position.y;
+                }
+                // ② 착지할 때 데미지 계산
+                else
+                {
+                    float fallDistance = _fallStartY - transform.position.y;
+                    if (fallDistance > 1f && photonView.IsMine)
+                    {
+                        int damage = Mathf.Clamp((int)fallDistance, 1, 50);
+                        Debug.Log(damage + "낙하 데미지");
+                        TakeDamage(damage);
+                    }
+                }
                 isAir = newIsAir;
                 animator.SetBool("isAir", newIsAir);
 
@@ -1002,6 +1028,9 @@ namespace HelloWorld
         {
             Gizmos.color = Color.red;                            // 원 색상
             Gizmos.DrawWireSphere(transform.position, goldPickupRange);  // 반지름만큼 선으로 그리기
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position, minFallRange);
         }
 
         private void Die()
@@ -1033,6 +1062,18 @@ namespace HelloWorld
             foreach (var c in cols) c.enabled = false;
             rigidBody.isKinematic = true;
             // Raycast 같은 로직이 들어있는 메서드들도 isDead 체크로 빠져나가게
+        }
+
+        public void RespawnToStart()
+        {
+            rigidBody.linearVelocity = Vector3.zero;
+            rigidBody.angularVelocity = Vector3.zero;
+
+            // 2) 위치 및 회전 복구
+            transform.position = _startPosition;
+            transform.rotation = _startRotation;
+            TakeDamage(50);
+
         }
 
     }
