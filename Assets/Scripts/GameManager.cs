@@ -21,7 +21,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private static GameManager m_instance;
 
     [Header("Player & Room Info")]
-    public GameObject playerPrefab;
+    [Tooltip("마스터 클라이언트용 플레이어 프리팹 (Resources 폴더 안)")]
+    public GameObject masterClientPrefab;
+    [Tooltip("일반 클라이언트용 플레이어 프리팹 (Resources 폴더 안)")]
+    public GameObject otherClientPrefab;
     public TextMeshProUGUI inviteCodeText;
     private int height = 0;
     public bool isGameover { get; private set; }
@@ -50,12 +53,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Start()
     {
+
+        GameObject prefabToSpawn = PhotonNetwork.IsMasterClient
+            ? masterClientPrefab
+            : otherClientPrefab;
         // 플레이어 스폰 위치 결정
         Vector3 spawnPosition = PhotonNetwork.IsMasterClient
             ? new Vector3(0f, 3f, -3f)
             : new Vector3(-1.5f, 3f, -3f);
 
-        PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, Quaternion.identity);
+        PhotonNetwork.Instantiate(prefabToSpawn.name, spawnPosition, Quaternion.identity);
 
         ShowInviteCode();
     }
