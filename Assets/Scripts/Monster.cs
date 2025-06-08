@@ -270,10 +270,15 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
 
     protected IEnumerator KILLED()
     {
+
+        navMeshAgent.isStopped = true;    // 더 이상 이동 금지
+        navMeshAgent.ResetPath();         // 남아 있던 경로 클리어
+        childBoxCollider.enabled = false; // 충돌 판정도 비활성화
+
         gameObject.layer = LayerMask.NameToLayer("Dead");
         animator.Play("Dead", 0, 0);
 
-        float duration = 1.5f;
+        float duration = 1f;
         float timer = 0f;
 
         Color color = spriteRenderer.material.color;

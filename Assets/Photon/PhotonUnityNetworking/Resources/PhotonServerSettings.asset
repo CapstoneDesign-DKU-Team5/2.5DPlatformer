@@ -54,6 +54,9 @@ MonoBehaviour:
   - RPC_ReceiveHeal
   - RPC_SetHealing
   - RPC_AddCurrencyForOthers
+  - HandlePickup
+  - RPC_TriggerDeath
+  - RPC_PlayerDied
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

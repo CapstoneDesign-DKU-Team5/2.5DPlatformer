@@ -99,6 +99,7 @@ namespace HelloWorld
         private bool lastAirState = false;
 
         private bool flipState = false;
+        private bool isDead = false;
 
         private Vector3 networkPos;
         private Quaternion networkRot;
@@ -175,6 +176,7 @@ namespace HelloWorld
 
         private void Update()
         {
+            if (isDead) return;
             if (!photonView.IsMine || mainCamera == null || cameraScript == null)
                 return;
 
@@ -238,6 +240,8 @@ namespace HelloWorld
 
 
             photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.OthersBuffered, currentHealth);
+            if (currentHealth <= 0)
+                Die();
         }
 
 
@@ -825,6 +829,8 @@ namespace HelloWorld
             Invoke("UnlockControl", 0.5f);
             Invoke("OffDamaged", 1.5f);
             Invoke(nameof(SendEndFlashRPC), 1.5f);
+            if (currentHealth <= 0)
+                Die();
         }
 
         private void SendEndFlashRPC()
@@ -981,7 +987,39 @@ namespace HelloWorld
             Gizmos.color = Color.red;                            // 원 색상
             Gizmos.DrawWireSphere(transform.position, goldPickupRange);  // 반지름만큼 선으로 그리기
         }
+
+        private void Die()
+        {
+            isDead = true;
+
+            
+            animator.SetTrigger("isDead");   
+            DisableControlAndCollisions();
+            GameManager.instance.photonView.RPC("RPC_PlayerDied", RpcTarget.All);
+            photonView.RPC(nameof(RPC_TriggerDeath), RpcTarget.Others);
+        }
+
+        [PunRPC]
+        private void RPC_TriggerDeath()
+        {
+            // 원격 플레이어 죽음 애니만 보여주고
+            animator.SetTrigger("isDead");
+            DisableControlAndCollisions();
+        }
+
+        private void DisableControlAndCollisions()
+        {
+            // 이동·점프·공격 키 입력 무시
+            isControlLocked = true;
+            // 물리/충돌 끄기
+            var cols = GetComponentsInChildren<Collider>();
+            foreach (var c in cols) c.enabled = false;
+            rigidBody.isKinematic = true;
+            // Raycast 같은 로직이 들어있는 메서드들도 isDead 체크로 빠져나가게
+        }
+
     }
+
 
 
 }

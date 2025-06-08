@@ -41,11 +41,25 @@ public class Gold : MonoBehaviourPun
 
     public void Pickup()
     {
-        if (!photonView.IsMine) return;
+        // 1) 비소유 클라이언트는 마스터에게만 요청하고 바로 리턴
+        if (!photonView.IsMine)
+        {
+            AddVirtualCurrency();
+            photonView.RPC(nameof(HandlePickup), RpcTarget.MasterClient);
+            return;
+        }
 
-        AddVirtualCurrency();
+        // 2) 내가 소유자라면 직접 처리
+        HandlePickup();
+    }
+
+    [PunRPC]
+    private void HandlePickup()
+    {
+        // 마스터(소유자)에서 한 번만 실행
+        AddVirtualCurrency();                           // 마스터 클라이언트 자신의 PlayFab 갱신
         photonView.RPC(nameof(RPC_AddCurrencyForOthers), RpcTarget.Others);
-        PhotonNetwork.Destroy(photonView);
+        PhotonNetwork.Destroy(photonView);              // 마스터가 오브젝트 파괴
     }
 
     private void AddVirtualCurrency()
@@ -71,6 +85,7 @@ public class Gold : MonoBehaviourPun
     [PunRPC]
     private void RPC_AddCurrencyForOthers()
     {
+        // 다른 클라이언트(비마스터) 세션에서도 PlayFab 갱신
         AddVirtualCurrency();
     }
 }

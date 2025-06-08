@@ -33,9 +33,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [Tooltip("Pause Canvas 안의 Exit Room 버튼")]
     public Button exitButton;
 
+    [Header("UI Canvases")]
+    [Tooltip("인게임 UI Canvas")]
+    public GameObject uiCanvas;
+    [Tooltip("Game Over Canvas")]
+    public GameObject gameOverCanvas;
+
+    private int aliveCount;
+    public bool isGameover { get; private set; }
+
     public TextMeshProUGUI inviteCodeText;
     private int height = 0;
-    public bool isGameover { get; private set; }
+
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -62,8 +71,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private void Start()
     {
 
+        // 2) UI 초기 상태
+        if (uiCanvas != null) uiCanvas.SetActive(true);
+        if (gameOverCanvas != null) gameOverCanvas.SetActive(false);
+
         if (pauseCanvas != null)
             pauseCanvas.SetActive(false);
+
+        aliveCount = PhotonNetwork.CurrentRoom.PlayerCount;
+        isGameover = false;
 
         // Exit 버튼에 리스너 추가
         if (exitButton != null)
@@ -127,6 +143,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    [PunRPC]
+    private void RPC_PlayerDied()
+    {
+        aliveCount--;
 
+        // 모두 죽었으면 게임오버 처리
+        if (!isGameover && aliveCount <= 0)
+        {
+            isGameover = true;
+            if (uiCanvas != null) uiCanvas.SetActive(false);
+            if (gameOverCanvas != null) gameOverCanvas.SetActive(true);
+        }
+    }
 
 }

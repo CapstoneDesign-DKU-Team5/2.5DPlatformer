@@ -123,6 +123,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goldText: {fileID: 0}
+  rotationSpeed: 270
 --- !u!114 &7728231940881285494
 MonoBehaviour:
   m_ObjectHideFlags: 0
