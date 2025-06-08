@@ -2321,7 +2321,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &279978444
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6520,7 +6520,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -32.459946, y: 268}
+  m_AnchoredPosition: {x: -32.45996, y: 268}
   m_SizeDelta: {x: -868.26, y: -669.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &794014565
@@ -6971,7 +6971,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -32.459946, y: 50.784912}
+  m_AnchoredPosition: {x: -32.45996, y: 50.784912}
   m_SizeDelta: {x: -868.26, y: -665.27}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &875673695
@@ -7436,7 +7436,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -32.459946, y: 161.78497}
+  m_AnchoredPosition: {x: -32.45996, y: 161.78497}
   m_SizeDelta: {x: -868.26, y: -657.28}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &938006028
@@ -12917,6 +12917,7 @@ GameObject:
   - component: {fileID: 1589143986}
   - component: {fileID: 1589143985}
   - component: {fileID: 1589143984}
+  - component: {fileID: 1589143987}
   m_Layer: 5
   m_Name: LoadingImage
   m_TagString: Untagged
@@ -12981,6 +12982,22 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -180}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!111 &1589143987
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1589143983}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: 5a5179222b783b94f8f921e11130af4f, type: 2}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!1 &1593473029
 GameObject:
   m_ObjectHideFlags: 0
@@ -13218,10 +13235,10 @@ MonoBehaviour:
   loadingText: {fileID: 2128208631}
   loadingImage: {fileID: 1589143984}
   loadingSprites:
-  - {fileID: 211146891, guid: 78760c23bf78c7344bac7ad3600117bb, type: 3}
-  - {fileID: 1102961328, guid: 78760c23bf78c7344bac7ad3600117bb, type: 3}
-  - {fileID: 602546041, guid: 78760c23bf78c7344bac7ad3600117bb, type: 3}
-  - {fileID: 1524793308, guid: 78760c23bf78c7344bac7ad3600117bb, type: 3}
+  - {fileID: 2051423070, guid: 4faaaca1992ac3148b679e8d877d4767, type: 3}
+  - {fileID: 774241029, guid: 4faaaca1992ac3148b679e8d877d4767, type: 3}
+  - {fileID: 1498817431, guid: 4faaaca1992ac3148b679e8d877d4767, type: 3}
+  - {fileID: 1936584362, guid: 4faaaca1992ac3148b679e8d877d4767, type: 3}
 --- !u!1 &1648021054
 GameObject:
   m_ObjectHideFlags: 0
