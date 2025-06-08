@@ -3,6 +3,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.SceneManagement;
 using TMPro; // 추가
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -25,6 +26,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public GameObject masterClientPrefab;
     [Tooltip("일반 클라이언트용 플레이어 프리팹 (Resources 폴더 안)")]
     public GameObject otherClientPrefab;
+
+    [Header("Pause UI")]
+    [Tooltip("ESC 시 활성화할 Canvas")]
+    public GameObject pauseCanvas;
+    [Tooltip("Pause Canvas 안의 Exit Room 버튼")]
+    public Button exitButton;
+
     public TextMeshProUGUI inviteCodeText;
     private int height = 0;
     public bool isGameover { get; private set; }
@@ -54,24 +62,33 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private void Start()
     {
 
+        if (pauseCanvas != null)
+            pauseCanvas.SetActive(false);
+
+        // Exit 버튼에 리스너 추가
+        if (exitButton != null)
+            exitButton.onClick.AddListener(() => PhotonNetwork.LeaveRoom());
+
+        // 2) 플레이어 스폰
         GameObject prefabToSpawn = PhotonNetwork.IsMasterClient
             ? masterClientPrefab
             : otherClientPrefab;
-        // 플레이어 스폰 위치 결정
+
         Vector3 spawnPosition = PhotonNetwork.IsMasterClient
             ? new Vector3(0f, 3f, -3f)
             : new Vector3(-1.5f, 3f, -3f);
 
         PhotonNetwork.Instantiate(prefabToSpawn.name, spawnPosition, Quaternion.identity);
 
+        // 3) 초대 코드 표시
         ShowInviteCode();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && pauseCanvas != null)
         {
-            PhotonNetwork.LeaveRoom();
+            pauseCanvas.SetActive(!pauseCanvas.activeSelf);
         }
     }
 

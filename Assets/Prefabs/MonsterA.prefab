@@ -331,6 +331,7 @@ MonoBehaviour:
   monsterXOrZ: 0
   stats: {fileID: 11400000, guid: f4549fe2b32ce944b8a209617f91fbb2, type: 2}
   healthBarFillImage: {fileID: 4944387534955820322}
+  goldPrefab: {fileID: 7443098622453733361, guid: 1fb0023560384e14e91ed034aed63a7b, type: 3}
   state: 0
 --- !u!95 &4984061436899585273
 Animator:

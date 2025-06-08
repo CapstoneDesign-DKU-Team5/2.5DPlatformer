@@ -224,7 +224,7 @@ namespace HelloWorld
                     if (doorScript != null)
                     {
                         // 6) 위쪽 방향키 입력 시 상호작용 호출
-                        if (Input.GetKeyDown(KeyCode.UpArrow))
+                        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
                         {
                             doorScript.OpenOrInteract();
                         }
