@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace HelloWorld
 {
@@ -19,9 +20,13 @@ namespace HelloWorld
         [SerializeField] private float speed = 2f;
         [SerializeField] private float jumpHeight = 5f;
         [SerializeField] private float cameraRaySize = 30f;
+        [SerializeField] private float interactDistance = 1.5f;
 
         [Header("UI")]
         [SerializeField] private TMP_Text usernameText;
+
+        private Vector3 initialPosition;
+
 
         private BoxCollider boxColider;
 
@@ -42,6 +47,7 @@ namespace HelloWorld
 
         private void Start()
         {
+            initialPosition = transform.position;
             usernameText.text = PlayerPrefs.GetString("displayName", "Guest");
         }
 
@@ -51,6 +57,7 @@ namespace HelloWorld
             IsAir();
             PlayerMoveAni();
             PlayerLookCamera();
+            CheckDoorInteraction();
         }
 
         private void FixedUpdate()
@@ -133,7 +140,7 @@ namespace HelloWorld
 
         private void RayTop()
         {
-            float offset = 0.5f;
+            float offset = 0.3f;
             Vector3 forwardDir = GetForwardRight().forward;
             Vector3 rayStart = transform.position - forwardDir * (cameraRaySize / 2);
             Vector3 boxSize = playerCollider.bounds.extents;
@@ -152,7 +159,7 @@ namespace HelloWorld
 
         private void RayDown()
         {
-            float offset = 0.5f;
+            float offset = 0.3f;
             Vector3 forwardDir = GetForwardRight().forward;
             Vector3 rayStart = transform.position - forwardDir * (cameraRaySize / 2);
             Vector3 boxSize = playerCollider.bounds.extents;
@@ -173,7 +180,7 @@ namespace HelloWorld
         {
             if (!isAir) return;
 
-            float offset = 0.5f;
+            float offset = 0.3f;
             Vector3 forwardDir = GetForwardRight().forward;
             Vector3 rayStart = transform.position;
             Vector3 boxSize = playerCollider.bounds.extents;
@@ -192,5 +199,52 @@ namespace HelloWorld
             Quaternion rot = Quaternion.Euler(0, angle, 0);
             return (rot * Vector3.forward, rot * Vector3.right);
         }
+
+        private void CheckDoorInteraction()
+        {
+            // 1) 카메라 기준 전방·후방·오른쪽·왼쪽 방향 벡터 계산
+            Vector3 forwardDir = GetForwardRight().forward;
+            Vector3 rightDir = GetForwardRight().right;
+            Vector3 backDir = -forwardDir;
+            Vector3 leftDir = -rightDir;
+
+            // 2) 플레이어 몸체 중앙(허리 높이 정도)에서 Ray 시작
+            Vector3 rayOrigin = transform.position + Vector3.up * (playerCollider.bounds.extents.y * 0.5f);
+
+            // 3) 4개 방향을 배열에 담기
+            Vector3[] checkDirs = new Vector3[] { forwardDir, backDir, rightDir, leftDir };
+
+            foreach (Vector3 dir in checkDirs)
+            {
+                // 4) 각 방향으로 interactDistance만큼 Raycast
+                if (Physics.Raycast(rayOrigin, dir, out RaycastHit hit, interactDistance))
+                {
+                    // 5) Ray가 닿은 오브젝트의 상위 중 DoorInteraction 컴포넌트가 있는지 검사
+                    DoorInteraction doorScript = hit.collider.GetComponentInParent<DoorInteraction>();
+                    if (doorScript != null)
+                    {
+                        // 6) 위쪽 방향키 입력 시 상호작용 호출
+                        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+                        {
+                            doorScript.OpenOrInteract();
+                        }
+                        // 한 번이라도 문을 발견했다면, 더 이상 다른 방향을 확인할 필요 없으므로 break
+                        break;
+                    }
+                }
+
+                // 디버그 시각화를 위해 네 방향 Ray를 시각적으로 표시 (Scene 뷰에만 보임)
+                Debug.DrawRay(rayOrigin, dir * interactDistance, Color.green);
+            }
+        }
+        public void RespawnToStart()
+        {
+            rigidBody.linearVelocity = Vector3.zero; // 낙하 중일 경우 멈추기
+            transform.position = initialPosition;
+        }
+
+
     }
+
+
 }
