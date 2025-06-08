@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: "\uCDA9\uC804\uD615 \uBB3C\uC57D"
   description: "\uCCB4\uB825\uC744 15%\uB9CC\uD07C 1\uBD84\uC5D0 \uAC78\uCCD0 \uD68C\uBCF5\uC2DC\uD0B5\uB2C8\uB2E4.
     3\uD68C \uC0AC\uC6A9 \uAC00\uB2A5\uD569\uB2C8\uB2E4."
-  icon: {fileID: 21300000, guid: 22e6de7afae383c44a04387a8681bda4, type: 3}
+  icon: {fileID: -1299547031, guid: e22141212e945354da0b642ef7a94367, type: 3}
   consumable: 1
   usesPerItem: 3
   effectType: 0

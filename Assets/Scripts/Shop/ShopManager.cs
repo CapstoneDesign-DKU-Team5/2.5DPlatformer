@@ -12,6 +12,8 @@ public class ShopManager : MonoBehaviour
     [Header("툴팁 패널")]
     public GameObject tooltipPanel; // 툴팁 UI 패널
     public TextMeshProUGUI tooltipText; // 툴팁 텍스트
+    [Header("로딩 패널")]
+    public GameObject shopLoadingPanel;
 
     [Header("플레이어 골드 표시")]
     public TextMeshProUGUI goldText; // 골드 수치 표시 텍스트
@@ -25,6 +27,8 @@ public class ShopManager : MonoBehaviour
 
     void Start()
     {
+        if (shopLoadingPanel != null)
+            shopLoadingPanel.SetActive(false);
         LoadShopItems();
         LoadGold();
         buyButton.onClick.AddListener(BuySelectedItem);
@@ -36,28 +40,37 @@ public class ShopManager : MonoBehaviour
     // 상점 아이템 불러오기
     void LoadShopItems()
     {
+        // 불러오기 시작 전 로딩 패널 켜기
+        if (shopLoadingPanel != null)
+            shopLoadingPanel.SetActive(true);
+
         PlayFabClientAPI.GetCatalogItems(new GetCatalogItemsRequest
         {
             CatalogVersion = "1.0"
         }, result =>
         {
+            // --- 성공 콜백 ---
             List<CatalogItem> items = result.Catalog;
 
             int i = 0;
             for (; i < shopSlots.Length && i < items.Count; i++)
-            {
                 AssignToSlot(shopSlots[i], items[i]);
-            }
 
             for (; i < shopSlots.Length; i++)
-            {
                 ClearSlot(shopSlots[i]);
-            }
+
+            // 로딩 끝나면 패널 끄기
+            if (shopLoadingPanel != null)
+                shopLoadingPanel.SetActive(false);
         }, error =>
         {
             Debug.LogError("카탈로그 로딩 실패: " + error.GenerateErrorReport());
+            // 에러 시에도 패널 끄기
+            if (shopLoadingPanel != null)
+                shopLoadingPanel.SetActive(false);
         });
     }
+
 
     // 슬롯에 아이템 할당
     void AssignToSlot(GameObject slot, CatalogItem item)

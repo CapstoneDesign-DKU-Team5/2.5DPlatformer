@@ -6,63 +6,77 @@ using PlayFab;
 using UnityEngine.UI;
 using Unity.VisualScripting;
 using System.Collections;
+using System.Threading;
+using System.Linq;
+using System.Collections.Generic;
 
 
 namespace HelloWorld
 {
     public class NetworkPlayer : MonoBehaviourPun
     {
-        [Header("ÄÄÆ÷³ÍÆ® ÂüÁ¶")]
-        [SerializeField, Tooltip("Ä³¸¯ÅÍ ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Á¦¾îÇÏ´Â Animator")]
+        [Header("ì»´í¬ë„ŒíŠ¸ ì°¸ì¡°")]
+        [SerializeField, Tooltip("ìºë¦­í„° ì• ë‹ˆë©”ì´ì…˜ì„ ì œì–´í•˜ëŠ” Animator")]
         private Animator animator;
 
-        [SerializeField, Tooltip("½ºÇÁ¶óÀÌÆ® ¹İÀü ¹× »ö»ó º¯°æ¿¡ »ç¿ëµÇ´Â SpriteRenderer")]
+        [SerializeField, Tooltip("ìŠ¤í”„ë¼ì´íŠ¸ ë°˜ì „ ë° ìƒ‰ìƒ ë³€ê²½ì— ì‚¬ìš©ë˜ëŠ” SpriteRenderer")]
         private SpriteRenderer spriteRenderer;
 
-        [SerializeField, Tooltip("¹°¸® ¿¬»ê¿¡ »ç¿ëµÇ´Â Rigidbody")]
+        [SerializeField, Tooltip("ë¬¼ë¦¬ ì—°ì‚°ì— ì‚¬ìš©ë˜ëŠ” Rigidbody")]
         private Rigidbody rigidBody;
 
-        [SerializeField, Tooltip("ÇÃ·¹ÀÌ¾î ¸öÃ¼¸¦ ³ªÅ¸³»´Â ÁÖ Collider")]
+        [SerializeField, Tooltip("í”Œë ˆì´ì–´ ëª¸ì²´ë¥¼ ë‚˜íƒ€ë‚´ëŠ” ì£¼ Collider")]
         private Collider playerCollider;
 
-        [Header("Ä«¸Ş¶ó ÂüÁ¶")]
-        [SerializeField, Tooltip("ÇÃ·¹ÀÌ¾î¸¦ µû¶ó´Ù´Ï´Â ¸ŞÀÎ Ä«¸Ş¶ó")]
+        [Header("ì¹´ë©”ë¼ ì°¸ì¡°")]
+        [SerializeField, Tooltip("í”Œë ˆì´ì–´ë¥¼ ë”°ë¼ë‹¤ë‹ˆëŠ” ë©”ì¸ ì¹´ë©”ë¼")]
         private Camera mainCamera;
 
-        [SerializeField, Tooltip("Ä«¸Ş¶ó È¸ÀüÀ» ´ã´çÇÏ´Â ½ºÅ©¸³Æ®")]
+        [SerializeField, Tooltip("ì¹´ë©”ë¼ íšŒì „ì„ ë‹´ë‹¹í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸")]
         private RotateCamera cameraScript;
 
-        [Header("ÀÌµ¿ ¼³Á¤")]
-        [SerializeField, Tooltip("¼öÆò ÀÌµ¿ ¼Óµµ (´ÜÀ§/ÃÊ)")]
+        [Header("ì´ë™ ì„¤ì •")]
+        [SerializeField, Tooltip("ìˆ˜í‰ ì´ë™ ì†ë„ (ë‹¨ìœ„/ì´ˆ)")]
         private float speed = 2f;
 
-        [SerializeField, Tooltip("Á¡ÇÁ ½Ã Àû¿ëÇÒ Èû (ForceMode.Impulse)")]
+        [SerializeField, Tooltip("ì í”„ ì‹œ ì ìš©í•  í˜ (ForceMode.Impulse)")]
         private float jumpHeight = 20f;
 
-        [SerializeField, Tooltip("Àü¹æ ·¹ÀÌÄ³½ºÆ® ±æÀÌÀÇ Àı¹İ")]
+        [SerializeField, Tooltip("ì „ë°© ë ˆì´ìºìŠ¤íŠ¸ ê¸¸ì´ì˜ ì ˆë°˜")]
         private float cameraRaySize = 30f;
 
         [Header("UI")]
-        [SerializeField, Tooltip("Playfab À¯Àú³×ÀÓ Ç¥½Ã")]
+        [SerializeField, Tooltip("Playfab ìœ ì €ë„¤ì„ í‘œì‹œ")]
         private TMP_Text usernameText;
-        [SerializeField, Tooltip("PlayerStat ScriptableObject ¿¡¼Â")]
+        [SerializeField, Tooltip("PlayerStat ScriptableObject ì—ì…‹")]
         private PlayerStat playerStat;
         [SerializeField, Tooltip("HealthBar")]
         private Image healthBarFillImage;
 
         [Header("=== Item Effect Slots ===")]
-        [SerializeField, Tooltip("¾ÆÀÌÅÛ ÀÌÆåÆ®°¡ »ı¼ºµÉ À§Ä¡µé")]
+        [SerializeField, Tooltip("ì•„ì´í…œ ì´í™íŠ¸ê°€ ìƒì„±ë  ìœ„ì¹˜ë“¤")]
         private Transform[] itemEffectSlots = new Transform[3];
+
+        [Header("=== Healing Settings ===")]
+        [SerializeField, Tooltip("í ê°€ëŠ¥í•œ Xì¶• ê±°ë¦¬ ë²”ìœ„")]
+        private float healRangeX = 2f;
+        [SerializeField, Tooltip("í Amount")]
+        private int healAmount = 10;
+        [SerializeField, Tooltip("í ì‹œ ë‚´ ì²´ë ¥ ì†Œëª¨ëŸ‰")]
+        private int healCost = 10;
 
         private float currentHealth;
         private int currentPower;
         private readonly Vector3 _effectRotateAxis = new Vector3(-1f, 0f, 1f).normalized;
-        private const float _effectRotateSpeed = 90f; // ÃÊ´ç 90µµ
+        private const float _effectRotateSpeed = 90f; // ì´ˆë‹¹ 90ë„
+
+        [SerializeField, Tooltip("ê³¨ë“œ ì¤ê¸° ë²”ìœ„")]
+        private float goldPickupRange = 2f;
 
 
         private BoxCollider boxColider;
 
-        // ¦¡¦¡ ·±Å¸ÀÓ º¯¼ö¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+        // â”€â”€ ëŸ°íƒ€ì„ ë³€ìˆ˜â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         private bool climbState = false;
 
         private float h = 0f;
@@ -82,25 +96,31 @@ namespace HelloWorld
         private bool isVisible = true;
         private bool isInvisibleFrontAndBack = false;
         private int isCameraFront = 1;
-        private bool lastAirState= false;
+        private bool lastAirState = false;
 
         private bool flipState = false;
+        private bool isDead = false;
 
         private Vector3 networkPos;
         private Quaternion networkRot;
+        private Vector3 networkVel;
+        private double networkTimeStamp;
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
             if (stream.IsWriting)
             {
-       
                 stream.SendNext(transform.position);
                 stream.SendNext(transform.rotation);
+                stream.SendNext(rigidBody.linearVelocity);
+                stream.SendNext(PhotonNetwork.Time);
             }
             else
-            { 
+            {
                 networkPos = (Vector3)stream.ReceiveNext();
                 networkRot = (Quaternion)stream.ReceiveNext();
+                networkVel = (Vector3)stream.ReceiveNext();
+                networkTimeStamp = (double)stream.ReceiveNext();
             }
         }
 
@@ -125,7 +145,7 @@ namespace HelloWorld
                 photonView.RPC(nameof(SetUsernameText), RpcTarget.AllBuffered, displayName);
             }
         }
-        
+
 
         [PunRPC]
         private void SetUsernameText(string name)
@@ -156,17 +176,21 @@ namespace HelloWorld
 
         private void Update()
         {
+           
+           
             if (!photonView.IsMine || mainCamera == null || cameraScript == null)
                 return;
 
             if (!photonView.IsMine)
             {
-              
+                double lag = PhotonNetwork.Time - networkTimeStamp;
+                Vector3 extrapolated = networkPos + networkVel * (float)lag;
+
                 transform.position = Vector3.Lerp(
-                    transform.position,
-                    networkPos,
-                    Time.deltaTime * 10f  
-                );
+                transform.position,
+                extrapolated,
+                Time.deltaTime * 10f  // ë³´ê°„ ì†ë„: í•„ìš”ì‹œ ì¡°ì ˆ
+            );
                 transform.rotation = Quaternion.Slerp(
                     transform.rotation,
                     networkRot,
@@ -174,10 +198,25 @@ namespace HelloWorld
                 );
             }
 
+            // 3) í•œ ë²ˆë§Œ ì£½ìŒ ì²˜ë¦¬
+            if (!isDead && currentHealth <= 0)
+            {
+                Die();
+            }
+            if (isDead) return;
+
             InputKey();
             UpdateClimbState();
             PlayerMoveAni();
             PlayerLookCamera();
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                TryHeal();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Z))
+                TryPickupGold();
         }
 
         private void FixedUpdate()
@@ -203,12 +242,14 @@ namespace HelloWorld
         {
             if (!photonView.IsMine) return;
 
-            
+
             currentHealth = Mathf.Max(0, currentHealth - damageAmount);
             UpdateHealthBar();
 
-            
+
             photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.OthersBuffered, currentHealth);
+            if (currentHealth <= 0)
+                Die();
         }
 
 
@@ -245,7 +286,7 @@ namespace HelloWorld
         {
             if (!photonView.IsMine) return;
             currentPower = newPower;
-            // ÇÊ¿äÇÏ´Ù¸é °ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç/È¿°ú °»½Å ·ÎÁ÷ Ãß°¡
+            // í•„ìš”í•˜ë‹¤ë©´ ê³µê²© ì• ë‹ˆë©”ì´ì…˜/íš¨ê³¼ ê°±ì‹  ë¡œì§ ì¶”ê°€
             photonView.RPC(nameof(RPC_UpdatePower), RpcTarget.OthersBuffered, currentPower);
         }
 
@@ -319,7 +360,7 @@ namespace HelloWorld
             Vector3 boxSize = playerCollider.bounds.extents;
             boxSize.y = 0.1f;
 
-            // ¶¥¿¡ ´ê¾Æ ÀÖÀ¸¸é grounded=true
+            // ë•…ì— ë‹¿ì•„ ìˆìœ¼ë©´ grounded=true
             bool grounded = Physics.BoxCast(
                 transform.position,
                 boxSize,
@@ -332,13 +373,13 @@ namespace HelloWorld
 
             bool newIsAir = !grounded;
 
-            // »óÅÂ°¡ ¹Ù²ğ ¶§¿¡¸¸ Ã³¸®
+            // ìƒíƒœê°€ ë°”ë€” ë•Œì—ë§Œ ì²˜ë¦¬
             if (newIsAir != lastAirState)
             {
                 isAir = newIsAir;
                 animator.SetBool("isAir", newIsAir);
 
-                // ³» Ä³¸¯ÅÍ¿¡¼­¸¸ RPC È£Ãâ
+                // ë‚´ ìºë¦­í„°ì—ì„œë§Œ RPC í˜¸ì¶œ
                 if (photonView.IsMine)
                 {
                     photonView.RPC(
@@ -364,6 +405,7 @@ namespace HelloWorld
 
             if (Input.GetButtonDown("Fire1"))
             {
+                if(!isControlLocked)
                 attack = true;
             }
         }
@@ -425,7 +467,7 @@ namespace HelloWorld
         {
             if (h > 0)
             {
-                if (spriteRenderer.flipX == true) // ¿ø·¡ ÀÌ Á¶°ÇÀÌ¾úÀ½
+                if (spriteRenderer.flipX == true) // ì›ë˜ ì´ ì¡°ê±´ì´ì—ˆìŒ
                 {
                     photonView.RPC(nameof(SetFlipState), RpcTarget.AllBuffered, false);
                 }
@@ -609,6 +651,7 @@ namespace HelloWorld
                 climbState = false;
                 climbJump = true;
                 animator.SetBool("isClimbIdle", false);
+                photonView.RPC(nameof(RPC_SetClimbIdle), RpcTarget.Others, false);
                 return;
             }
 
@@ -616,12 +659,14 @@ namespace HelloWorld
             {
                 climbState = true;
                 animator.SetBool("isClimbIdle", true);
+                photonView.RPC(nameof(RPC_SetClimbIdle), RpcTarget.Others, true);
             }
 
             if (climbState && !canClimb)
             {
                 climbState = false;
                 animator.SetBool("isClimbIdle", false);
+                photonView.RPC(nameof(RPC_SetClimbIdle), RpcTarget.Others, false);
             }
         }
 
@@ -633,10 +678,10 @@ namespace HelloWorld
             isAttacking = true;
         }
 
-        //Animation Event Attack 0:03¿¡¼­ È£Ãâ
+        //Animation Event Attack 0:03ì—ì„œ í˜¸ì¶œ
         private void AnimEvent_Hit()
         {
-            // ¼­¹ö °æÀ¯·Î(Room ¾È ¸ğµç Å¬¶ó + ³» Å¬¶ó) Hit() ½ÇÇà
+            // ì„œë²„ ê²½ìœ ë¡œ(Room ì•ˆ ëª¨ë“  í´ë¼ + ë‚´ í´ë¼) Hit() ì‹¤í–‰
             photonView.RPC(nameof(Hit), RpcTarget.AllViaServer);
         }
 
@@ -647,11 +692,11 @@ namespace HelloWorld
 
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * isCameraFront;
 
-            //player Áß½ÉÀ¸·ÎºÎÅÍ ¹üÀ§
+            //player ì¤‘ì‹¬ìœ¼ë¡œë¶€í„° ë²”ìœ„
             Vector3 attackRange = attackDir == 1 ? mainCamera.transform.right * 0.45f : -mainCamera.transform.right * 0.45f;
-            //player °ø°İ »ó ÇÏ ¹üÀ§
+            //player ê³µê²© ìƒ í•˜ ë²”ìœ„
             Vector3 attackHalfHeight = Vector3.up * 0.1f;
-            //°ø°İ Áß½É ½ÃÀÛ ³ôÀÌ
+            //ê³µê²© ì¤‘ì‹¬ ì‹œì‘ ë†’ì´
             Vector3 attackHeight = Vector3.up * 0.1f;
 
             RaycastHit enemyHit;
@@ -678,7 +723,7 @@ namespace HelloWorld
                             Monster monster = enemyHit.collider.GetComponent<Monster>();
                             if (monster != null)
                             {
-                                monster.OnDamaged(transform.position, 1);
+                                monster.OnDamaged(transform.position, currentPower);
                             }
                             break;
                         }
@@ -688,7 +733,7 @@ namespace HelloWorld
             }
         }
 
-        //Animation Event Attack 0:06¿¡¼­ È£Ãâ
+        //Animation Event Attack 0:06ì—ì„œ í˜¸ì¶œ
         private void EndAttack()
         {
             attack = false;
@@ -697,13 +742,13 @@ namespace HelloWorld
 
         public void CheckCollisionDamage()
         {
-            //ÆÇÁ¤ ÀÌ»óÇÏ¸é Á¶±İ ´Ã·Á¾ß
+            //íŒì • ì´ìƒí•˜ë©´ ì¡°ê¸ˆ ëŠ˜ë ¤ì•¼
             Vector3 rightOffset = mainCamera.transform.right * boxColider.size.x / 2f;
-            //Àı¹İº¸´Ù Á¶±İ ´õ ÁÙÀÓ
+            //ì ˆë°˜ë³´ë‹¤ ì¡°ê¸ˆ ë” ì¤„ì„
             Vector3 topOffset = Vector3.up * boxColider.size.y / 2.2f;
             Vector3 rayStart = transform.position - mainCamera.transform.forward * (cameraRaySize / 2) * isCameraFront;
 
-            //player ²ÀÁşÁ¡¿¡ ray
+            //player ê¼­ì§“ì ì— ray
             Vector3[] offsets = new Vector3[]
             {
                 //topRight
@@ -722,7 +767,7 @@ namespace HelloWorld
 
             foreach (var offset in offsets)
             {
-                //nullÀÌ ¾Æ´Ï°í
+                //nullì´ ì•„ë‹ˆê³ 
                 if (Physics.Raycast(rayStart + offset, mainCamera.transform.forward * isCameraFront, out enemyHit, cameraRaySize, mask))
                 {
                     if (enemyHit.collider.gameObject.layer == enemy)
@@ -732,11 +777,17 @@ namespace HelloWorld
                             return;
                         }
 
-                        //Ä«¸Ş¶ó¿¡¼­ º¸¿©¾ß¸¸ -> 180µµ Â÷ÀÌ³ª¾ß
+                        //ì¹´ë©”ë¼ì—ì„œ ë³´ì—¬ì•¼ë§Œ -> 180ë„ ì°¨ì´ë‚˜ì•¼
                         float CorrectDir = Mathf.Abs(enemyHit.transform.eulerAngles.y) - Mathf.Abs(transform.eulerAngles.y);
                         if (CorrectDir % 180f == 0 ? true : false)
                         {
-                            OnDamaged(enemyHit.transform.position);
+                            Monster monster = enemyHit.collider.GetComponent<Monster>();
+                            if (monster != null)
+                            {
+                                OnDamaged(enemyHit.transform.position, monster.stats.power);
+
+                            }
+
                             break;
                         }
                     }
@@ -744,14 +795,14 @@ namespace HelloWorld
             }
         }
 
-        public void OnDamaged(Vector3 monsterPos)
+        [PunRPC]
+        public void OnDamaged(Vector3 monsterPos, int damageAmount)
         {
-            if (isInvincible)
-            {
-                return;
-            }
+            if (!photonView.IsMine || isInvincible) return;
+            currentHealth = Mathf.Max(0, currentHealth - damageAmount);
+            UpdateHealthBar();
 
-            //¸Å´Ş¸®±â »óÅÂ ¹®Á¦ ÇØ°á
+            //ë§¤ë‹¬ë¦¬ê¸° ìƒíƒœ ë¬¸ì œ í•´ê²°
             if (climbState)
             {
                 climbState = false;
@@ -761,8 +812,8 @@ namespace HelloWorld
 
             spriteRenderer.color = new Color(1, 1, 1, 0.4f);
             animator.SetTrigger("isDamaged");
-
-            //ÇÃ·¹ÀÌ¾î x·Î Æ¨°Ü¾ß ÇÒÁö z·Î Æ¨°Ü¾ß ÇÒÁö °áÁ¤
+            photonView.RPC(nameof(RPC_StartDamageFlash), RpcTarget.Others);
+            //í”Œë ˆì´ì–´ xë¡œ íŠ•ê²¨ì•¼ í• ì§€ zë¡œ íŠ•ê²¨ì•¼ í• ì§€ ê²°ì •
             bool isXOrZ = Mathf.Abs(transform.eulerAngles.y) % 180 == 0 ? true : false;
 
             int dir;
@@ -786,9 +837,18 @@ namespace HelloWorld
 
             Invoke("UnlockControl", 0.5f);
             Invoke("OffDamaged", 1.5f);
+            Invoke(nameof(SendEndFlashRPC), 1.5f);
+            if (currentHealth <= 0)
+                Die();
         }
 
-        void UnlockControl() 
+        private void SendEndFlashRPC()
+        {
+            if (photonView.IsMine)
+                photonView.RPC(nameof(RPC_EndDamageFlash), RpcTarget.Others);
+        }
+
+        void UnlockControl()
         {
             isControlLocked = false;
         }
@@ -798,9 +858,9 @@ namespace HelloWorld
             spriteRenderer.color = new Color(1, 1, 1, 1);
             isInvincible = false;
 
-            //attck = trueÇÏ°í damaged = true °°Àº ÇÁ·¹ÀÓ¿¡ ½ÇÇàµÇ¸é
-            //StartAttackÀÌ ¹«½ÃµÇ°Å³ª? EndAttack ani Ãâ·Â¾ÈµÇ¼­ ¹«½Ã µÊ.
-            //ÀÏ´Ü ÇØ°á À§ÇØ¼­
+            //attck = trueí•˜ê³  damaged = true ê°™ì€ í”„ë ˆì„ì— ì‹¤í–‰ë˜ë©´
+            //StartAttackì´ ë¬´ì‹œë˜ê±°ë‚˜? EndAttack ani ì¶œë ¥ì•ˆë˜ì„œ ë¬´ì‹œ ë¨.
+            //ì¼ë‹¨ í•´ê²° ìœ„í•´ì„œ
             attack = false;
             isAttacking = false;
         }
@@ -808,11 +868,11 @@ namespace HelloWorld
         [PunRPC]
         public void RPC_SpawnItemEffect(int slotIndex, string prefabName, float duration)
         {
-            // ¨ç Resources Æú´õ ³»¿¡ effectPrefabÀ» ³Ö¾îµÎ°í, °æ·Î´Â "Effects/"+prefabName ¶ó°í °¡Á¤
+            // â‘  Resources í´ë” ë‚´ì— effectPrefabì„ ë„£ì–´ë‘ê³ , ê²½ë¡œëŠ” "Effects/"+prefabName ë¼ê³  ê°€ì •
             var effectPrefab = Resources.Load<GameObject>($"Effects/{prefabName}");
             if (effectPrefab == null) return;
 
-            // ¨è Instantiate + È¸Àü ÄÚ·çÆ¾ + ÆÄ±«
+            // â‘¡ Instantiate + íšŒì „ ì½”ë£¨í‹´ + íŒŒê´´
             Transform spawnPoint = itemEffectSlots[slotIndex];
             GameObject go = Instantiate(effectPrefab, spawnPoint.position, spawnPoint.rotation, spawnPoint);
             StartCoroutine(RotateEffect(go, duration));
@@ -836,5 +896,147 @@ namespace HelloWorld
                 yield return null;
             }
         }
+
+        [PunRPC]
+        private void RPC_StartDamageFlash()
+        {
+            spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+            animator.SetTrigger("isDamaged");
+        }
+
+        // 2) ê¹œë°•ê±°ë¦¼ ëë‚˜ê³  ì›ë˜ ìƒíƒœë¡œ ë³µêµ¬
+        [PunRPC]
+        private void RPC_EndDamageFlash()
+        {
+            spriteRenderer.color = new Color(1, 1, 1, 1f);
+        }
+
+        [PunRPC]
+        private void RPC_SetClimbIdle(bool climbIdle)
+        {
+            animator.SetBool("isClimbIdle", climbIdle);
+        }
+
+        private void TryHeal()
+        {
+            // ë‚´ ê²ƒë§Œ ì²´í¬
+            if (!photonView.IsMine) return;
+
+            // 1) ì”¬ì— ìˆëŠ” ëª¨ë“  NetworkPlayerë¥¼ ì°¾ëŠ”ë‹¤
+            var all = Object.FindObjectsByType<NetworkPlayer>(FindObjectsSortMode.None);
+
+            // 2) ë‚˜ë¥¼ ì œì™¸í•˜ê³ , Xì¶• ê±°ë¦¬ ë²”ìœ„ ì•ˆì— ë“  í”Œë ˆì´ì–´ë§Œ ëª¨ì€ë‹¤
+            List<NetworkPlayer> targets = new List<NetworkPlayer>();
+            foreach (var other in all)
+            {
+                if (other == this) continue;
+                if (Mathf.Abs(transform.position.x - other.transform.position.x) <= healRangeX)
+                    targets.Add(other);
+            }
+
+            if (targets.Count == 0)
+                return;
+
+            // 4) í ì‹œì‘ ì• ë‹ˆë©”ì´ì…˜ & RPC ì „ì†¡
+            animator.SetBool("isHealing", true);
+            photonView.RPC(nameof(RPC_SetHealing), RpcTarget.OthersBuffered, true);
+
+            // 5) ëŒ€ìƒë“¤ì— RPCë¡œ ì‹¤ì œ í
+            foreach (var victim in targets)
+            {
+                victim.photonView.RPC(nameof(RPC_ReceiveHeal), RpcTarget.AllBuffered, healAmount);
+            }
+
+            // 6) ë‚´ ì²´ë ¥ ì†Œëª¨
+            currentHealth = Mathf.Max(0, currentHealth - healCost);
+            UpdateHealthBar();
+            photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.OthersBuffered, currentHealth);
+
+            if (!isDead && currentHealth <= 0)
+            {
+                Die();
+            }
+
+
+            // 7) ì• ë‹ˆ ì¢…ë£Œ
+            StartCoroutine(StopHealingAnim());
+            
+        }
+
+
+        private IEnumerator StopHealingAnim()
+        {
+            yield return new WaitForSeconds(1f);
+            animator.SetBool("isHealing", false);
+            photonView.RPC(nameof(RPC_SetHealing), RpcTarget.OthersBuffered, false);
+        }
+
+        [PunRPC]
+        private void RPC_ReceiveHeal(int amount)
+        {
+            currentHealth = Mathf.Min(playerStat.hp, currentHealth + amount);
+            UpdateHealthBar();
+        }
+
+        [PunRPC]
+        private void RPC_SetHealing(bool isHealing)
+        {
+            animator.SetBool("isHealing", isHealing);
+        }
+
+        private void TryPickupGold()
+        {
+            Collider[] hits = Physics.OverlapSphere(transform.position, goldPickupRange);
+            foreach (var hit in hits)
+            {
+                if (hit.CompareTag("GoldCoin"))
+                {
+                    var gold = hit.GetComponent<Gold>();
+                    if (gold != null)
+                        gold.Pickup();
+                }
+            }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;                            // ì› ìƒ‰ìƒ
+            Gizmos.DrawWireSphere(transform.position, goldPickupRange);  // ë°˜ì§€ë¦„ë§Œí¼ ì„ ìœ¼ë¡œ ê·¸ë¦¬ê¸°
+        }
+
+        private void Die()
+        {
+            if (isDead) return;
+            isDead = true;
+
+            
+            animator.SetTrigger("isDead");   
+            DisableControlAndCollisions();
+            GameManager.instance.photonView.RPC("RPC_PlayerDied", RpcTarget.All);
+            photonView.RPC(nameof(RPC_AllTriggerDeath), RpcTarget.AllBuffered);
+        }
+
+        [PunRPC]
+        
+        private void RPC_AllTriggerDeath()
+        {
+            animator.SetTrigger("isDead");
+            DisableControlAndCollisions();
+        }
+
+        private void DisableControlAndCollisions()
+        {
+            // ì´ë™Â·ì í”„Â·ê³µê²© í‚¤ ì…ë ¥ ë¬´ì‹œ
+            isControlLocked = true;
+            // ë¬¼ë¦¬/ì¶©ëŒ ë„ê¸°
+            var cols = GetComponentsInChildren<Collider>();
+            foreach (var c in cols) c.enabled = false;
+            rigidBody.isKinematic = true;
+            // Raycast ê°™ì€ ë¡œì§ì´ ë“¤ì–´ìˆëŠ” ë©”ì„œë“œë“¤ë„ isDead ì²´í¬ë¡œ ë¹ ì ¸ë‚˜ê°€ê²Œ
+        }
+
     }
+
+
+
 }

@@ -15,7 +15,7 @@ MonoBehaviour:
   itemId: PowerPotion
   displayName: "\uAC15\uD654\uD615 \uBB3C\uC57D"
   description: "Power + 15, 3\uBD84 \uC9C0\uC18D"
-  icon: {fileID: 21300000, guid: cbdd842a5c77ab740a5e158f5261273b, type: 3}
+  icon: {fileID: -886734637, guid: 6bd9ed2d927b47244a1398893a68fd96, type: 3}
   consumable: 1
   usesPerItem: 1
   effectType: 3
