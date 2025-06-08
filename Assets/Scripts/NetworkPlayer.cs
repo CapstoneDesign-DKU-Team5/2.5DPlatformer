@@ -7,6 +7,8 @@ using UnityEngine.UI;
 using Unity.VisualScripting;
 using System.Collections;
 using System.Threading;
+using System.Linq;
+using System.Collections.Generic;
 
 
 namespace HelloWorld
@@ -55,10 +57,21 @@ namespace HelloWorld
         [SerializeField, Tooltip("아이템 이펙트가 생성될 위치들")]
         private Transform[] itemEffectSlots = new Transform[3];
 
+        [Header("=== Healing Settings ===")]
+        [SerializeField, Tooltip("힐 가능한 X축 거리 범위")]
+        private float healRangeX = 2f;
+        [SerializeField, Tooltip("힐 Amount")]
+        private int healAmount = 10;
+        [SerializeField, Tooltip("힐 시 내 체력 소모량")]
+        private int healCost = 10;
+
         private float currentHealth;
         private int currentPower;
         private readonly Vector3 _effectRotateAxis = new Vector3(-1f, 0f, 1f).normalized;
         private const float _effectRotateSpeed = 90f; // 초당 90도
+
+        [SerializeField, Tooltip("골드 줍기 범위")]
+        private float goldPickupRange = 2f;
 
 
         private BoxCollider boxColider;
@@ -83,7 +96,7 @@ namespace HelloWorld
         private bool isVisible = true;
         private bool isInvisibleFrontAndBack = false;
         private int isCameraFront = 1;
-        private bool lastAirState= false;
+        private bool lastAirState = false;
 
         private bool flipState = false;
 
@@ -131,7 +144,7 @@ namespace HelloWorld
                 photonView.RPC(nameof(SetUsernameText), RpcTarget.AllBuffered, displayName);
             }
         }
-        
+
 
         [PunRPC]
         private void SetUsernameText(string name)
@@ -186,6 +199,14 @@ namespace HelloWorld
             UpdateClimbState();
             PlayerMoveAni();
             PlayerLookCamera();
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                TryHeal();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Z))
+                TryPickupGold();
         }
 
         private void FixedUpdate()
@@ -211,11 +232,11 @@ namespace HelloWorld
         {
             if (!photonView.IsMine) return;
 
-            
+
             currentHealth = Mathf.Max(0, currentHealth - damageAmount);
             UpdateHealthBar();
 
-            
+
             photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.OthersBuffered, currentHealth);
         }
 
@@ -753,7 +774,7 @@ namespace HelloWorld
                                 OnDamaged(enemyHit.transform.position, monster.stats.power);
 
                             }
-                                
+
                             break;
                         }
                     }
@@ -812,7 +833,7 @@ namespace HelloWorld
                 photonView.RPC(nameof(RPC_EndDamageFlash), RpcTarget.Others);
         }
 
-        void UnlockControl() 
+        void UnlockControl()
         {
             isControlLocked = false;
         }
@@ -879,6 +900,86 @@ namespace HelloWorld
         private void RPC_SetClimbIdle(bool climbIdle)
         {
             animator.SetBool("isClimbIdle", climbIdle);
+        }
+
+        private void TryHeal()
+        {
+            // 내 것만 체크
+            if (!photonView.IsMine) return;
+
+            // 1) 씬에 있는 모든 NetworkPlayer를 찾는다
+            var all = Object.FindObjectsByType<NetworkPlayer>(FindObjectsSortMode.None);
+
+            // 2) 나를 제외하고, X축 거리 범위 안에 든 플레이어만 모은다
+            List<NetworkPlayer> targets = new List<NetworkPlayer>();
+            foreach (var other in all)
+            {
+                if (other == this) continue;
+                if (Mathf.Abs(transform.position.x - other.transform.position.x) <= healRangeX)
+                    targets.Add(other);
+            }
+
+            if (targets.Count == 0)
+                return;
+
+            // 4) 힐 시작 애니메이션 & RPC 전송
+            animator.SetBool("isHealing", true);
+            photonView.RPC(nameof(RPC_SetHealing), RpcTarget.OthersBuffered, true);
+
+            // 5) 대상들에 RPC로 실제 힐
+            foreach (var victim in targets)
+            {
+                victim.photonView.RPC(nameof(RPC_ReceiveHeal), RpcTarget.AllBuffered, healAmount);
+            }
+
+            // 6) 내 체력 소모
+            currentHealth = Mathf.Max(0, currentHealth - healCost);
+            UpdateHealthBar();
+            photonView.RPC(nameof(RPC_UpdateHealth), RpcTarget.OthersBuffered, currentHealth);
+
+            // 7) 애니 종료
+            StartCoroutine(StopHealingAnim());
+        }
+
+
+        private IEnumerator StopHealingAnim()
+        {
+            yield return new WaitForSeconds(1f);
+            animator.SetBool("isHealing", false);
+            photonView.RPC(nameof(RPC_SetHealing), RpcTarget.OthersBuffered, false);
+        }
+
+        [PunRPC]
+        private void RPC_ReceiveHeal(int amount)
+        {
+            currentHealth = Mathf.Min(playerStat.hp, currentHealth + amount);
+            UpdateHealthBar();
+        }
+
+        [PunRPC]
+        private void RPC_SetHealing(bool isHealing)
+        {
+            animator.SetBool("isHealing", isHealing);
+        }
+
+        private void TryPickupGold()
+        {
+            Collider[] hits = Physics.OverlapSphere(transform.position, goldPickupRange);
+            foreach (var hit in hits)
+            {
+                if (hit.CompareTag("GoldCoin"))
+                {
+                    var gold = hit.GetComponent<Gold>();
+                    if (gold != null)
+                        gold.Pickup();
+                }
+            }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;                            // 원 색상
+            Gizmos.DrawWireSphere(transform.position, goldPickupRange);  // 반지름만큼 선으로 그리기
         }
     }
 

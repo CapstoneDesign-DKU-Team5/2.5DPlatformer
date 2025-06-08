@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using HelloWorld;
 using System.Collections;
+using TMPro;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -20,6 +21,10 @@ public class PlayerManager : MonoBehaviour
     public List<ItemInstance> playerItems = new List<ItemInstance>();
 
     public NetworkPlayer targetPlayer;
+
+    [Header("UI")]
+    public TextMeshProUGUI goldText;            // PlayFab GM 표시용
+    public GameObject loadingPanel;
 
     private void Awake()
     {
@@ -45,8 +50,10 @@ public class PlayerManager : MonoBehaviour
 
     private void Start()
     {
+        if (loadingPanel != null)
+            loadingPanel.SetActive(false);
         InvokeRepeating(nameof(ApplyDamage), damageInterval, damageInterval);
-        LoadInventory();
+        LoadInventoryAndCurrency();
     }
 
     private void Update()
@@ -84,41 +91,64 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    public void LoadInventory()
+    private void LoadInventoryAndCurrency()
     {
+        // 호출 직전에 로딩 패널 켜기
+        if (loadingPanel != null)
+            loadingPanel.SetActive(true);
+
         PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(), result =>
         {
+
+            LoadGold();
+
+            // --- inventory 처리 (기존 코드) ---
             playerItems.Clear();
             var seenItemIds = new HashSet<string>();
-
             foreach (var instance in result.Inventory)
             {
-                if (seenItemIds.Contains(instance.ItemId))
-                    continue;
-
-                seenItemIds.Add(instance.ItemId);
-                playerItems.Add(instance);
-
-                if (seenItemIds.Count >= maxInventoryCount)
-                    break;
+                if (seenItemIds.Add(instance.ItemId) && playerItems.Count < maxInventoryCount)
+                    playerItems.Add(instance);
             }
-
-            // 슬롯별 uses 초기값 설정
             for (int i = 0; i < playerItems.Count; i++)
             {
                 var matchedItem = System.Array.Find(itemDatabase, item => item.itemId == playerItems[i].ItemId);
                 slotUses[i] = matchedItem != null ? matchedItem.usesPerItem : 0;
             }
             for (int i = playerItems.Count; i < maxInventoryCount; i++)
-            {
                 slotUses[i] = 0;
-            }
 
             UpdateInventoryUI();
+
+            // 로딩 끝나면 패널 숨김
+            if (loadingPanel != null)
+                loadingPanel.SetActive(false);
         },
         error =>
         {
-            Debug.LogError("인벤토리 로드 실패: " + error.GenerateErrorReport());
+            Debug.LogError("인벤토리/골드 로드 실패: " + error.GenerateErrorReport());
+            if (loadingPanel != null)
+                loadingPanel.SetActive(false);
+        });
+    }
+
+    private void LoadGold()
+    {
+        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(), result =>
+        {
+            if (result.VirtualCurrency.ContainsKey("GD"))
+            {
+                goldText.text = result.VirtualCurrency["GD"].ToString();
+            }
+            else
+            {
+                goldText.text = "0";
+            }
+        },
+        error =>
+        {
+            Debug.LogError("골드 로딩 실패: " + error.GenerateErrorReport());
+            goldText.text = "0";
         });
     }
 

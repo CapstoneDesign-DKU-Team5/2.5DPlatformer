@@ -38,6 +38,7 @@ public class DoorInteraction : MonoBehaviourPunCallbacks
     public LobbyManager lobbyManager;     // 씬에 있는 LobbyManager를 Inspector에서 드래그하여 연결
 
     private string currentInviteCode = "";
+    private bool _playerInRange = false;
 
     private void Awake()
     {
@@ -67,14 +68,34 @@ public class DoorInteraction : MonoBehaviourPunCallbacks
             }
         }
     }
+    private void Update()
+    {
+        if (!_playerInRange) return;
 
+        // 위 화살표 또는 W 키를 눌렀을 때
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        {
+            OpenOrInteract();
+        }
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag(playerTag)) _playerInRange = true;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag(playerTag)) _playerInRange = false;
+    }
     private void OnTriggerStay(Collider other)
     {
         // 태그가 playerTag가 아닌 경우 무시
         if (!other.CompareTag(playerTag)) return;
 
         // 위쪽 방향키를 누르면 상호작용
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
             OpenOrInteract();
         }

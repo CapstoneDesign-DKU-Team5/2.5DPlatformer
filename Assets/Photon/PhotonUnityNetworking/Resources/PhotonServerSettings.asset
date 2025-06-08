@@ -51,6 +51,9 @@ MonoBehaviour:
   - RPC_StartDamageFlash
   - RPC_UpdateHP
   - OnDamaged
+  - RPC_ReceiveHeal
+  - RPC_SetHealing
+  - RPC_AddCurrencyForOthers
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

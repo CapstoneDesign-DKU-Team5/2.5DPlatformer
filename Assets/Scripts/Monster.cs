@@ -50,6 +50,10 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
     [SerializeField, Tooltip("체력바 Fill 이미지 (Fill Type)")]
     private Image healthBarFillImage;
 
+    [Header("리워드")]
+    [SerializeField, Tooltip("죽었을 때 소환할 골드 프리팹 (Inspector에 연결)")]
+    private GameObject goldPrefab;
+
     protected enum State
     {
         IDLE,
@@ -86,6 +90,7 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
 
     protected void Awake()
     {
+
         monsterXOrZ = Approximately(Mathf.Abs(transform.eulerAngles.y % 180f));
 
         childBoxCollider = transform.Find("ChaseRange").GetComponentInChildren<BoxCollider>();
@@ -109,7 +114,13 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
     private void Start()
     {
         UpdateHealthBarUI();
-        
+        if (PhotonNetwork.IsMasterClient)
+        {
+            
+            PhotonNetwork.SendRate = 15;           
+            PhotonNetwork.SerializationRate = 10;  
+        }
+
     }
 
     protected IEnumerator StateMachine()
@@ -276,6 +287,26 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
             spriteRenderer.material.color = color;
 
             yield return null;
+        }
+
+        if (goldPrefab != null)
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                var go = PhotonNetwork.Instantiate(
+    goldPrefab.name,
+    transform.position,
+    goldPrefab.transform.rotation
+);
+                var goldComp = go.GetComponent<Gold>();
+                if (goldComp != null)
+                {
+                    goldComp.Initialize(stats.goldDrop);
+
+                }
+            }
+               
+                
         }
 
         Destroy(gameObject);

@@ -9,6 +9,8 @@ TagManager:
   - MatchmakingDoor
   - ItemDoor
   - Door
+  - GoldTextUI
+  - GoldCoin
   layers:
   - Default
   - TransparentFX
