@@ -173,7 +173,7 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
         }
         else
         {
-            yield return StartCoroutine(Wait(curAnimStateInfo.length));
+            yield return StartCoroutine(Wait(curAnimStateInfo.length/2));
         }
     }
 
