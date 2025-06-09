@@ -371,6 +371,8 @@ MonoBehaviour:
   healCost: 10
   goldPickupRange: 2
   minFallRange: 1
+  bulletPrefab: {fileID: 3889579735581425720, guid: 7205751cbf046c1448af5547536d96f9, type: 3}
+  sideSpawnOffset: 1
 --- !u!95 &2596930642235459831
 Animator:
   serializedVersion: 7

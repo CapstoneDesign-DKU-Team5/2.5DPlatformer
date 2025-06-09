@@ -3986,6 +3986,7 @@ MonoBehaviour:
   itemDatabase:
   - {fileID: 11400000, guid: 78ae28100ee552f459760e1e9eb0c14f, type: 2}
   - {fileID: 11400000, guid: df4e18ebb70a86945867f585dda224e9, type: 2}
+  - {fileID: 11400000, guid: f9e4a5344450f9047a9b3f23dc81f9c5, type: 2}
   tooltipPanel: {fileID: 1629795761700691542}
   tooltipText: {fileID: 1629795761700691541}
   inventoryLoadingPanel: {fileID: 1297369864}

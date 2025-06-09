@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47cbcd799fbbae549a039a261aece5d8, type: 3}
+  m_Name: Bullet
+  m_EditorClassIdentifier: 
+  itemId: Bullet
+  displayName: "\uC6D0\uAC70\uB9AC \uACF5\uACA9\uBAA8\uB4C8"
+  description: "\uAC15\uB825\uD55C \uD53C\uD574\uB97C \uC785\uD788\uB294 \uC6D0\uAC70\uB9AC
+    \uACF5\uACA9 \uD0C4\uD658\uC744 \uC7A5\uCC29\uD569\uB2C8\uB2E4. \uC6B0\uD074\uB9AD\uC73C\uB85C
+    \uC0AC\uC6A9\uD569\uB2C8\uB2E4."
+  icon: {fileID: -1452396378, guid: 905d242ecf1253441b93f2b36f576da3, type: 3}
+  consumable: 1
+  usesPerItem: 1
+  effectType: 2
+  healAmount: 0
+  buffDuration: 0
+  speedMultiplier: 0
+  dealAmount: 0
+  damageMultiplier: 0
+  effectPrefab: {fileID: 3889579735581425720, guid: 5dc4a57491be17c4dbc733b857661e6f, type: 3}

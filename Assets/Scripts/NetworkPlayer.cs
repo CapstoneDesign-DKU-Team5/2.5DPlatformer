@@ -9,6 +9,7 @@ using System.Collections;
 using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
+using Photon.Pun.Demo.Asteroids;
 
 
 namespace HelloWorld
@@ -77,6 +78,18 @@ namespace HelloWorld
         [Tooltip("낙하 데미지를 주기 시작하는 최소 거리")]
         [SerializeField]
         private float minFallRange = 1f;
+
+        [Header("=== Bullet Settings ===")]
+        [SerializeField, Tooltip("발사할 총알 프리팹 (Resources/Bullets 폴더)")]
+        private GameObject bulletPrefab;
+
+        
+
+        [SerializeField, Tooltip("발사체 생성 시 플레이어로부터 떨어질 거리")]
+        private float sideSpawnOffset = 1f;
+
+
+        private bool isShootable = false;
 
 
         private BoxCollider boxColider;
@@ -219,6 +232,7 @@ namespace HelloWorld
             UpdateClimbState();
             PlayerMoveAni();
             PlayerLookCamera();
+            HandleShooting();
 
             if (Input.GetKeyDown(KeyCode.F))
             {
@@ -1074,6 +1088,66 @@ namespace HelloWorld
             transform.rotation = _startRotation;
             TakeDamage(50);
 
+        }
+
+        // 1) RPC로 총알 발사 가능 상태 활성화
+        [PunRPC]
+        public void RPC_EnableShooting(float duration)
+        {
+            StartCoroutine(ShootingDurationCoroutine(duration));
+        }
+
+        // 2) 지정된 시간만큼 isShootable 유지
+        private IEnumerator ShootingDurationCoroutine(float duration)
+        {
+            isShootable = true;
+            Debug.Log("isShootable = true");
+            yield return new WaitForSeconds(duration);
+            isShootable = false;
+            Debug.Log("isShootable = false");
+        }
+
+        private void HandleShooting()
+        {
+            if (!photonView.IsMine || !isShootable)
+                return;
+
+            // 우클릭(마우스 오른쪽 버튼) 체크
+            if (Input.GetMouseButtonDown(1))
+            {
+                // 1) 화면 클릭 지점으로 Ray 쏴서 월드 좌표 얻기
+                Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+                {
+                    Vector3 clickPos = hit.point;
+
+                    // 2) 플레이어와 클릭 지점의 벡터 계산
+                    Vector3 dirToClick = (clickPos - transform.position).normalized;
+
+                    // 3) dot 연산으로 오른쪽(>0) / 왼쪽(<0) 판별
+                    float sideDot = Vector3.Dot(dirToClick, transform.right);
+                    float sideSign = sideDot >= 0f ? 1f : -1f;
+
+                    // 4) 스폰 위치 계산 (옆 + 높이)
+                    Vector3 spawnPos = transform.position
+                                       + transform.right * sideSign * sideSpawnOffset;
+
+
+                    // 5) 발사 방향은 클릭 지점을 향하도록 설정
+                    Quaternion spawnRot = Quaternion.LookRotation(dirToClick);
+
+                    // 6) PhotonNetwork로 동기화하여 생성
+                    GameObject bullet = PhotonNetwork.Instantiate(
+                        $"Bullets/{bulletPrefab.name}",
+                        spawnPos,
+                        spawnRot);
+
+                    // 7) Bullet 컴포넌트 초기화 (방향, 파워 전달)
+                    var b = bullet.GetComponent<Bullet>();
+                    if (b != null)
+                        b.Initialize(dirToClick);
+                }
+            }
         }
 
     }

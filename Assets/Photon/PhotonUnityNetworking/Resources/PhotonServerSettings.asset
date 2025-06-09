@@ -58,6 +58,7 @@ MonoBehaviour:
   - RPC_TriggerDeath
   - RPC_PlayerDied
   - RPC_AllTriggerDeath
+  - RPC_EnableShooting
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
