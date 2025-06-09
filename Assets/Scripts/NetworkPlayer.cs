@@ -90,6 +90,8 @@ namespace HelloWorld
 
 
         private bool isShootable = false;
+        private int shootCount = 0; // 남은 발사 횟수
+        private const int maxShootCount = 5; // 최대 발사 횟수
 
 
         private BoxCollider boxColider;
@@ -1094,6 +1096,7 @@ namespace HelloWorld
         [PunRPC]
         public void RPC_EnableShooting(float duration)
         {
+            shootCount = maxShootCount;
             StartCoroutine(ShootingDurationCoroutine(duration));
         }
 
@@ -1146,6 +1149,13 @@ namespace HelloWorld
                     var b = bullet.GetComponent<Bullet>();
                     if (b != null)
                         b.Initialize(dirToClick);
+                }
+                shootCount--;
+
+                if (shootCount <= 0)
+                {
+                    isShootable = false;
+                    Debug.Log("발사 횟수 모두 소모됨: isShootable = false");
                 }
             }
         }
