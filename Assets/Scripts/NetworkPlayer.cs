@@ -88,8 +88,16 @@ namespace HelloWorld
         [SerializeField, Tooltip("발사체 생성 시 플레이어로부터 떨어질 거리")]
         private float sideSpawnOffset = 1f;
 
+        [SerializeField, Tooltip("이모티콘 UI 이미지")]
+        private Image emoticonImage;
+
+        [SerializeField, Tooltip("이모티콘 스프라이트들")]
+        private Sprite[] emoteSprites;
+
 
         private bool isShootable = false;
+        private int shootCount = 0; // 남은 발사 횟수
+        private const int maxShootCount = 5; // 최대 발사 횟수
 
 
         private BoxCollider boxColider;
@@ -195,6 +203,8 @@ namespace HelloWorld
                 currentPower = playerStat.power;
                 UpdateHealthBar();
             }
+            if (emoticonImage != null)
+                emoticonImage.gameObject.SetActive(false);
         }
 
         private void Update()
@@ -233,6 +243,11 @@ namespace HelloWorld
             PlayerMoveAni();
             PlayerLookCamera();
             HandleShooting();
+
+            if (Input.GetKeyDown(KeyCode.F1))
+            {
+                photonView.RPC(nameof(RPC_HiEmoticon), RpcTarget.All);
+            }
 
             if (Input.GetKeyDown(KeyCode.F))
             {
@@ -1094,6 +1109,7 @@ namespace HelloWorld
         [PunRPC]
         public void RPC_EnableShooting(float duration)
         {
+            shootCount = maxShootCount;
             StartCoroutine(ShootingDurationCoroutine(duration));
         }
 
@@ -1147,11 +1163,50 @@ namespace HelloWorld
                     if (b != null)
                         b.Initialize(dirToClick);
                 }
+                shootCount--;
+
+                if (shootCount <= 0)
+                {
+                    isShootable = false;
+                    Debug.Log("발사 횟수 모두 소모됨: isShootable = false");
+                }
             }
         }
 
+        [PunRPC]
+        private void RPC_HiEmoticon()
+        {
+            StartCoroutine(ShowEmoticon(0, 2f));
+        }
+
+        private IEnumerator ShowEmoticon(int spriteIndex, float duration)
+        {
+            if (emoticonImage == null || spriteIndex < 0 || spriteIndex >= emoteSprites.Length)
+                yield break;
+
+            // Sprite 교체
+            emoticonImage.sprite = emoteSprites[spriteIndex];
+
+            // UI on/off
+            emoticonImage.gameObject.SetActive(true);
+            usernameText.gameObject.SetActive(false);
+
+            yield return new WaitForSeconds(duration);
+
+            emoticonImage.gameObject.SetActive(false);
+            usernameText.gameObject.SetActive(true);
+        }
+
+        [PunRPC]
+
+        public void RPC_AllTriggerClear()
+        {
+           
+            DisableControlAndCollisions();
+        }
     }
 
 
+   
 
 }

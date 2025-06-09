@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemId: Bullet
   displayName: "\uC6D0\uAC70\uB9AC \uACF5\uACA9\uBAA8\uB4C8"
-  description: "\uAC15\uB825\uD55C \uD53C\uD574\uB97C \uC785\uD788\uB294 \uC6D0\uAC70\uB9AC
-    \uACF5\uACA9 \uD0C4\uD658\uC744 \uC7A5\uCC29\uD569\uB2C8\uB2E4. \uC6B0\uD074\uB9AD\uC73C\uB85C
-    \uC0AC\uC6A9\uD569\uB2C8\uB2E4."
+  description: "\uC6B0\uD074\uB9AD\uC73C\uB85C \uAC15\uB825\uD55C \uD3ED\uBC1C \uC218\uB958\uD0C4\uC744
+    \uBC1C\uC0AC\uD569\uB2C8\uB2E4 5\uD68C \uC0AC\uC6A9 \uAC00\uB2A5\uD569\uB2C8\uB2E4."
   icon: {fileID: -1452396378, guid: 905d242ecf1253441b93f2b36f576da3, type: 3}
   consumable: 1
   usesPerItem: 1
