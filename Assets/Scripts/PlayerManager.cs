@@ -257,8 +257,12 @@ public class PlayerManager : MonoBehaviour
                     case ItemEffectType.DamageBuff:
                         effectDuration = 180f;
                         break;
-                    case ItemEffectType.SpeedBoost:
-                        effectDuration = matchedItem.buffDuration;
+                    case ItemEffectType.Bullet:
+                        effectDuration = 120f;
+                        targetPlayer.photonView.RPC(
+       nameof(NetworkPlayer.RPC_EnableShooting),
+       RpcTarget.AllBuffered,
+       effectDuration);
                         break;             
                 }
                 string prefabName = matchedItem.EffectPrefab.name;

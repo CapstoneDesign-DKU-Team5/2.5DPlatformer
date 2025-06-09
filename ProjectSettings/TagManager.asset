@@ -11,6 +11,7 @@ TagManager:
   - Door
   - GoldTextUI
   - GoldCoin
+  - Monster
   layers:
   - Default
   - TransparentFX
