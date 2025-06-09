@@ -256,8 +256,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.25
-  m_Height: 0.84375
+  m_Radius: 0.39
+  m_Height: 0.7
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &3438463308217343370
@@ -279,7 +279,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.5, y: 0.84375, z: 0.2}
+  m_Size: {x: 0.87, y: 0.78125, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &3861687082244982796
 Rigidbody:
@@ -329,9 +329,9 @@ MonoBehaviour:
   target: {fileID: 0}
   targetPos: {x: 0, y: 0, z: 0}
   monsterXOrZ: 0
-  stats: {fileID: 0}
-  healthBarFillImage: {fileID: 0}
-  goldPrefab: {fileID: 0}
+  stats: {fileID: 11400000, guid: a3574f0b12498ba42a429bb568b0586f, type: 2}
+  healthBarFillImage: {fileID: 4944387534955820322}
+  goldPrefab: {fileID: 7443098622453733361, guid: 1fb0023560384e14e91ed034aed63a7b, type: 3}
   state: 0
 --- !u!95 &4984061436899585273
 Animator:
@@ -364,17 +364,17 @@ NavMeshAgent:
   m_GameObject: {fileID: 6709419708312792593}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.25
+  m_Radius: 0.453125
   m_Speed: 1
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0.65
+  m_StoppingDistance: 0.71
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
-  m_Height: 0.84375
-  m_BaseOffset: 0.421875
+  m_Height: 0.78125
+  m_BaseOffset: 0.390625
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!114 &1196152151034698609
