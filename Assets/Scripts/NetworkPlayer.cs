@@ -1197,9 +1197,16 @@ namespace HelloWorld
             usernameText.gameObject.SetActive(true);
         }
 
+        [PunRPC]
 
+        public void RPC_AllTriggerClear()
+        {
+           
+            DisableControlAndCollisions();
+        }
     }
 
 
+   
 
 }
