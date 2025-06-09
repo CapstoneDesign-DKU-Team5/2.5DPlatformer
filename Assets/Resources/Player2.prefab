@@ -375,7 +375,12 @@ MonoBehaviour:
   sideSpawnOffset: 1
   emoticonImage: {fileID: 6943253359378543734}
   emoteSprites:
-  - {fileID: -1872999091, guid: 90cba11b72d888849bdee4f8948b13f9, type: 3}
+  - {fileID: 431697309, guid: adec1312d1ea5154ab5aeacc12cc1f04, type: 3}
+  - {fileID: -1153477149, guid: adec1312d1ea5154ab5aeacc12cc1f04, type: 3}
+  - {fileID: 797572924, guid: adec1312d1ea5154ab5aeacc12cc1f04, type: 3}
+  - {fileID: -1890294950, guid: adec1312d1ea5154ab5aeacc12cc1f04, type: 3}
+  - {fileID: -583050414, guid: adec1312d1ea5154ab5aeacc12cc1f04, type: 3}
+  - {fileID: 1346961158, guid: adec1312d1ea5154ab5aeacc12cc1f04, type: 3}
 --- !u!95 &2596930642235459831
 Animator:
   serializedVersion: 7

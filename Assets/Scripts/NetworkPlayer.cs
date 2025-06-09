@@ -248,6 +248,26 @@ namespace HelloWorld
             {
                 photonView.RPC(nameof(RPC_HiEmoticon), RpcTarget.All);
             }
+            if (Input.GetKeyDown(KeyCode.F2))
+            {
+                photonView.RPC(nameof(RPC_HelpEmoticon), RpcTarget.All);
+            }
+            if (Input.GetKeyDown(KeyCode.F3))
+            {
+                photonView.RPC(nameof(RPC_TurnLeftEmoticon), RpcTarget.All);
+            }
+            if (Input.GetKeyDown(KeyCode.F4))
+            {
+                photonView.RPC(nameof(RPC_TurnRightEmoticon), RpcTarget.All);
+            }
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                photonView.RPC(nameof(RPC_UseHealEmoticon), RpcTarget.All);
+            }
+            if (Input.GetKeyDown(KeyCode.F6))
+            {
+                photonView.RPC(nameof(RPC_UsePowerEmoticon), RpcTarget.All);
+            }
 
             if (Input.GetKeyDown(KeyCode.F))
             {
@@ -1177,6 +1197,36 @@ namespace HelloWorld
         private void RPC_HiEmoticon()
         {
             StartCoroutine(ShowEmoticon(0, 2f));
+        }
+
+        [PunRPC]
+        private void RPC_TurnLeftEmoticon()
+        {
+            StartCoroutine(ShowEmoticon(1, 2f));
+        }
+
+        [PunRPC]
+        private void RPC_TurnRightEmoticon()
+        {
+            StartCoroutine(ShowEmoticon(2, 2f));
+        }        
+
+        [PunRPC]
+        private void RPC_UsePowerEmoticon()
+        {
+            StartCoroutine(ShowEmoticon(3, 2f));
+        }
+
+        [PunRPC]
+        private void RPC_UseHealEmoticon()
+        {
+            StartCoroutine(ShowEmoticon(4, 2f));
+        }
+
+        [PunRPC]
+        private void RPC_HelpEmoticon()
+        {
+            StartCoroutine(ShowEmoticon(5, 2f));
         }
 
         private IEnumerator ShowEmoticon(int spriteIndex, float duration)

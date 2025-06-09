@@ -64,6 +64,11 @@ MonoBehaviour:
   - RPC_HiEmoticon
   - RPC_GameClear
   - RPC_AllTriggerClear
+  - RPC_HelpEmoticon
+  - RPC_TurnLeftEmoticon
+  - RPC_TurnRightEmoticon
+  - RPC_UseHealEmoticon
+  - RPC_UsePowerEmoticon
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
