@@ -185,7 +185,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
-            inviteCodeText.text = "방 초대 코드: 없음";
+            inviteCodeText.text = "";
         }
     }
 
