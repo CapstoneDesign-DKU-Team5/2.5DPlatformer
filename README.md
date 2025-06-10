@@ -37,8 +37,32 @@
 ---
 <img src="https://github.com/user-attachments/assets/66fa0793-e330-444e-a69d-12ffcedf5ffe">
 
-### 프로젝트 구조(폴더 한마디로 정리)
+### 📁 프로젝트 폴더 구조
 ---
+ProjectRoot/
+├── Assets/ # Unity 프로젝트 주요 리소스
+│ ├── Animation/ # 애니메이션 리소스
+│ ├── GoldCoin/ # 골드 코인 관련 리소스
+│ ├── Materials/ # 머티리얼 리소스
+│ ├── Photon/ # Photon 네트워킹 리소스
+│ ├── PlayFabEditorExtensions/ # PlayFab 에디터 확장 기능
+│ ├── PlayFabSDK/ # PlayFab SDK
+│ ├── Prefabs/ # 프리팹 모음
+│ ├── Resources/ # Resources 폴더 (런타임 로딩)
+│ ├── Rolling_Balls-Sci-fi_Pack/ # Sci-fi 게임팩 리소스
+│ ├── Scenes/ # Unity 씬 파일
+│ ├── Scripts/ # 게임 로직 스크립트
+│ ├── Settings/ # 게임 설정 관련 파일
+│ ├── Sprites/ # 스프라이트 이미지
+│ ├── TextMesh Pro/ # TextMesh Pro 관련 리소스
+│ ├── TutorialInfo/ # Unity 튜토리얼 정보
+│ └── UI Images/ # UI에 사용되는 이미지
+├── Packages/ # Unity 패키지 정의
+│ └── com.unity.multiplayer.tools/ # Unity Multiplayer Tools 패키지
+├── ProjectSettings/ # Unity 프로젝트 설정 (에디터 환경, 입력 설정 등)
+├── .gitignore # Git 무시할 파일 목록
+├── .vsconfig # Visual Studio 환경 설정
+└── README.md # 프로젝트 설명 문서
 
 ### 실행 방법
 ---
