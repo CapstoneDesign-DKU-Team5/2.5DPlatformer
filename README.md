@@ -39,6 +39,7 @@
 
 ### 📁 프로젝트 폴더 구조
 ---
+```
 ProjectRoot/
 ├── Assets/ # Unity 프로젝트 주요 리소스
 │ ├── Animation/ # 애니메이션 리소스
@@ -63,6 +64,7 @@ ProjectRoot/
 ├── .gitignore # Git 무시할 파일 목록
 ├── .vsconfig # Visual Studio 환경 설정
 └── README.md # 프로젝트 설명 문서
+```
 
 ### 실행 방법
 ---
