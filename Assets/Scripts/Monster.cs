@@ -117,8 +117,8 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             
-            PhotonNetwork.SendRate = 15;           
-            PhotonNetwork.SerializationRate = 10;  
+            PhotonNetwork.SendRate = 60;           
+            PhotonNetwork.SerializationRate = 30;  
         }
 
     }
