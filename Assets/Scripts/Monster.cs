@@ -117,8 +117,8 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             
-            PhotonNetwork.SendRate = 15;           
-            PhotonNetwork.SerializationRate = 10;  
+            PhotonNetwork.SendRate = 60;           
+            PhotonNetwork.SerializationRate = 30;  
         }
 
     }
@@ -371,7 +371,7 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
         if (HP <= 0)
         {
             target = null;
-            state = State.KILLED;
+            photonView.RPC(nameof(RPC_Kill), RpcTarget.AllBuffered); // 모든 클라에 죽음 동기화
             return;
         }
         else
@@ -384,6 +384,16 @@ public class Monster : MonoBehaviourPunCallbacks,IPunObservable
 
         damaged = true;
         Invoke("OffDamaged", 0.6f);
+    }
+
+    [PunRPC]
+    public void RPC_Kill()
+    {
+        if (state == State.KILLED) return;
+
+        state = State.KILLED;
+        StopAllCoroutines(); // 혹시 남아 있는 코루틴 방지
+        StartCoroutine(StateMachine());
     }
 
     protected void OffDamaged()

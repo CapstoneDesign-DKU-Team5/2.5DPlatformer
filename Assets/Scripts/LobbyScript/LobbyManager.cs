@@ -2,6 +2,8 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using PlayFab;
+using UnityEngine.SceneManagement;
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
@@ -10,9 +12,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     [Header("UI References (LobbyManager)")]
     public TextMeshProUGUI connectionInfoText;
 
+    [Header("Title UI")]
+    [Tooltip("로그인 완료 후 숨길 TitleCanvas")]
+    [SerializeField] private GameObject titleCanvas;
+
     // 매치메이킹을 요청한 상태인지 저장하는 플래그
     private bool wantsMatchmaking = false;
 
+
+   
     private void Start()
     {
         // Photon 초기 연결 시도
@@ -108,6 +116,23 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         {
             connectionInfoText.text = "네트워크 재연결 중...";
             PhotonNetwork.ConnectUsingSettings();
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // LobbyScene에 진입했을 때
+        if (scene.name == "LobbyScene" && titleCanvas != null)
+        {
+            // PlayFab 로그인 확인: 클라이언트가 이미 로그인 되어 있으면
+            if (PlayFabClientAPI.IsClientLoggedIn())
+            {
+                titleCanvas.SetActive(false);
+            }
+            else
+            {
+                titleCanvas.SetActive(true);
+            }
         }
     }
 }
