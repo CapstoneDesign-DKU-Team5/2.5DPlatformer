@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df5247883d35e2440b0f567db636250e, type: 3}
   m_Name: MonsterB
   m_EditorClassIdentifier: 
-  hp: 100
+  hp: 20
   power: 10
   goldDrop: 100

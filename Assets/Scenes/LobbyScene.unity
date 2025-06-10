@@ -9609,6 +9609,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectionInfoText: {fileID: 1554315607}
+  titleCanvas: {fileID: 322000565}
 --- !u!4 &1129481570
 Transform:
   m_ObjectHideFlags: 0
