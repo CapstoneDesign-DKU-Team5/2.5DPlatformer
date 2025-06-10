@@ -49,8 +49,8 @@ ProjectRoot/
 │ ├── PlayFabEditorExtensions/ # PlayFab 에디터 확장 기능
 │ ├── PlayFabSDK/ # PlayFab SDK
 │ ├── Prefabs/ # 프리팹 모음
-│ ├── Resources/ # Resources 폴더 (런타임 로딩)
-│ ├── Rolling_Balls-Sci-fi_Pack/ # Sci-fi 게임팩 리소스
+│ ├── Resources/ # Resources 폴더 (런타임 로딩?)
+│ ├── Rolling_Balls-Sci-fi_Pack/ # 무료 에셋
 │ ├── Scenes/ # Unity 씬 파일
 │ ├── Scripts/ # 게임 로직 스크립트
 │ ├── Settings/ # 게임 설정 관련 파일
