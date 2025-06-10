@@ -49,8 +49,8 @@
 * **아이템 줍기** : Z
 * **카메라 회전** : Q(시계방향), E(반시계방향)
 * **버튼 클릭** : 마우스 왼클릭
-* **아이템 사용** : 아이템 순서대로 숫자키 (1, 2, 3, ...)
-* **이모티콘** : F1, F2, F3, ...
+* **아이템 사용** : <img src="https://github.com/user-attachments/assets/b8a0e993-da85-4218-9600-45a570d24945">
+* **이모티콘** : <img src="https://github.com/user-attachments/assets/bd8fb9d6-9f66-41d4-9128-9c89f95c9877">
 * **로비에서 원하는 문으로 이동** : W or ↑
   
 ### 관련 링크
