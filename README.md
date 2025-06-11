@@ -24,6 +24,7 @@
 * **3D지만 2D 같은**
   
   플레이어는 카메라 회전을 통해 시점을 90°로 전환할 수 있습니다. 이를 통해 특정 시점에서는 보이지 않던 길이 다른 시점에서 보이게 됩니다. 특정 발판이나 구조물을 이용해 위로 올라갈 수 있는 길을 탐색해서 끝까지 올라가세요!
+
   <img style="height: 100%; width: 49%; float:left;" src="https://github.com/user-attachments/assets/cbea6185-f005-4b5f-8a25-4b980e5e6b06" />
   <img style="height: 100%; width: 49%; float:right;" src="https://github.com/user-attachments/assets/a3ada043-8517-4eda-a501-ea3d06486929" />
 
@@ -31,16 +32,19 @@
 * **친구와 함께**
 
   본 게임은 2인 협동 플레이를 제공합니다. 매치메이킹이나 방을 생성하여 스테이지를 시작할 수 있습니다. 자신에게 아이템을 사용하거나 상대에게 체력을 나누어주면서 함께 길을 탐색하고 끝까지 올라가세요! 2명이 함께 꼭대기에 올라야 스테이지가 클리어됩니다.
+  
   ![Image](https://github.com/user-attachments/assets/bad9be12-efda-4ff4-a030-c5d49eac6c3d)
 
 * **몬스터 주의!**
   
   플레이를 하다보면 플레이어를 공격하는 몬스터를 마주칠 수 있습니다. 몬스터와 접촉하면 데미지를 입으면서 뒤로 튕겨지기 때문에 플레이어는 몬스터를 피하거나 처치해서 이동합니다. 몬스터 처치 시 일정량의 재화를 획득할 수 있습니다.
+  
   <img src="https://github.com/user-attachments/assets/da293568-7553-4fde-87b2-1d268df6d979" />
 
 * **게임 클리어를 위한 업그레이드**
   
   플레이를 통해 재화가 모였다면 상점에서 플레이에 도움을 주는 아이템을 구매할 수 있습니다. 구매한 아이템은 다음 플레이부터 사용할 수 있습니다. 적절한 아이템 사용을 통해 끝까지 올라가세요!
+  
   ![Image](https://github.com/user-attachments/assets/5db6b6c8-bf89-4bb2-bf99-71f3d0b51681)
   
 ### 기술 스택
