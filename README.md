@@ -80,5 +80,13 @@ ProjectRoot/
   
 ### 관련 링크
 ---
-* **프로젝트 개발 과정** : (노션페이지 걸고 싶은데 2개를 나눠서 걸어야할지)
+* **프로젝트 개발 과정** :
+* * 프로젝트 제안서 : https://handy-mango-559.notion.site/1b0461ec02208014bb7dd3dd8736dd18
+  * 프로젝트 백로그 : https://handy-mango-559.notion.site/1b5461ec022080cd96b4e313991fcdae?v=1b5461ec022080e58931000c51fe27f8
+  * 기술 스택 및 아키텍처 다이어그램 : https://handy-mango-559.notion.site/1bf461ec02208096b990d3ca6724e0f9?pvs=74
+  * 스프린트 1 회고록 : https://handy-mango-559.notion.site/_01-1ce461ec02208044912fec236ffc600e?pvs=74
+  * 스프린트 2 회고록 : https://handy-mango-559.notion.site/_02-1db461ec022080f29660e8a0c8fdce25?pvs=74
+  * 스프린트 3 회고록 : https://handy-mango-559.notion.site/_03-1eb461ec022080fab624ce68d028a92b?pvs=74
+  * 스프린트 4 회고록 : https://aeolian-trout-620.notion.site/_04-200f922e1a7a807193aef50d43a23452?pvs=74
+  * 최종 프로젝트 보고서 :
 * **Demo Video** : https://youtu.be/rlQRbWROKNg
