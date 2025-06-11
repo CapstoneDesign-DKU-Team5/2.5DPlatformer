@@ -70,10 +70,10 @@ ProjectRoot/
 ---
 * **플레이어 이동** : AWSD or 방향키(←↑↓→)
 * **플레이어 점프** : Space bar
-* **플레이어 공격** : 마우스 왼클릭
+* **플레이어 공격** : 마우스 좌클릭
 * **아이템 줍기** : Z
 * **카메라 회전** : Q(시계방향), E(반시계방향)
-* **버튼 클릭** : 마우스 왼클릭
+* **버튼 클릭** : 마우스 좌클릭
 * **아이템 사용** : <img src="https://github.com/user-attachments/assets/bd8fb9d6-9f66-41d4-9128-9c89f95c9877">
 * **이모티콘** : <img src="https://github.com/user-attachments/assets/b8a0e993-da85-4218-9600-45a570d24945">
 * **로비에서 원하는 문으로 이동** : W or ↑
