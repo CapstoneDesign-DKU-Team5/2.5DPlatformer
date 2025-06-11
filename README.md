@@ -70,7 +70,7 @@ ProjectRoot/
 └── README.md # 프로젝트 설명 문서
 ```
 
-### 실행 방법
+### 플레이 방법
 ---
 * **플레이어 이동** : AWSD or 방향키(←↑↓→)
 * **플레이어 점프** : Space bar
@@ -86,7 +86,7 @@ ProjectRoot/
 ### 관련 링크
 ---
 * **프로젝트 개발 과정** :
-* * 프로젝트 제안서 : https://handy-mango-559.notion.site/1b0461ec02208014bb7dd3dd8736dd18
+  * 프로젝트 제안서 : https://handy-mango-559.notion.site/1b0461ec02208014bb7dd3dd8736dd18
   * 프로젝트 백로그 : https://handy-mango-559.notion.site/1b5461ec022080cd96b4e313991fcdae?v=1b5461ec022080e58931000c51fe27f8
   * 기술 스택 및 아키텍처 다이어그램 : https://handy-mango-559.notion.site/1bf461ec02208096b990d3ca6724e0f9?pvs=74
   * 스프린트 1 회고록 : https://handy-mango-559.notion.site/_01-1ce461ec02208044912fec236ffc600e?pvs=74
