@@ -103,5 +103,5 @@ ProjectRoot/
   * 스프린트 2 회고록 : https://handy-mango-559.notion.site/_02-1db461ec022080f29660e8a0c8fdce25?pvs=74
   * 스프린트 3 회고록 : https://handy-mango-559.notion.site/_03-1eb461ec022080fab624ce68d028a92b?pvs=74
   * 스프린트 4 회고록 : https://aeolian-trout-620.notion.site/_04-200f922e1a7a807193aef50d43a23452?pvs=74
-  * 최종 프로젝트 보고서 :
+  * 최종 프로젝트 보고서 : https://aeolian-trout-620.notion.site/20df922e1a7a80839620c187da3de203
 * **Demo Video** : https://youtu.be/rlQRbWROKNg
